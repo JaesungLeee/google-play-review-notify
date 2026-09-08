@@ -1,0 +1,43 @@
+# Example configuration. Copy to your repository root as play-review-notify.yml.
+# Secrets are injected via ${ENV_VAR} references; never commit real values.
+version: 1
+
+apps:
+  - packageName: com.example.app
+    name: 'Example App'
+    tracks: [production]
+    channels: [release-slack]
+
+sources:
+  email:
+    enabled: true
+    auth:
+      clientId: ${GMAIL_CLIENT_ID}
+      clientSecret: ${GMAIL_CLIENT_SECRET}
+      refreshToken: ${GMAIL_REFRESH_TOKEN}
+    lookbackHours: 24
+  playApi:
+    enabled: false
+  storeListing:
+    enabled: false
+
+events:
+  REJECTED: { enabled: true, mentions: ['<!channel>'] }
+  LIVE: { enabled: true, mergeInto: APPROVED }
+
+channels:
+  release-slack:
+    type: slack
+    webhookUrl: ${SLACK_WEBHOOK_URL}
+  # ops-discord:
+  #   type: discord
+  #   webhookUrl: ${DISCORD_WEBHOOK_URL}
+  # n8n:
+  #   type: webhook
+  #   url: ${N8N_WEBHOOK_URL}
+  #   secret: ${N8N_WEBHOOK_SECRET}
+defaultChannels: [release-slack]
+
+stateStore:
+  type: file
+  path: .play-review-notify/state.json

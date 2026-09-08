@@ -285,7 +285,7 @@ includeReason: true
 
 ### 5.7 CLI
 
-패키지명: `@jaesunglee/google-play-review-notify`, 실행 명령: `npx @jaesunglee/google-play-review-notify <command>`
+패키지명: `play-review-notify`, 실행 명령: `npx play-review-notify <command>`. 전역 설치 시 bin `play-review-notify` 및 약어 `gprn` 제공.
 
 | 명령 | 설명 | 우선순위 |
 | --- | --- | --- |
@@ -347,7 +347,7 @@ jobs:
 | 방식 | 구조 | 지원 수준 | 비고 |
 | --- | --- | --- | --- |
 | A. 이벤트 푸시 (기본) | 이 도구 → `webhook` 채널 → n8n Webhook Trigger | P1, 공식 지원 | n8n Cloud/셀프호스팅 모두 가능 |
-| B. n8n이 CLI 실행 | n8n Schedule Trigger → Execute Command(`npx @jaesunglee/google-play-review-notify run --json`) → n8n 노드로 라우팅 | P2, 문서·예시 제공 | Execute Command는 셀프호스팅 전용 |
+| B. n8n이 CLI 실행 | n8n Schedule Trigger → Execute Command(`npx play-review-notify run --json`) → n8n 노드로 라우팅 | P2, 문서·예시 제공 | Execute Command는 셀프호스팅 전용 |
 | C. n8n 커뮤니티 노드 | 코어 라이브러리를 감싼 `n8n-nodes-google-play-review-notify` | Phase 4 검토 | 룰셋 이중 관리를 피하기 위해 코어 재사용 필수 |
 
 n8n 네이티브 노드만으로 전체 파이프라인을 재구현하는 방식은 이메일 룰셋과 중복 제거 로직이 이중화되므로 채택하지 않는다.
@@ -547,7 +547,7 @@ Source: email · 2026-09-07 09:00 UTC
 
 ## 9. 배포 및 릴리즈
 
-- npm: `@jaesunglee/google-play-review-notify`. `npx @jaesunglee/google-play-review-notify run`.
+- npm: `play-review-notify`. `npx play-review-notify run`.
 - GitHub Marketplace: `JaesungLeee/google-play-review-notify`. `v1` 메이저 태그를 최신 v1.x로 이동 유지.
 - 릴리즈 자동화: Conventional Commits → changesets 또는 release-please로 CHANGELOG·태그·npm publish·`dist/` 번들 갱신.
 - 이메일 룰셋 변경은 patch 버전으로 빠르게 배포한다.
@@ -586,7 +586,7 @@ Source: email · 2026-09-07 09:00 UTC
 
 1. Play Console이 "심사 중 진입" 이메일을 보내지 않는 경우가 대부분이므로, `SUBMITTED` 이벤트는 API 어댑터 또는 `emit`에 의존한다. Phase 0에서 API 관측으로 충분한지 확인 필요.
 2. 이메일에 패키지명이 포함되지 않는 케이스 비율 확인 후 앱명 매칭 전략 확정.
-3. ~~npm 패키지명·GitHub 조직명 확정.~~ → 확정: npm `@jaesunglee/google-play-review-notify`, GitHub `JaesungLeee/google-play-review-notify` (2026-09-07)
+3. ~~npm 패키지명·GitHub 조직명 확정.~~ → 확정: npm `play-review-notify`(스코프 없는 짧은 이름, `@jaesunglee/google-play-review-notify`에서 변경, 2026-09-08), GitHub `JaesungLeee/google-play-review-notify` (2026-09-07)
 4. 관리형 게시(managed publishing)를 사용하는 앱에서 "승인됨(게시 대기)"과 "라이브"를 구분하는 UX 결정.
 5. Google Workspace 도메인 전체 위임 방식 지원 여부 — 현재 비목표, 요청이 있으면 P2로 검토.
 6. n8n 커뮤니티 노드를 만들 경우 트리거 노드(폴링) 형태로 할지, 액션 노드(1회 실행) 형태로 할지 결정 필요. 코어 라이브러리의 `runOnce(config)`를 그대로 호출하는 액션 노드가 구현이 단순하다.

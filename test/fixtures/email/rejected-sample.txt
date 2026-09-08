@@ -1,0 +1,11 @@
+From: Google Play Console <googleplay-noreply@google.com>
+Subject: Action required: Your app Example App (com.example.app) has been rejected
+
+Hi Developers at Example,
+
+Your app Example App (com.example.app) with version code 1204 wasn't published due to a policy violation.
+
+Issue: Violation of Deceptive Behavior policy
+Your app contains content that misleads users.
+
+Next steps: fix the issue and resubmit.

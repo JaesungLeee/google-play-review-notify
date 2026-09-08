@@ -1,0 +1,54 @@
+{
+  "$comment": "DRAFT rule set (English). Patterns are unvalidated until Phase 0 collects real Play Console emails as fixtures. See docs/PRD_ko.md §8.1.",
+  "locale": "en",
+  "rules": [
+    {
+      "type": "SUSPENDED",
+      "subject": [
+        "has been suspended",
+        "account has been terminated",
+        "developer account has been suspended"
+      ]
+    },
+    {
+      "type": "REMOVED",
+      "subject": ["has been removed from Google Play", "Removal of your app"]
+    },
+    {
+      "type": "REJECTED",
+      "subject": [
+        "has been rejected",
+        "Update rejected",
+        "wasn't published",
+        "was not published",
+        "Action required"
+      ]
+    },
+    {
+      "type": "POLICY_WARNING",
+      "subject": ["Policy", "policy violation", "policy issue", "Warning"]
+    },
+    {
+      "type": "APPROVED",
+      "subject": [
+        "has been approved",
+        "is now available on Google Play",
+        "is now live",
+        "has been published",
+        "update is live"
+      ]
+    }
+  ],
+  "extract": {
+    "packageName": [
+      "regex:\\b([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)+)\\b(?=[\\s\\)\\]]|$)"
+    ],
+    "appName": [
+      "regex:[Yy]our app,? (?:\"|“)?(.+?)(?:\"|”)?,? (?:\\(|has |is |was |wasn't )",
+      "regex:app (?:\"|“)(.+?)(?:\"|”)"
+    ],
+    "versionName": ["regex:[Vv]ersion(?: name)?:? ([0-9]+(?:\\.[0-9]+)+)"],
+    "versionCode": ["regex:[Vv]ersion code:? ([0-9]+)", "regex:\\(([0-9]{2,})\\)"],
+    "reason": ["section:Issue|Reason|Policy|Why"]
+  }
+}

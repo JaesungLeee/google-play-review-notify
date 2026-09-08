@@ -285,7 +285,7 @@ includeReason: true
 
 ### 5.7 CLI
 
-Package name: `@jaesunglee/google-play-review-notify`, invoked as `npx @jaesunglee/google-play-review-notify <command>`
+Package name: `play-review-notify`, invoked as `npx play-review-notify <command>`. A global install exposes the `play-review-notify` bin and the `gprn` short alias.
 
 | Command | Description | Priority |
 | --- | --- | --- |
@@ -347,7 +347,7 @@ This tool focuses on detection. Post-processing after notification (ticket creat
 | Mode | Structure | Support level | Notes |
 | --- | --- | --- | --- |
 | A. Event push (primary) | This tool → `webhook` channel → n8n Webhook Trigger | P1, officially supported | Works on n8n Cloud and self-hosted |
-| B. n8n runs the CLI | n8n Schedule Trigger → Execute Command (`npx @jaesunglee/google-play-review-notify run --json`) → n8n routing nodes | P2, docs and example provided | Execute Command is self-hosted only |
+| B. n8n runs the CLI | n8n Schedule Trigger → Execute Command (`npx play-review-notify run --json`) → n8n routing nodes | P2, docs and example provided | Execute Command is self-hosted only |
 | C. n8n community node | `n8n-nodes-google-play-review-notify` wrapping the core library | Phase 4 candidate | Must reuse the core to avoid duplicating rule sets |
 
 Re-implementing the whole pipeline with native n8n nodes is rejected because the email rule set and dedupe logic would be duplicated.
@@ -547,7 +547,7 @@ Colors per event: SUBMITTED gray, APPROVED/LIVE green, REJECTED red, POLICY_WARN
 
 ## 9. Distribution and Releases
 
-- npm: `@jaesunglee/google-play-review-notify`. `npx @jaesunglee/google-play-review-notify run`.
+- npm: `play-review-notify`. `npx play-review-notify run`.
 - GitHub Marketplace: `JaesungLeee/google-play-review-notify`. The `v1` major tag is moved to the latest v1.x.
 - Release automation: Conventional Commits → changesets or release-please for CHANGELOG, tags, npm publish, and `dist/` bundle refresh.
 - Email rule set changes ship quickly as patch versions.
@@ -586,7 +586,7 @@ Colors per event: SUBMITTED gray, APPROVED/LIVE green, REJECTED red, POLICY_WARN
 
 1. Play Console usually sends no "entered review" email, so `SUBMITTED` depends on the API adapter or `emit`. Phase 0 must confirm API observation is sufficient.
 2. Measure how often emails lack a package name before finalizing the app-name matching strategy.
-3. ~~Finalize the npm package name and GitHub organization.~~ → Resolved: npm `@jaesunglee/google-play-review-notify`, GitHub `JaesungLeee/google-play-review-notify` (2026-09-07)
+3. ~~Finalize the npm package name and GitHub organization.~~ → Resolved: npm `play-review-notify` (unscoped short name, renamed from `@jaesunglee/google-play-review-notify` on 2026-09-08), GitHub `JaesungLeee/google-play-review-notify` (2026-09-07)
 4. Decide the UX for distinguishing "approved (pending publish)" from "live" for apps using managed publishing.
 5. Google Workspace domain-wide delegation: currently a non-goal; revisit as P2 on request.
 6. If an n8n community node is built, decide between a trigger node (polling) and an action node (single run). An action node that calls the core library's `runOnce(config)` directly is the simpler implementation.

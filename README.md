@@ -1,7 +1,64 @@
 # google-play-review-notify
-Google Play 앱 심사 결과(승인/거절 등)를 감지해 Slack·Discord로 알리는 범용 워크플로우.
+
+Google Play 앱 심사 결과(승인/거절/정책 알림 등)를 감지해 Slack·Discord 또는 임의의 Webhook(n8n 등)으로 알리는 범용 워크플로우.
+GitHub Action과 CLI 두 형태로 제공됩니다.
+
+> 상태: 스캐폴딩 단계. 이메일 어댑터의 분류 룰셋은 Phase 0 검증 전 초안이며, Play API·스토어 리스팅 어댑터는 스텁입니다. 로드맵은 [PRD](docs/PRD_ko.md#10-로드맵)를 참고하세요.
 
 ## Docs
 
 - [PRD (한국어, 기본)](docs/PRD_ko.md)
 - [PRD (English)](docs/PRD_en.md)
+
+## Quick start (CLI)
+
+```bash
+cp examples/play-review-notify.yml play-review-notify.yml   # 설정 편집
+export SLACK_WEBHOOK_URL=... GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... GMAIL_REFRESH_TOKEN=...
+
+npx play-review-notify test-notify        # 채널 연결 확인
+npx play-review-notify run --dry-run      # 감지 결과만 출력
+npx play-review-notify run                # 실제 전송 (첫 실행은 베이스라인만 기록)
+```
+
+전역 설치 시 `play-review-notify` 또는 약어 `gprn`으로 실행할 수 있습니다.
+
+```bash
+npm i -g play-review-notify
+gprn run --dry-run
+```
+
+## Quick start (GitHub Action)
+
+```yaml
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    permissions: { contents: read, actions: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JaesungLeee/google-play-review-notify@v1
+        with:
+          config-path: play-review-notify.yml
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+```
+
+## Development
+
+```bash
+npm ci
+npm run typecheck && npm run lint && npm test
+npm run build        # dist/ (CLI, library) + dist/action/index.js (Action bundle, 커밋 대상)
+npm run cli -- --help
+```
+
+## License
+
+Apache-2.0

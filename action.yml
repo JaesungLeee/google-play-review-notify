@@ -1,0 +1,61 @@
+name: 'Google Play Review Notify'
+description: 'Detect Google Play app review outcomes (approved, rejected, policy notices) and notify Slack, Discord, or any webhook.'
+author: 'JaesungLeee'
+branding:
+  icon: 'bell'
+  color: 'green'
+
+inputs:
+  config-path:
+    description: 'Path to play-review-notify.yml. Optional when the inputs below are provided.'
+    required: false
+    default: 'play-review-notify.yml'
+  packages:
+    description: 'Comma-separated package names (used when no config file is present).'
+    required: false
+  gmail-client-id:
+    description: 'OAuth2 client id for the Gmail source.'
+    required: false
+  gmail-client-secret:
+    description: 'OAuth2 client secret for the Gmail source.'
+    required: false
+  gmail-refresh-token:
+    description: 'OAuth2 refresh token (scope: gmail.readonly).'
+    required: false
+  play-service-account-json:
+    description: 'Service account JSON with read-only Play Console access (enables the Play API source).'
+    required: false
+  slack-webhook-url:
+    description: 'Slack Incoming Webhook URL.'
+    required: false
+  discord-webhook-url:
+    description: 'Discord Webhook URL.'
+    required: false
+  webhook-url:
+    description: 'Generic HTTP webhook URL (e.g. n8n Webhook Trigger).'
+    required: false
+  webhook-secret:
+    description: 'HMAC-SHA256 secret used to sign generic webhook payloads.'
+    required: false
+  state-store:
+    description: 'github-cache | file | none. Defaults to github-cache unless the config file sets stateStore.'
+    required: false
+  dry-run:
+    description: 'Render messages without sending or saving state.'
+    required: false
+    default: 'false'
+  emit-event:
+    description: 'JSON object {type, packageName, track?, versionCode?, versionName?} to emit directly (e.g. SUBMITTED after upload).'
+    required: false
+
+outputs:
+  events:
+    description: 'JSON array of new ReviewEvent objects detected in this run.'
+  events-count:
+    description: 'Number of new events.'
+  has-rejection:
+    description: '"true" when at least one REJECTED event was detected.'
+
+runs:
+  using: 'node20'
+  main: 'dist/action/index.js'

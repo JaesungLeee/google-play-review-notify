@@ -1,0 +1,69 @@
+{
+  "name": "play-review-notify",
+  "version": "0.1.0",
+  "description": "Detect Google Play app review outcomes (approved, rejected, and more) and notify Slack, Discord, or any webhook.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaesungLeee/google-play-review-notify.git"
+  },
+  "homepage": "https://github.com/JaesungLeee/google-play-review-notify#readme",
+  "bugs": "https://github.com/JaesungLeee/google-play-review-notify/issues",
+  "keywords": [
+    "google-play",
+    "play-console",
+    "app-review",
+    "slack",
+    "discord",
+    "webhook",
+    "github-actions",
+    "n8n"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "play-review-notify": "dist/cli.js",
+    "gprn": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "rules",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cli": "tsx src/cli/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@actions/cache": "^4.0.3",
+    "@actions/core": "^1.11.1",
+    "@googleapis/gmail": "^18.0.0",
+    "commander": "^13.1.0",
+    "yaml": "^2.7.1",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.26.0",
+    "@types/node": "^20.17.32",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.2",
+    "prettier": "^3.5.3",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.1",
+    "vitest": "^3.1.3"
+  }
+}
