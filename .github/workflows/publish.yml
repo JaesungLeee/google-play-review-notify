@@ -1,0 +1,59 @@
+# Publishes to npm with provenance and moves the floating major tag when a GitHub Release is
+# published (normally by merging the Release Please PR).
+#
+# npm authentication uses OIDC trusted publishing: no NPM_TOKEN secret. One-time setup on
+# npmjs.com → package → Settings → Trusted Publisher → GitHub Actions:
+#   owner JaesungLeee, repository google-play-review-notify, workflow publish.yml.
+# See CONTRIBUTING.md, "Releasing".
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (e.g. v0.2.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write # move the v<major> tag
+  id-token: write # npm provenance / trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - name: Upgrade npm (trusted publishing needs npm >= 11.5)
+        run: npm install -g npm@latest && npm --version
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Verify tag, package.json and built CLI agree
+        run: |
+          tag="${{ inputs.tag || github.event.release.tag_name }}"
+          pkg="v$(node -p "require('./package.json').version")"
+          cli="v$(node dist/cli.js --version)"
+          echo "tag=$tag package=$pkg cli=$cli"
+          test "$tag" = "$pkg" || { echo "::error::tag $tag != package.json $pkg"; exit 1; }
+          test "$tag" = "$cli" || { echo "::error::tag $tag != dist/cli.js $cli"; exit 1; }
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+      - name: Move the floating major tag (v1 -> this release)
+        run: |
+          tag="${{ inputs.tag || github.event.release.tag_name }}"
+          major="${tag%%.*}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f -a "$major" -m "$major major tag (tracks latest ${major}.x): $tag" "$tag"
+          git push -f origin "$major"
