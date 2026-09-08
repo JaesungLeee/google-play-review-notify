@@ -19,7 +19,11 @@ sources:
   playApi:
     enabled: false
   storeListing:
-    enabled: false
+    # Detects LIVE (production only) by watching the public store page's "Updated on" date.
+    # Google sends no approval email, so this is how you learn that a release actually shipped.
+    enabled: true
+    locale: en
+    country: US
 
 events:
   REJECTED: { enabled: true, mentions: ['<!channel>'] }

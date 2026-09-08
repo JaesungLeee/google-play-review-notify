@@ -5,3 +5,4 @@ package-lock.json
 docs/
 README.md
 CHANGELOG.md
+test/fixtures/
