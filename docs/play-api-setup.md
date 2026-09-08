@@ -1,84 +1,99 @@
-# Play Developer API 연동 설정 (서비스 계정)
+# Play Developer API setup (service account)
 
-Play API 소스는 트랙에 새 versionCode가 나타나는 순간을 `SUBMITTED` 이벤트로 알립니다.
-인증에는 Google Cloud **서비스 계정** JSON 키가 필요하고, Play Console에서는 **읽기 전용** 권한만 주면 됩니다.
+한국어: [play-api-setup.ko.md](./play-api-setup.ko.md)
 
-> Play API가 알려주지 **못하는** 것: 심사 중·승인·거절 상태. 심사 중인 릴리즈도 `status: completed`로 보고됩니다(Phase 0에서 실제 확인).
-> 거절은 이메일 소스, 라이브는 스토어 리스팅 소스가 담당합니다. 자세한 내용은 [phase0-notes.md](./phase0-notes.md).
+The Play API source emits a `SUBMITTED` event the moment a new versionCode appears on a track.
+Authentication uses a Google Cloud **service account** JSON key; in Play Console the account only
+needs **read-only** access.
 
-| 환경 변수                   | 값                                 |
-| --------------------------- | ---------------------------------- |
-| `PLAY_SERVICE_ACCOUNT_JSON` | 서비스 계정 키 JSON **내용** 전체 |
+> What the Play API can **not** tell you: whether a release is in review, approved, or rejected.
+> A release under review is already reported as `status: completed` (verified in Phase 0).
+> Rejections come from the email source and going live from the store listing source. Details in
+> [phase0-notes.md](./phase0-notes.md) (Korean).
 
-로컬 CLI에서는 JSON 내용 대신 키 파일 경로를 설정에 직접 적어도 됩니다(`serviceAccountJson: /path/to/key.json`).
+| Variable                    | Value                                  |
+| --------------------------- | -------------------------------------- |
+| `PLAY_SERVICE_ACCOUNT_JSON` | the **content** of the service account key JSON |
 
-## 1. Google Cloud 프로젝트와 API
+For a local CLI you may instead put the key file path directly in the config
+(`serviceAccountJson: /path/to/key.json`).
 
-1. https://console.cloud.google.com 에서 프로젝트를 선택하거나 새로 만듭니다. Gmail용 프로젝트와 같이 써도 됩니다.
-2. 아래 주소에서 **Google Play Android Developer API**를 **사용** 설정합니다.
+## 1. Google Cloud project and the API
+
+1. Open https://console.cloud.google.com and select or create a project. The Gmail project can be
+   reused.
+2. Enable the **Google Play Android Developer API**:
 
    ```
    https://console.cloud.google.com/apis/library/androidpublisher.googleapis.com
    ```
 
-Play Console에 Cloud 프로젝트를 "연결"하는 단계는 더 이상 필요 없습니다. 최신 Play Console에는 그 메뉴가 없습니다.
+Linking the Cloud project inside Play Console is no longer required; recent Play Console versions
+do not have that page anymore.
 
-## 2. 서비스 계정과 키
+## 2. Service account and key
 
-1. https://console.cloud.google.com/iam-admin/serviceaccounts → **+ 서비스 계정 만들기**.
-2. 이름(예: `play-review-notify`) 입력 → **만들고 계속하기** → 역할 부여는 건너뛰고 **완료**. Cloud IAM 역할은 필요 없습니다.
-3. 만들어진 계정의 **이메일**(`이름@프로젝트ID.iam.gserviceaccount.com`)을 복사해 둡니다.
-4. 계정 클릭 → **키** 탭 → **키 추가 → 새 키 만들기 → JSON**. 내려받은 파일을 저장소 밖에 보관합니다.
+1. https://console.cloud.google.com/iam-admin/serviceaccounts → **+ Create service account**.
+2. Enter a name (for example `play-review-notify`) → **Create and continue** → skip the role step
+   → **Done**. No Cloud IAM role is needed.
+3. Copy the account's **email** (`name@project-id.iam.gserviceaccount.com`).
+4. Open the account → **Keys** tab → **Add key → Create new key → JSON**. Keep the downloaded
+   file outside your repository.
 
-## 3. Play Console에서 앱 권한 부여
+## 3. Grant app access in Play Console
 
-1. https://play.google.com/console → **사용자 및 권한 → 새 사용자 초대**.
-2. 이메일에 2단계의 서비스 계정 이메일을 입력합니다.
-3. **앱 권한** 탭 → **앱 추가** → 감시할 앱 선택 → **"앱 정보 보기(읽기 전용)"** 만 체크.
-4. **사용자 초대**. 서비스 계정은 초대 수락이 필요 없고 바로 활성화되지만, API에 반영되기까지 몇 분에서 수십 분 걸릴 수 있습니다.
+1. https://play.google.com/console → **Users and permissions → Invite new users**.
+2. Enter the service account email from step 2.
+3. **App permissions** tab → **Add app** → select the apps to watch → check only
+   **"View app information (read-only)"**.
+4. **Invite user**. Service accounts do not need to accept the invitation and become active
+   immediately, but the API may take several minutes (occasionally longer) to reflect it.
 
-## 4. 설정
+## 4. Configuration
 
 ```yaml
 sources:
   playApi:
     enabled: true
     serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}
-    # emitLiveWithoutConfirmation: true   # 스토어 페이지가 없는 앱(내부 테스트 전용 등)에서만 고려
+    # emitLiveWithoutConfirmation: true   # only for apps without a public listing (internal-only)
 ```
 
-GitHub Actions에서는 키 파일 내용을 통째로 `PLAY_SERVICE_ACCOUNT_JSON` 시크릿에 넣고, Action 입력 `play-service-account-json`으로 넘깁니다.
+In GitHub Actions, store the whole key file content in the `PLAY_SERVICE_ACCOUNT_JSON` secret and
+pass it through the `play-service-account-json` input or the `env` block.
 
-동작 확인:
+Verify:
 
 ```bash
 npx play-review-notify run --dry-run --verbose
-# [DEBUG] Play API com.example.app: production=[3] ...
+# [DEBUG] Source play-api produced 0 event(s)
 ```
 
-응답 원본을 그대로 보고 싶으면 스파이크 스크립트를 쓰세요.
+To see the raw API response, use the spike script from a checkout of this repository:
 
 ```bash
 PLAY_SERVICE_ACCOUNT_FILE=~/secrets/play-sa.json npm run spike:play -- com.example.app snapshot
 ```
 
-## 감지 규칙
+## Detection rules
 
-| 이전 상태            | 현재 관측                       | 동작                                                 |
-| -------------------- | ------------------------------- | ---------------------------------------------------- |
-| 패키지 첫 관측       | 무엇이든                        | 기록만                                               |
-| versionCode V 없음   | 트랙에 V 등장                   | `SUBMITTED` (confidence medium), 릴리즈 이름을 버전명으로 |
-| V 있음               | V 사라짐, 더 높은 버전 없음     | 로그만 (거절 후보). 거절 메일이 오면 그쪽에서 알림   |
-| V 있음               | V 사라짐, 더 높은 W 등장        | `SUBMITTED`(W)                                       |
-| 어떤 상태든          | `completed`/`inProgress`        | `emitLiveWithoutConfirmation: true`일 때만 `LIVE` (low) |
+| Previous state              | Current observation                   | Action                                                                     |
+| --------------------------- | ------------------------------------- | -------------------------------------------------------------------------- |
+| Package seen for the first time | anything                          | record only                                                                |
+| versionCode V absent        | V appears on the track                | `SUBMITTED` (confidence medium), release name used as `versionName`        |
+| V present                   | V disappears, no higher version       | log only (rejection candidate); the rejection email produces the event     |
+| V present                   | V disappears, higher W appears        | `SUBMITTED`(W)                                                             |
+| any                         | `completed` / `inProgress`            | `LIVE` (low) only when `emitLiveWithoutConfirmation: true`                 |
 
-이벤트 id는 `api:<패키지>:<트랙>:<versionCode>:SUBMITTED`로, CI에서 업로드 직후 `emit --type SUBMITTED`로 보낸 이벤트와 같은 키를 씁니다. 둘을 함께 써도 알림은 한 번만 갑니다.
+Event ids are `api:<package>:<track>:<versionCode>:SUBMITTED`, the same key used by
+`emit --type SUBMITTED`, so a CI pipeline that emits right after upload and this source never
+notify twice.
 
-## 문제 해결
+## Troubleshooting
 
-| 증상                                                   | 원인과 조치                                                                              |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| `403 ... insufficient permissions` / `not have permission` | 3단계 권한 반영 대기 중이거나 앱 권한에 해당 앱이 없습니다. 10분 뒤 재시도.                |
-| `403 ... accessNotConfigured` / `API has not been used`  | 1단계 API가 꺼져 있습니다. 메시지의 링크에서 사용 설정.                                   |
-| `404 Package not found`                                | 서비스 계정을 초대한 개발자 계정에 그 앱이 없습니다. 앱이 있는 계정에서 초대했는지 확인. |
-| `invalid_grant` / `Invalid JWT`                        | 키 JSON이 깨졌거나 시스템 시계가 틀렸습니다. 키를 다시 내려받거나 시간을 동기화.          |
+| Symptom                                                    | Cause and fix                                                                                              |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `403 ... insufficient permissions` / `not have permission` | Step 3 has not propagated yet, or the app is missing from the app permissions. Retry after 10 minutes.     |
+| `403 ... accessNotConfigured` / `API has not been used`    | Step 1 API is disabled. Enable it from the link in the error message.                                      |
+| `404 Package not found`                                    | The developer account you invited the service account to does not own that app.                            |
+| `invalid_grant` / `Invalid JWT`                            | The key JSON is corrupted or the system clock is off. Re-download the key or sync the clock.               |

@@ -1,0 +1,79 @@
+name: Unrecognized Play email
+description: A Google Play email was not classified, or was classified as the wrong event
+title: '[email] '
+labels: ['email-rules']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Each report turns into a fixture and a rule so nobody misses that notice again.
+        **Mask before pasting**: replace the developer name, app names, package names, your server URLs and the recipient address with placeholders such as `Sample Team`, `Sample App`, `com.example.sampleapp`, `developer@example.com`. Keep the subject wording and the sentence structure unchanged.
+  - type: input
+    id: subject
+    attributes:
+      label: Masked subject line
+      placeholder: 'Action Required: Your app is not compliant with Google Play Policies (Sample App)'
+    validations:
+      required: true
+  - type: input
+    id: sender
+    attributes:
+      label: Sender address
+      placeholder: no-reply-googleplay-developer@google.com
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Play Console language of the email
+      options:
+        [English, Korean, Japanese, German, French, Spanish, Portuguese, Other (say which below)]
+    validations:
+      required: true
+  - type: dropdown
+    id: meaning
+    attributes:
+      label: What did the email actually mean?
+      options:
+        - Update rejected (previous version still live)
+        - First release rejected
+        - Warning about a live app with a deadline
+        - App removed from Google Play
+        - Account or app suspended
+        - Approval / published notice
+        - Not review-related (newsletter, terms, tax, ...)
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: current
+    attributes:
+      label: How did this tool classify it?
+      options:
+        [
+          UNKNOWN_NOTICE (not classified),
+          REJECTED,
+          POLICY_WARNING,
+          REMOVED,
+          SUSPENDED,
+          APPROVED,
+          Not sure,
+        ]
+  - type: textarea
+    id: body
+    attributes:
+      label: Masked plain-text body
+      description: Gmail → ⋮ → Show original → Download original gives an .eml; paste the text/plain part here.
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date received
+      placeholder: 2026-09-08
+  - type: input
+    id: version
+    attributes:
+      label: play-review-notify version
+      placeholder: 0.1.2
