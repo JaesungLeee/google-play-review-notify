@@ -1,6 +1,6 @@
 # n8n examples
 
-Planned importable workflows (see docs/PRD_ko.md §5.9.2, Phase 2):
+Planned importable workflows (see docs/design.md, "Notifiers"):
 
 - `webhook-to-slack-discord.json` — Webhook Trigger → HMAC verification → Switch(event type) → Slack/Discord
 - `rejected-to-jira.json` — create a Jira issue for `REJECTED` events

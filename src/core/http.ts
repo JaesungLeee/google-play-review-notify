@@ -1,4 +1,4 @@
-/** fetch with retry: exponential backoff, honors Retry-After on 429. See FR-NOTIFY-4. */
+/** fetch with retry: exponential backoff, honors Retry-After on 429. */
 export interface RetryOptions {
   retries?: number;
   baseDelayMs?: number;

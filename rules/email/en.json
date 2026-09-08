@@ -1,5 +1,5 @@
 {
-  "$comment": "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (Phase 0, see docs/PRD_en.md §8.1): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
+  "$comment": "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (see docs/design.md, 'Email rule sets'): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
   "locale": "en",
   "rules": [
     {

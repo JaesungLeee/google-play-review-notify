@@ -1,5 +1,5 @@
 /**
- * One-time Gmail OAuth2 authorization used by `play-review-notify auth gmail` (FR-CLI: auth).
+ * One-time Gmail OAuth2 authorization used by `play-review-notify auth gmail`.
  *
  * Runs the "loopback" flow recommended for installed apps: a temporary HTTP server on
  * 127.0.0.1 receives the authorization code, which is exchanged for a refresh token with

@@ -19,6 +19,6 @@ export class ManualSourceAdapter implements SourceAdapter {
 export function manualEventId(
   e: Pick<ReviewEvent, 'type' | 'packageName' | 'track' | 'versionCode'>,
 ): string {
-  // Same key shape as the Play API adapter so the two never duplicate (FR-SRC-MANUAL-1).
+  // Same key shape as the Play API adapter so the two never duplicate.
   return `api:${e.packageName ?? 'unknown'}:${e.track ?? 'production'}:${e.versionCode ?? 'unknown'}:${e.type}`;
 }

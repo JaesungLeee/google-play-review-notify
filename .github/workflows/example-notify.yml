@@ -1,5 +1,5 @@
 # Example consumer workflow (reference only; copy into your app repository).
-# See docs/PRD_ko.md §5.8. Disabled here via workflow_dispatch-only trigger.
+# See README.md, "Quick start: GitHub Action". Disabled here via workflow_dispatch-only trigger.
 name: Play review notify (example)
 
 on:

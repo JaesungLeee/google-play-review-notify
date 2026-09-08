@@ -1,6 +1,6 @@
 /**
- * Generic HTTP webhook (n8n, Make, custom servers). See docs/PRD_ko.md §5.9.1 for the payload
- * contract and headers. FR-NOTIFY-7..9, FR-INTEG-1..3.
+ * Generic HTTP webhook (n8n, Make, custom servers). See docs/design.md, "Notifiers", for the
+ * payload contract and headers.
  */
 import { createHmac } from 'node:crypto';
 import { fetchWithRetry, type RetryOptions } from '../core/http';

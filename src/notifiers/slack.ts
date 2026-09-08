@@ -1,7 +1,7 @@
 import { fetchWithRetry, type RetryOptions } from '../core/http';
 import type { ChannelTarget, Notifier, RenderedMessage } from '../core/types';
 
-/** Slack Incoming Webhook (Block Kit). See FR-NOTIFY-1. */
+/** Slack Incoming Webhook (Block Kit). */
 export class SlackNotifier implements Notifier {
   readonly type = 'slack';
   constructor(private readonly retry: RetryOptions = {}) {}

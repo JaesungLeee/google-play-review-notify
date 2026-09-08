@@ -20,5 +20,5 @@ body:
     attributes:
       label: Scope check
       options:
-        - label: This is not about scraping the Play Console UI (out of scope, see the PRD)
+        - label: This is not about scraping the Play Console UI (out of scope, see docs/design.md)
         - label: I would be willing to open a pull request for this

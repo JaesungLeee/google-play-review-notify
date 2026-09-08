@@ -1,7 +1,7 @@
 import { fetchWithRetry, type RetryOptions } from '../core/http';
 import type { ChannelTarget, Notifier, RenderedMessage } from '../core/types';
 
-/** Discord Webhook (embed). See FR-NOTIFY-2. */
+/** Discord Webhook (embed). */
 export class DiscordNotifier implements Notifier {
   readonly type = 'discord';
   constructor(private readonly retry: RetryOptions = {}) {}

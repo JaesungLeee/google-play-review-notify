@@ -1,5 +1,5 @@
 /**
- * Single pipeline entry used by both the CLI and the GitHub Action. See docs/PRD_ko.md §7.
+ * Single pipeline entry used by both the CLI and the GitHub Action. See docs/design.md, "Pipeline".
  *
  *   sources.poll → normalize → dedupe/diff (state) → route + render → notify → save state
  */

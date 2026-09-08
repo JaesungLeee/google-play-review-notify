@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** CLI entry. See docs/PRD_ko.md §5.7 for commands and exit codes. */
+/** CLI entry. Exit codes are documented in docs/design.md, "CLI contract". */
 import { Command } from 'commander';
 import { collectSecrets, loadConfigFile, ConfigError, type Config } from '../core/config';
 import { createConsoleLogger, type LogLevel } from '../core/logger';
@@ -214,9 +214,7 @@ for (const [name, phase] of [
     .command(name)
     .description(`(not implemented yet, planned for ${phase})`)
     .action(() => {
-      process.stderr.write(
-        `${name} is not implemented yet (planned for ${phase}; see docs/PRD_ko.md §5.7)\n`,
-      );
+      process.stderr.write(`${name} is not implemented yet (planned for ${phase})\n`);
       process.exit(EXIT.CONFIG);
     });
 }

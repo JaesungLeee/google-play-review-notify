@@ -1,4 +1,4 @@
-/** Email source adapter: primary signal. See docs/PRD_ko.md §5.2.1. */
+/** Email source adapter: primary signal. See docs/design.md, "What each signal can and cannot say". */
 import type { Config } from '../../core/config';
 import type {
   PollContext,
