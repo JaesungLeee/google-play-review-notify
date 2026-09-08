@@ -149,12 +149,15 @@ interface SourceAdapter {
 - **FR-SRC-API-5 (P0)** The Phase 0 spike validates these inference rules against a real account and finalizes the decision table in the appendix. Until then the API adapter's rules are labeled "hypothesis".
 - Required permission: the service account needs only the Play Console "View app information (read-only)" permission. No upload permission.
 
-#### 5.2.3 Store listing adapter: optional
+#### 5.2.3 Store listing adapter: live (approval) confirmation
 
-- **FR-SRC-STORE-1 (P2)** Fetches `https://play.google.com/store/apps/details?id=<pkg>&hl=<lang>&gl=<country>` without authentication and extracts the displayed version name and "Updated on" date.
-- **FR-SRC-STORE-2 (P2)** Emits `LIVE` (confidence: medium) when either value changes from the previous state. If the version shows "Varies with device", only the updated date is used.
-- **FR-SRC-STORE-3 (P2)** Off by default. Parsing failures (HTML changes, etc.) log a warning and the run continues. After `storeListing.failureThreshold` consecutive failures (default 5), a single warning notification is sent.
-- **FR-SRC-STORE-4 (P2)** At most one request per app per run, with an explicit User-Agent.
+> Phase 0 (2026-09-08) showed that the Play API reports a release as `completed` while it is still under review and that no approval email is sent. The public listing is therefore the only signal that a production release actually reached users, so this adapter was promoted from P2 to P0 and built in Phase 1.
+
+- **FR-SRC-STORE-1 (P0)** Fetches `https://play.google.com/store/apps/details?id=<pkg>&hl=<lang>&gl=<country>` without authentication and extracts the "Updated on" date. The page data embeds it as `"<display text>",[<epochSeconds>,<nanos>]`, so the epoch value is compared independently of locale. The displayed version name is not used: the page mixes in versions of other apps, making it unreliable.
+- **FR-SRC-STORE-2 (P0)** Emits `LIVE` (confidence: medium, track: production) when, compared with the previous state, (a) the listing goes from 404 to 200 (first release live) or (b) the updated date changes. Event id: `store:<pkg>:<epoch>:LIVE`. A package seen for the first time, or a baseline run, is recorded only.
+- **FR-SRC-STORE-3 (P0)** Off by default (`sources.storeListing.enabled`). Parsing failures (HTML changes, etc.) log a warning, keep the last good state, and the run continues. After `storeListing.failureThreshold` consecutive failures (default 5) an error is logged (no separate notification event). A 404 is not a failure; it is recorded as "not published".
+- **FR-SRC-STORE-4 (P0)** One request per app per run, only for apps configured with the `production` track, with User-Agent `google-play-review-notify/<version>`.
+- **Limitations**: non-production tracks (internal/alpha/beta) are not visible on the store and cannot be detected. With managed publishing, detection happens only after the developer clicks publish, so the "approved, pending publish" moment is not observable.
 
 #### 5.2.4 Manual / external trigger
 
@@ -558,9 +561,9 @@ Colors per event: SUBMITTED gray, APPROVED/LIVE green, REJECTED red, POLICY_WARN
 | Phase | Scope | Exit criteria |
 | --- | --- | --- |
 | **0. Technical spike** | Collect real email samples, observe Play API track responses (at least one each of under review / rejected / approved), confirm store listing parseability | Rule set fixtures for 8.1, decision table for 8.2 finalized |
-| **1. MVP** | Core pipeline, email adapter, Slack/Discord webhooks, file and github-cache state stores, CLI `run / auth gmail / test-notify`, GitHub Action, README | Approval and rejection notifications received for one real app |
+| **1. MVP** | Core pipeline, email adapter (English and Korean rule sets), store listing adapter (LIVE), Slack/Discord webhooks, file and github-cache state stores, CLI `run / auth gmail / test-notify`, GitHub Action, README | Rejection and live notifications received for one real app |
 | **2. Secondary signals and ergonomics** | Play API adapter (SUBMITTED/LIVE), per-app routing, template overrides, generic webhook channel (HMAC signature, payload schema), example n8n workflows, `doctor`, `init`, Job Summary, reusable workflow | Scenario with 2+ apps and 2+ channels passes; events received by an n8n Webhook Trigger |
-| **3. Extensions** | Store listing adapter, `emit`, Korean rule set, custom StateStore/Notifier loading, Marketplace listing, n8n Execute Command guide | One external repository adopts it |
+| **3. Extensions** | `emit`, additional locale rule sets, custom StateStore/Notifier loading, Marketplace listing, n8n Execute Command guide | One external repository adopts it |
 | **4. Ecosystem** | n8n community node (`n8n-nodes-google-play-review-notify`, reusing the core library) | Community node published |
 
 ## 11. Success Metrics

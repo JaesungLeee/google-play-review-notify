@@ -114877,20 +114877,113 @@ var PlayApiSourceAdapter = class _PlayApiSourceAdapter {
 };
 
 // src/sources/store-listing/index.ts
+function storeListingUrl(packageName, locale, country) {
+  const q = new URLSearchParams({ id: packageName, hl: locale, gl: country });
+  return `https://play.google.com/store/apps/details?${q.toString()}`;
+}
+function parseStoreListing(html) {
+  const label = /class="lXlx5">[^<]*<\/div><div class="xg1aie">([^<]+)<\/div>/.exec(html)?.[1];
+  const entry = (text2) => {
+    const pattern = text2 ? `"(${text2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})",\\[(\\d{9,10}),\\d+\\]` : `"([^"]{6,30})",\\[(\\d{9,10}),\\d+\\]`;
+    return new RegExp(pattern).exec(html);
+  };
+  const m2 = label && entry(label) || entry(void 0);
+  const text = m2?.[1];
+  const epoch = m2?.[2];
+  const info2 = {};
+  if (text !== void 0 && epoch !== void 0) {
+    info2.updatedText = text;
+    info2.updatedAt = Number(epoch);
+  } else if (label) {
+    info2.updatedText = label;
+  }
+  return info2;
+}
 var StoreListingSourceAdapter = class _StoreListingSourceAdapter {
-  constructor(cfg) {
+  constructor(cfg, opts = {}) {
     this.cfg = cfg;
+    this.opts = opts;
   }
   cfg;
+  opts;
   name = "store-listing";
-  static fromConfig(config) {
-    return new _StoreListingSourceAdapter(config.sources.storeListing);
+  static fromConfig(config, opts = {}) {
+    return new _StoreListingSourceAdapter(config.sources.storeListing, opts);
   }
-  async poll(_ctx, _state) {
-    void this.cfg;
-    throw new Error(
-      "Store listing source is not implemented yet (planned for Phase 3; see PRD \xA75.2.3)"
-    );
+  async poll(ctx, prev) {
+    const previous = prev?.packages ?? {};
+    const packages = { ...previous };
+    const events = [];
+    for (const app of ctx.apps.filter((a) => a.tracks.includes("production"))) {
+      const pkg = app.packageName;
+      const before = previous[pkg];
+      const result = await this.observe(ctx, pkg, before);
+      packages[pkg] = result.state;
+      if (!result.ok || !before || ctx.baseline) continue;
+      const now = result.state;
+      const wentLive = !before.published && now.published;
+      const updated = before.published && now.published && now.updatedAt !== void 0 && before.updatedAt !== void 0 && now.updatedAt !== before.updatedAt;
+      if (wentLive || updated) {
+        events.push(this.liveEvent(ctx, app, now));
+      } else if (before.published && !now.published) {
+        ctx.logger.warn(`Store listing for ${pkg} disappeared (404); not emitting an event`);
+      }
+    }
+    return { events, nextState: { packages } };
+  }
+  async observe(ctx, pkg, before) {
+    const url = storeListingUrl(pkg, this.cfg.locale, this.cfg.country);
+    try {
+      const res = await fetchWithRetry(
+        url,
+        {
+          method: "GET",
+          headers: {
+            "user-agent": `google-play-review-notify/${this.opts.version ?? "0.0.0"}`,
+            "accept-language": this.cfg.locale
+          },
+          signal: AbortSignal.timeout(this.opts.timeoutMs ?? 15e3)
+        },
+        { retries: 1, fetchImpl: this.opts.fetchImpl ?? fetch }
+      );
+      const info2 = parseStoreListing(await res.text());
+      if (info2.updatedAt === void 0) {
+        throw new Error('could not find the "Updated on" date in the listing HTML');
+      }
+      ctx.logger.debug(`Store listing ${pkg}: updated ${info2.updatedText} (${info2.updatedAt})`);
+      const state = { published: true, updatedAt: info2.updatedAt, failures: 0 };
+      if (info2.updatedText) state.updatedText = info2.updatedText;
+      return { ok: true, state };
+    } catch (e2) {
+      if (e2 instanceof HttpError && e2.status === 404) {
+        ctx.logger.debug(`Store listing ${pkg}: not published (404)`);
+        return { ok: true, state: { published: false, failures: 0 } };
+      }
+      const failures = (before?.failures ?? 0) + 1;
+      const msg = e2 instanceof Error ? e2.message : String(e2);
+      if (failures === this.cfg.failureThreshold) {
+        ctx.logger.error(
+          `Store listing ${pkg} failed ${failures} times in a row; the page format may have changed (${msg})`
+        );
+      } else {
+        ctx.logger.warn(`Store listing ${pkg} fetch/parse failed (${failures}): ${msg}`);
+      }
+      return { ok: false, state: { ...before ?? { published: false }, failures } };
+    }
+  }
+  liveEvent(ctx, app, observed) {
+    const ev = {
+      id: `store:${app.packageName}:${observed.updatedAt}:LIVE`,
+      type: "LIVE",
+      packageName: app.packageName,
+      track: "production",
+      source: "store-listing",
+      confidence: "medium",
+      observedAt: ctx.now.toISOString(),
+      consoleUrl: consoleUrlFor(app.packageName)
+    };
+    if (app.name) ev.appName = app.name;
+    return ev;
   }
 };
 
@@ -114910,11 +115003,12 @@ function manualEventId(e2) {
 }
 
 // src/sources/index.ts
-function createSources(config, logger2) {
+function createSources(config, logger2, opts = {}) {
   const out = [];
   if (config.sources.email.enabled) out.push(EmailSourceAdapter.fromConfig(config));
   if (config.sources.playApi.enabled) out.push(PlayApiSourceAdapter.fromConfig(config));
-  if (config.sources.storeListing.enabled) out.push(StoreListingSourceAdapter.fromConfig(config));
+  if (config.sources.storeListing.enabled)
+    out.push(StoreListingSourceAdapter.fromConfig(config, opts));
   if (out.length === 0) logger2.warn("No sources enabled; nothing will be detected");
   return out;
 }
@@ -115110,7 +115204,7 @@ async function main() {
   const config = parseConfig(buildConfigInput());
   const log = actionLogger(collectSecrets(config));
   const dryRun = core.getBooleanInput("dry-run");
-  const sources = createSources(config, log);
+  const sources = createSources(config, log, { version: VERSION });
   const emit = input("emit-event");
   if (emit) {
     const parsed = JSON.parse(emit);

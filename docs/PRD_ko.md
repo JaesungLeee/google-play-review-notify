@@ -149,12 +149,15 @@ interface SourceAdapter {
 - **FR-SRC-API-5 (P0)** Phase 0 스파이크에서 실제 계정으로 위 추론 규칙을 검증한 뒤 결정표(decision table)를 이 문서 부록에 확정한다. 검증 전까지 API 어댑터의 이벤트 발생 규칙은 "가설"로 표기한다.
 - 필요 권한: 서비스 계정에 Play Console "앱 정보 보기(읽기 전용)" 권한. 앱 업로드 권한은 요구하지 않는다.
 
-#### 5.2.3 스토어 리스팅 어댑터 — 선택
+#### 5.2.3 스토어 리스팅 어댑터 — 라이브(승인) 확인
 
-- **FR-SRC-STORE-1 (P2)** 인증 없이 `https://play.google.com/store/apps/details?id=<pkg>&hl=<lang>&gl=<country>`를 조회해 표시 버전명과 "업데이트 날짜"를 추출한다.
-- **FR-SRC-STORE-2 (P2)** 이전 상태와 달라지면 `LIVE`(confidence: medium)를 발생시킨다. 버전명이 "기기에 따라 다름"으로 노출되면 업데이트 날짜 변화만으로 판단한다.
-- **FR-SRC-STORE-3 (P2)** 기본 비활성. HTML 구조 변경 등으로 파싱에 실패하면 경고 로그만 남기고 실행은 계속되어야 한다. 실패가 `storeListing.failureThreshold`(기본 5회) 연속되면 1회 경고 알림을 보낸다.
-- **FR-SRC-STORE-4 (P2)** 요청 간격은 앱당 실행마다 1회로 제한하고 User-Agent를 명시한다.
+> Phase 0(2026-09-08) 결과 Play API는 심사 중인 릴리즈도 `completed`로 보고하고 승인 이메일은 오지 않는다. 따라서 production 트랙의 "실제 반영"을 확인하는 유일한 신호가 스토어 리스팅이며, 우선순위를 P2에서 P0으로 올려 Phase 1에 구현했다.
+
+- **FR-SRC-STORE-1 (P0)** 인증 없이 `https://play.google.com/store/apps/details?id=<pkg>&hl=<lang>&gl=<country>`를 조회해 "업데이트 날짜"를 추출한다. 페이지 데이터에 날짜가 `"<표시 문자열>",[<epoch초>,<nanos>]` 형태로 들어 있어 locale과 무관하게 epoch 값을 비교한다. 표시 버전명은 페이지에 여러 앱의 버전이 섞여 있어 신뢰할 수 없으므로 사용하지 않는다.
+- **FR-SRC-STORE-2 (P0)** 이전 상태와 비교해 (a) 404 → 200 전환(첫 출시 라이브) 또는 (b) 업데이트 날짜 변화가 있으면 `LIVE`(confidence: medium, track: production)를 발생시킨다. 이벤트 id는 `store:<pkg>:<epoch>:LIVE`. 처음 관측하는 패키지와 베이스라인 실행에서는 기록만 한다.
+- **FR-SRC-STORE-3 (P0)** 기본 비활성(설정 `sources.storeListing.enabled`). HTML 구조 변경 등으로 파싱에 실패하면 경고 로그만 남기고 마지막 정상 상태를 유지한 채 실행을 계속한다. 실패가 `storeListing.failureThreshold`(기본 5회) 연속되면 error 로그를 남긴다(별도 알림 이벤트는 없음). 404는 실패가 아니라 "미게시" 상태로 기록한다.
+- **FR-SRC-STORE-4 (P0)** 요청은 앱당 실행마다 1회, `production` 트랙이 설정된 앱만 조회하며 User-Agent `google-play-review-notify/<version>`을 명시한다.
+- **한계**: production 외 트랙(internal/alpha/beta)은 스토어에 노출되지 않아 감지할 수 없다. 관리형 게시(managed publishing)를 쓰는 앱은 개발자가 게시 버튼을 누른 뒤에야 감지되므로 "승인됨(게시 대기)" 시점은 알 수 없다.
 
 #### 5.2.4 수동/외부 트리거
 
@@ -558,9 +561,9 @@ Source: email · 2026-09-07 09:00 UTC
 | Phase | 범위 | 완료 기준 |
 | --- | --- | --- |
 | **0. 기술 검증 (스파이크)** | 실제 계정으로 이메일 샘플 수집, Play API 트랙 응답 관찰(심사 중/거절/승인 각 1회 이상), 스토어 리스팅 파싱 가능성 확인 | 8.1 룰셋 초안 픽스처 확보, 8.2 결정표 확정 |
-| **1. MVP** | 코어 파이프라인, 이메일 어댑터, Slack/Discord webhook, file/github-cache 상태 저장, CLI `run/auth gmail/test-notify`, GitHub Action, README | 실제 앱 1개에서 승인·거절 알림 수신 성공 |
+| **1. MVP** | 코어 파이프라인, 이메일 어댑터(영어·한국어 룰셋), 스토어 리스팅 어댑터(LIVE), Slack/Discord webhook, file/github-cache 상태 저장, CLI `run/auth gmail/test-notify`, GitHub Action, README | 실제 앱 1개에서 거절·라이브 알림 수신 성공 |
 | **2. 보조 신호 & 편의** | Play API 어댑터(SUBMITTED/LIVE), 앱별 라우팅, 템플릿 오버라이드, 범용 Webhook 채널(HMAC 서명, 페이로드 스키마), n8n 예시 워크플로우, `doctor`, `init`, Job Summary, 재사용 워크플로우 | 앱 2개 이상·채널 2개 이상 시나리오 통과, n8n Webhook Trigger로 이벤트 수신 확인 |
-| **3. 확장** | 스토어 리스팅 어댑터, `emit`, 한국어 룰셋, 커스텀 StateStore/Notifier 로딩, Marketplace 등록, n8n Execute Command 방식 가이드 | 외부 저장소 도입 사례 1건 |
+| **3. 확장** | `emit`, 추가 locale 룰셋, 커스텀 StateStore/Notifier 로딩, Marketplace 등록, n8n Execute Command 방식 가이드 | 외부 저장소 도입 사례 1건 |
 | **4. 생태계** | n8n 커뮤니티 노드(`n8n-nodes-google-play-review-notify`, 코어 라이브러리 재사용) | n8n 커뮤니티 노드 등록 |
 
 ## 11. 성공 지표

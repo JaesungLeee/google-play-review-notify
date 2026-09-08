@@ -69,7 +69,7 @@ program
           : await createStateStore(config, log);
     const summary = await runOnce({
       config,
-      sources: createSources(config, log),
+      sources: createSources(config, log, { version: VERSION }),
       notifiers: createDefaultNotifiers({ version: VERSION }),
       stateStore,
       logger: log,

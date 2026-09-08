@@ -100,7 +100,7 @@ async function main(): Promise<void> {
   const log = actionLogger(collectSecrets(config));
   const dryRun = core.getBooleanInput('dry-run');
 
-  const sources = createSources(config, log);
+  const sources = createSources(config, log, { version: VERSION });
   const emit = input('emit-event');
   if (emit) {
     const parsed = JSON.parse(emit) as Partial<ReviewEvent> & {
