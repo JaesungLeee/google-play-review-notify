@@ -17,3 +17,5 @@ test/fixtures/play-api/private/
 /play-review-notify.yml
 # Local-only notes and scratch files
 /.local/
+# Product requirements stay local (kept for the maintainer, not part of the public repo)
+/docs/PRD_*.md

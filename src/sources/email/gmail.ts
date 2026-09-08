@@ -1,4 +1,4 @@
-/** Thin Gmail API client (OAuth2 refresh token, gmail.readonly). FR-SRC-EMAIL-1. */
+/** Thin Gmail API client (OAuth2 refresh token, gmail.readonly). */
 import { auth as googleAuth, gmail as gmailApi, type gmail_v1 } from '@googleapis/gmail';
 import { htmlToText, type ParsedEmail } from './rules';
 

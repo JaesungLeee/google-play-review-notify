@@ -1,4 +1,4 @@
-/** Thin Play Developer Publishing API client (service account, read-only edit flow). FR-SRC-API-1. */
+/** Thin Play Developer Publishing API client (service account, read-only edit flow). */
 import { androidpublisher, auth as authPlus } from '@googleapis/androidpublisher';
 import { readFileSync } from 'node:fs';
 

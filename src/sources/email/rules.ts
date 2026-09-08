@@ -1,7 +1,7 @@
 /**
  * Email classification engine. Rules are evaluated top-to-bottom; the first subject/body match wins.
  * Extraction patterns are `regex:<pattern>` (first capture group) or `section:<Heading|Alt>` (text
- * following a heading line until a blank line). See docs/PRD_ko.md §8.1.
+ * following a heading line until a blank line). See docs/design.md, "Email rule sets".
  */
 import { readFileSync } from 'node:fs';
 import type { ReviewEventType } from '../../core/types';

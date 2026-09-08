@@ -1,4 +1,4 @@
-/** Default English templates + user overrides. See docs/PRD_ko.md §5.5 and §8.4. */
+/** Default English templates + user overrides. See README.md, "Configuration" (templates). */
 import type { AppConfig, Config } from '../core/config';
 import { renderTemplate } from '../core/template';
 import type { RenderedMessage, ReviewEvent, ReviewEventType } from '../core/types';

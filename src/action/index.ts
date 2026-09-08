@@ -1,4 +1,4 @@
-/** GitHub Action entry. See docs/PRD_ko.md §5.8. Inputs > env > config file. */
+/** GitHub Action entry. Inputs > env > config file (docs/design.md, "Configuration precedence"). */
 import { PACKAGE_VERSION } from '../core/version';
 import * as core from '@actions/core';
 import { existsSync } from 'node:fs';

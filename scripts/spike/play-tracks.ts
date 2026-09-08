@@ -4,7 +4,7 @@
  * Runs the read-only flow  edits.insert → tracks.list + bundles.list → edits.delete
  * and writes the raw responses to test/fixtures/play-api/private/<timestamp>-<label>.json
  * (git-ignored). Run it at each stage of a review cycle (in review, rejected, approved,
- * published, live) so the responses can be diffed and PRD §8.2 finalized.
+ * published, live) so the responses can be diffed against the decision table in docs/design.md.
  *
  * Usage:
  *   PLAY_SERVICE_ACCOUNT_FILE=./sa.json npm run spike:play -- com.example.app in-review

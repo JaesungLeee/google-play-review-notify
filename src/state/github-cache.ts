@@ -1,7 +1,7 @@
 /**
  * GitHub Actions Cache backed store. Cache entries are immutable, so every save uses a fresh key
  * (`<prefix>-<runId>-<attempt>-<ts>`) and load restores the newest entry matching `<prefix>-`.
- * Entries unused for 7 days are evicted by GitHub → the next run baselines. See FR-STATE-2.
+ * Entries unused for 7 days are evicted by GitHub → the next run baselines.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';

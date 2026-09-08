@@ -17,7 +17,7 @@ export async function createStateStore(config: Config, logger: Logger): Promise<
     case 'none':
       return new NoneStateStore();
     case 'custom': {
-      // FR-STATE-3: user module exporting `createStateStore(): StateStore` or a default StateStore instance.
+      // User module exporting `createStateStore(): StateStore` or a default StateStore instance.
       const mod = (await import(resolve(cfg.module))) as {
         default?: StateStore | (() => StateStore);
         createStateStore?: () => StateStore;

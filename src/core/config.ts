@@ -1,5 +1,5 @@
 /**
- * Configuration schema and loader. See docs/PRD_ko.md §5.6.
+ * Configuration schema and loader. See README.md, "Configuration".
  * Precedence (highest first): explicit overrides (Action inputs / CLI flags) > env > file.
  */
 import { readFileSync } from 'node:fs';

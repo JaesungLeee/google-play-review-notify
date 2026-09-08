@@ -1,5 +1,5 @@
 /**
- * Core domain types. See docs/PRD_ko.md §5.1 (event model) and §5.2–5.4 (plugin interfaces).
+ * Core domain types. See docs/design.md (event model, plugin interfaces).
  */
 
 export const REVIEW_EVENT_TYPES = [
