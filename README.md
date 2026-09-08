@@ -29,9 +29,9 @@ normalized events:
 Everything is idempotent: each event has a stable id, state is persisted between runs, and the
 first run only records a baseline without notifying.
 
-> The detection rules were validated against real Play Console emails and API responses; see
-> [docs/phase0-notes.md](docs/phase0-notes.md) (Korean) for the evidence and the known limits,
-> including managed publishing.
+> The detection rules were validated against real Play Console emails and Play API responses.
+> The resulting decision table and known limits, including managed publishing, are in the
+> [PRD, section 8.2](docs/PRD_en.md#82-play-api-inference-decision-table-finalized-in-phase-0-2026-09-08).
 
 ## Quick start: GitHub Action
 
@@ -192,7 +192,6 @@ maxRetries: 3
 - [Gmail setup (OAuth refresh token)](docs/gmail-oauth.md) · [한국어](docs/gmail-oauth.ko.md)
 - [Play Developer API setup (service account)](docs/play-api-setup.md) · [한국어](docs/play-api-setup.ko.md)
 - [Product requirements](docs/PRD_en.md) · [한국어](docs/PRD_ko.md)
-- [Phase 0 research notes](docs/phase0-notes.md) (Korean): what the emails and the API really look like
 - [Integrating with n8n](examples/n8n/README.md)
 - [Changelog](CHANGELOG.md)
 

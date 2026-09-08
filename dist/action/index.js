@@ -119640,7 +119640,7 @@ var import_node_fs3 = require("fs");
 
 // rules/email/en.json
 var en_default2 = {
-  $comment: "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (Phase 0, see docs/phase0-notes.md): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
+  $comment: "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (Phase 0, see docs/PRD_en.md \xA78.1): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
   locale: "en",
   rules: [
     {
@@ -119702,7 +119702,7 @@ var en_default2 = {
 
 // rules/email/ko.json
 var ko_default = {
-  $comment: "Korean rule set, validated against real Play Console emails collected in Phase 0 (2026-09-08; see docs/phase0-notes.md). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '\uC571 \uC0C1\uD0DC: \uAC70\uBD80\uB428'. APPROVED patterns are still unobserved.",
+  $comment: "Korean rule set, validated against real Play Console emails collected in Phase 0 (2026-09-08; see docs/PRD_ko.md \xA78.1). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '\uC571 \uC0C1\uD0DC: \uAC70\uBD80\uB428'. APPROVED patterns are still unobserved.",
   locale: "ko",
   rules: [
     {

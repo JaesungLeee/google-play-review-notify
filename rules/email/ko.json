@@ -1,5 +1,5 @@
 {
-  "$comment": "Korean rule set, validated against real Play Console emails collected in Phase 0 (2026-09-08; see docs/phase0-notes.md). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '앱 상태: 거부됨'. APPROVED patterns are still unobserved.",
+  "$comment": "Korean rule set, validated against real Play Console emails collected in Phase 0 (2026-09-08; see docs/PRD_ko.md §8.1). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '앱 상태: 거부됨'. APPROVED patterns are still unobserved.",
   "locale": "ko",
   "rules": [
     {

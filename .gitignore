@@ -15,3 +15,5 @@ test/fixtures/email/private/
 test/fixtures/play-api/private/
 # Local consumer config used for manual testing (contains only ${ENV} references, but keep it out of the tool repo)
 /play-review-notify.yml
+# Local-only notes and scratch files
+/.local/

@@ -497,7 +497,7 @@ dist/index.js  # ncc 번들 (커밋)
 ```
 
 - 룰은 위에서 아래로 평가하고 첫 매치를 채택한다. 매치 없음 + 발신자 allowlist 통과 = `UNKNOWN_NOTICE`.
-- Phase 0(2026-09-08)에서 실제 이메일을 수집해 `REJECTED`·`POLICY_WARNING` 룰(en, ko)을 확정했다. 정책 메일은 거절과 경고가 같은 제목을 쓰므로 본문의 `앱 상태: 거부됨` / `App Status: Rejected` 줄로 거절을 판정한다. `APPROVED`·`REMOVED`·`SUSPENDED` 패턴은 아직 관측 전 초안이다. 상세는 [phase0-notes.md](./phase0-notes.md).
+- Phase 0(2026-09-08)에서 실제 이메일을 수집해 `REJECTED`·`POLICY_WARNING` 룰(en, ko)을 확정했다. 정책 메일은 거절과 경고가 같은 제목을 쓰므로 본문의 `앱 상태: 거부됨` / `App Status: Rejected` 줄로 거절을 판정한다. `APPROVED`·`REMOVED`·`SUSPENDED` 패턴은 아직 관측 전 초안이다.
 
 ### 8.2 Play API 추론 결정표 (Phase 0에서 확정, 2026-09-08)
 

@@ -8,8 +8,8 @@ needs **read-only** access.
 
 > What the Play API can **not** tell you: whether a release is in review, approved, or rejected.
 > A release under review is already reported as `status: completed` (verified in Phase 0).
-> Rejections come from the email source and going live from the store listing source. Details in
-> [phase0-notes.md](./phase0-notes.md) (Korean).
+> Rejections come from the email source and going live from the store listing source. See the
+> decision table in the [PRD, section 8.2](./PRD_en.md#82-play-api-inference-decision-table-finalized-in-phase-0-2026-09-08).
 
 | Variable                    | Value                                  |
 | --------------------------- | -------------------------------------- |

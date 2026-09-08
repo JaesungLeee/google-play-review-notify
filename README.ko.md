@@ -24,7 +24,7 @@ Google Play는 심사 결과를 Play Console 화면과 개발자 계정 메일�
 
 모든 이벤트는 멱등입니다. 이벤트마다 안정적인 id가 있고, 상태가 실행 사이에 유지되며, 첫 실행은 알림 없이 기준점만 기록합니다.
 
-> 감지 규칙은 실제 Play Console 메일과 API 응답으로 검증했습니다. 근거와 한계(관리형 게시 포함)는 [docs/phase0-notes.md](docs/phase0-notes.md)를 참고하세요.
+> 감지 규칙은 실제 Play Console 메일과 Play API 응답으로 검증했습니다. 확정된 결정표와 한계(관리형 게시 포함)는 [PRD 8.2절](docs/PRD_ko.md#82-play-api-추론-결정표-phase-0에서-확정-2026-09-08)에 있습니다.
 
 ## 빠른 시작: GitHub Action
 
@@ -165,7 +165,6 @@ maxRetries: 3
 - [Gmail 연동 설정](docs/gmail-oauth.ko.md) · [English](docs/gmail-oauth.md)
 - [Play Developer API 연동 설정](docs/play-api-setup.ko.md) · [English](docs/play-api-setup.md)
 - [PRD](docs/PRD_ko.md) · [English](docs/PRD_en.md)
-- [Phase 0 관측 노트](docs/phase0-notes.md): 실제 메일과 API 응답이 어떻게 생겼는지
 - [n8n 연동](examples/n8n/README.md)
 - [변경 이력](CHANGELOG.md)
 

@@ -497,7 +497,7 @@ dist/index.js  # ncc bundle (committed)
 ```
 
 - Rules are evaluated top to bottom; the first match wins. No match plus a passing sender allowlist yields `UNKNOWN_NOTICE`.
-- Phase 0 (2026-09-08) collected real emails and finalized the `REJECTED` and `POLICY_WARNING` rules (en, ko). Policy emails share one subject for rejections and warnings, so rejection is decided by the body line `App Status: Rejected` / `앱 상태: 거부됨`. `APPROVED`, `REMOVED`, and `SUSPENDED` patterns remain unobserved drafts. Details: [phase0-notes.md](./phase0-notes.md).
+- Phase 0 (2026-09-08) collected real emails and finalized the `REJECTED` and `POLICY_WARNING` rules (en, ko). Policy emails share one subject for rejections and warnings, so rejection is decided by the body line `App Status: Rejected` / `앱 상태: 거부됨`. `APPROVED`, `REMOVED`, and `SUSPENDED` patterns remain unobserved drafts.
 
 ### 8.2 Play API inference decision table (finalized in Phase 0, 2026-09-08)
 
