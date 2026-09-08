@@ -7,6 +7,7 @@ import { runOnce } from '../core/run';
 import type { ReviewEvent, RunSummary } from '../core/types';
 import { createDefaultNotifiers } from '../notifiers';
 import { createSources, ManualSourceAdapter } from '../sources';
+import { authorizeGmail } from '../sources/email/oauth';
 import { createStateStore, FileStateStore, NoneStateStore } from '../state';
 import { renderMessage } from '../templates';
 
@@ -222,13 +223,63 @@ for (const [name, phase] of [
 program
   .command('auth')
   .argument('<provider>', 'gmail')
-  .description('(not implemented yet, planned for Phase 1) obtain an OAuth refresh token')
-  .action((provider: string) => {
-    process.stderr.write(
-      `auth ${provider} is not implemented yet (planned for Phase 1; see docs/PRD_ko.md §5.7)\n`,
-    );
-    process.exit(EXIT.CONFIG);
-  });
+  .description('Obtain an OAuth refresh token (one-time setup). See docs/gmail-oauth.md')
+  .option('--client-id <id>', 'OAuth client id (default: $GMAIL_CLIENT_ID)')
+  .option('--client-secret <secret>', 'OAuth client secret (default: $GMAIL_CLIENT_SECRET)')
+  .option('--port <port>', 'local callback port (default: a free port)', (v) => Number(v))
+  .option('--no-open', 'print the consent URL instead of opening a browser')
+  .action(
+    async (
+      provider: string,
+      cmd: { clientId?: string; clientSecret?: string; port?: number; open: boolean },
+    ) => {
+      const g = program.opts<GlobalOpts>();
+      if (provider !== 'gmail') {
+        process.stderr.write(`Unknown provider "${provider}". Supported: gmail\n`);
+        process.exit(EXIT.CONFIG);
+      }
+      const clientId = cmd.clientId ?? process.env['GMAIL_CLIENT_ID'];
+      const clientSecret = cmd.clientSecret ?? process.env['GMAIL_CLIENT_SECRET'];
+      if (!clientId || !clientSecret) {
+        process.stderr.write(
+          'Missing OAuth client. Pass --client-id/--client-secret or set GMAIL_CLIENT_ID and ' +
+            'GMAIL_CLIENT_SECRET (create a "Desktop app" OAuth client; see docs/gmail-oauth.md).\n',
+        );
+        process.exit(EXIT.CONFIG);
+      }
+      const err = (m: string) => process.stderr.write(m + '\n');
+      try {
+        const result = await authorizeGmail({
+          clientId,
+          clientSecret,
+          port: cmd.port ?? 0,
+          openBrowser: cmd.open,
+          onAuthUrl: (url) =>
+            err(
+              (cmd.open ? 'Opening your browser. If it does not open, visit:' : 'Visit:') +
+                `\n\n  ${url}\n\nWaiting for Google to redirect back to this machine...`,
+            ),
+        });
+        if (g.json) {
+          process.stdout.write(JSON.stringify(result) + '\n');
+        } else {
+          err(
+            `\nAuthorized${result.emailAddress ? ` as ${result.emailAddress}` : ''}. ` +
+              'Add this to your environment or CI secrets:\n',
+          );
+          process.stdout.write(`GMAIL_REFRESH_TOKEN=${result.refreshToken}\n`);
+          err(
+            '\nKeep it secret. If the OAuth consent screen is still in "Testing", the token ' +
+              'expires after 7 days; publish the app to production to make it permanent.',
+          );
+        }
+        process.exit(EXIT.OK);
+      } catch (e) {
+        err(`auth gmail failed: ${(e as Error).message}`);
+        process.exit(EXIT.CONFIG);
+      }
+    },
+  );
 
 program.parseAsync(process.argv).catch((e: unknown) => {
   const msg = e instanceof ConfigError ? e.message : ((e as Error).stack ?? String(e));
