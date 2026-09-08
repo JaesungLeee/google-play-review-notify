@@ -1,7 +1,8 @@
 import { defineConfig } from 'tsup';
 import { version } from './package.json';
 
-// Inlined into every bundle; see src/core/version.ts.
+// Inlined into the CLI/library bundle only; the committed Action bundle reads package.json at
+// runtime so it does not go stale on version bumps. See src/core/version.ts.
 const define = { __PKG_VERSION__: JSON.stringify(version) };
 
 export default defineConfig([
@@ -24,7 +25,6 @@ export default defineConfig([
     target: 'node20',
     platform: 'node',
     noExternal: [/.*/],
-    define,
     sourcemap: false,
     minify: false,
     clean: false,
