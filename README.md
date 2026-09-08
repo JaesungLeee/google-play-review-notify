@@ -9,12 +9,16 @@ GitHub Action과 CLI 두 형태로 제공됩니다.
 
 - [PRD (한국어, 기본)](docs/PRD_ko.md)
 - [PRD (English)](docs/PRD_en.md)
+- [Gmail 연동 설정 (OAuth Refresh Token 발급)](docs/gmail-oauth.md)
+- [Phase 0 관측 노트](docs/phase0-notes.md)
 
 ## Quick start (CLI)
 
 ```bash
 cp examples/play-review-notify.yml play-review-notify.yml   # 설정 편집
-export SLACK_WEBHOOK_URL=... GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... GMAIL_REFRESH_TOKEN=...
+export GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=...           # docs/gmail-oauth.md 참고
+npx play-review-notify auth gmail         # 브라우저 동의 → GMAIL_REFRESH_TOKEN 출력 (최초 1회)
+export GMAIL_REFRESH_TOKEN=... SLACK_WEBHOOK_URL=...
 
 npx play-review-notify test-notify        # 채널 연결 확인
 npx play-review-notify run --dry-run      # 감지 결과만 출력
