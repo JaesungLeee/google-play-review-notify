@@ -1,5 +1,6 @@
 # Example consumer workflow (reference only; copy into your app repository).
-# See README.md, "Quick start: GitHub Action". Disabled here via workflow_dispatch-only trigger.
+# Uses the reusable workflow, which bundles schedule-friendly permissions, checkout and the Action.
+# Disabled here via a workflow_dispatch-only trigger; enable the schedule in your copy.
 name: Play review notify (example)
 
 on:
@@ -9,18 +10,12 @@ on:
 
 jobs:
   notify:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write # cache save
-    steps:
-      - uses: actions/checkout@v4
-      - uses: JaesungLeee/google-play-review-notify@v1
-        with:
-          config-path: play-review-notify.yml
-          dry-run: 'true'
-        env:
-          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
-          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
-          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
+    with:
+      config-path: play-review-notify.yml
+      dry-run: true
+    secrets:
+      GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+      GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+      GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

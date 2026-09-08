@@ -11,6 +11,8 @@ export interface GmailAuth {
 export interface GmailClient {
   /** Returns messages matching the Gmail search query, newest first. */
   search(query: string, max?: number): Promise<ParsedEmail[]>;
+  /** Address of the authorized mailbox; used by `doctor`. Optional for injected fakes. */
+  profile?(): Promise<{ emailAddress: string; messagesTotal?: number }>;
 }
 
 export function createGmailClient(auth: GmailAuth): GmailClient {
@@ -19,6 +21,14 @@ export function createGmailClient(auth: GmailAuth): GmailClient {
   const gmail = gmailApi({ version: 'v1', auth: oauth2 });
 
   return {
+    async profile() {
+      const p = await gmail.users.getProfile({ userId: 'me' });
+      const out: { emailAddress: string; messagesTotal?: number } = {
+        emailAddress: p.data.emailAddress ?? '',
+      };
+      if (typeof p.data.messagesTotal === 'number') out.messagesTotal = p.data.messagesTotal;
+      return out;
+    },
     async search(query, max = 50) {
       const list = await gmail.users.messages.list({ userId: 'me', q: query, maxResults: max });
       const ids = (list.data.messages ?? []).map((m) => m.id).filter((id): id is string => !!id);

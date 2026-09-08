@@ -1,0 +1,106 @@
+# Reusable workflow: schedule, permissions, checkout and the Action in one `uses:` line.
+#
+#   jobs:
+#     notify:
+#       uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
+#       with:
+#         config-path: play-review-notify.yml
+#       secrets: inherit
+#
+# Provide the secrets your config references (GMAIL_*, PLAY_SERVICE_ACCOUNT_JSON, *_WEBHOOK_URL).
+# Without a config file, pass `packages` plus the credential secrets and the Action builds one.
+name: Play review notify (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      config-path:
+        description: Path to play-review-notify.yml in the calling repository
+        type: string
+        default: play-review-notify.yml
+      packages:
+        description: Comma-separated package names, used when there is no config file
+        type: string
+        default: ''
+      state-store:
+        description: github-cache | file | none
+        type: string
+        default: github-cache
+      dry-run:
+        description: Render messages without sending or saving state
+        type: boolean
+        default: false
+      emit-event:
+        description: JSON event to emit directly, e.g. {"type":"SUBMITTED","packageName":"...","versionCode":"42"}
+        type: string
+        default: ''
+      runs-on:
+        description: Runner label
+        type: string
+        default: ubuntu-latest
+    secrets:
+      GMAIL_CLIENT_ID:
+        required: false
+      GMAIL_CLIENT_SECRET:
+        required: false
+      GMAIL_REFRESH_TOKEN:
+        required: false
+      PLAY_SERVICE_ACCOUNT_JSON:
+        required: false
+      SLACK_WEBHOOK_URL:
+        required: false
+      DISCORD_WEBHOOK_URL:
+        required: false
+      WEBHOOK_URL:
+        required: false
+      WEBHOOK_SECRET:
+        required: false
+    outputs:
+      events:
+        description: JSON array of new events detected in this run
+        value: ${{ jobs.notify.outputs.events }}
+      events-count:
+        description: Number of new events
+        value: ${{ jobs.notify.outputs.events-count }}
+      has-rejection:
+        description: '"true" when at least one REJECTED event was detected'
+        value: ${{ jobs.notify.outputs.has-rejection }}
+
+jobs:
+  notify:
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      contents: read
+      actions: write # save state to the Actions cache
+    outputs:
+      events: ${{ steps.notify.outputs.events }}
+      events-count: ${{ steps.notify.outputs.events-count }}
+      has-rejection: ${{ steps.notify.outputs.has-rejection }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: notify
+        uses: JaesungLeee/google-play-review-notify@v1
+        with:
+          config-path: ${{ inputs.config-path }}
+          packages: ${{ inputs.packages }}
+          state-store: ${{ inputs.state-store }}
+          dry-run: ${{ inputs.dry-run }}
+          emit-event: ${{ inputs.emit-event }}
+          # Inputs are only used when no config file is present; a config file references the env below.
+          gmail-client-id: ${{ secrets.GMAIL_CLIENT_ID }}
+          gmail-client-secret: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          gmail-refresh-token: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          play-service-account-json: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          discord-webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          webhook-secret: ${{ secrets.WEBHOOK_SECRET }}
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}

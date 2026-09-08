@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `doctor` command: checks Node version, config (sources, events, channel routing), Gmail
+  credentials and recent Play emails, Play API access per app, store listing reachability,
+  channel URLs and the state store, and prints a fix hint for every problem. Read-only.
+- Reusable workflow `.github/workflows/notify.yml` (`workflow_call`) bundling permissions,
+  checkout and the Action; the example consumer workflow now uses it.
+
 ## [0.1.2] - 2026-09-08
 
 ### Fixed

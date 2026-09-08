@@ -9,6 +9,7 @@ import type { ReviewEvent, RunSummary } from '../core/types';
 import { createDefaultNotifiers } from '../notifiers';
 import { createSources, ManualSourceAdapter } from '../sources';
 import { authorizeGmail } from '../sources/email/oauth';
+import { formatDoctorReport, runDoctor } from './doctor';
 import { createStateStore, FileStateStore, NoneStateStore } from '../state';
 import { renderMessage } from '../templates';
 
@@ -206,10 +207,19 @@ state
     log.info('State removed');
   });
 
-for (const [name, phase] of [
-  ['init', 'Phase 2'],
-  ['doctor', 'Phase 2'],
-] as const) {
+program
+  .command('doctor')
+  .description('Check config, credentials, sources, channels, and state store without sending')
+  .action(async () => {
+    const g = program.opts<GlobalOpts>();
+    const config = loadOrExit(g);
+    const results = await runDoctor(config, { version: VERSION });
+    if (g.json) process.stdout.write(JSON.stringify(results, null, 2) + '\n');
+    else process.stdout.write(formatDoctorReport(results) + '\n');
+    process.exit(results.some((r) => r.status === 'fail') ? EXIT.CONFIG : EXIT.OK);
+  });
+
+for (const [name, phase] of [['init', 'Phase 2']] as const) {
   program
     .command(name)
     .description(`(not implemented yet, planned for ${phase})`)
