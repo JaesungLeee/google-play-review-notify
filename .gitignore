@@ -1,0 +1,11 @@
+node_modules/
+dist/*
+!dist/action/
+dist/action/*
+!dist/action/index.js
+coverage/
+.play-review-notify/
+*.log
+.env
+.env.*
+.DS_Store

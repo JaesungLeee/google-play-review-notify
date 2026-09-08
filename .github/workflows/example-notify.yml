@@ -1,0 +1,26 @@
+# Example consumer workflow (reference only; copy into your app repository).
+# See docs/PRD_ko.md §5.8. Disabled here via workflow_dispatch-only trigger.
+name: Play review notify (example)
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '*/10 * * * *'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write # cache save
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JaesungLeee/google-play-review-notify@v1
+        with:
+          config-path: play-review-notify.yml
+          dry-run: 'true'
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
