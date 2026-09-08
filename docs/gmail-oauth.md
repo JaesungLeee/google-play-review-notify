@@ -79,6 +79,7 @@ npx play-review-notify run --dry-run --verbose
 | 증상                                              | 원인과 조치                                                                                                  |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `redirect_uri_mismatch`                           | OAuth 클라이언트 유형이 "데스크톱 앱"이 아닙니다. 3단계에서 새로 만드세요.                                   |
+| `403 오류: org_internal` (조직 내 사용자만 사용 가능) | 동의 화면 사용자 유형이 "내부"입니다. https://console.cloud.google.com/auth/audience 에서 **외부로 변경**하고 테스트 사용자에 Gmail 주소를 추가하세요. |
 | `access_denied` / "앱이 확인되지 않음"에서 막힘   | 외부 유형인데 테스트 사용자에 계정이 없습니다. 2단계 4번을 확인하세요.                                        |
 | `Google did not return a refresh token`           | 이전에 같은 클라이언트를 승인한 적이 있습니다. https://myaccount.google.com/permissions 에서 앱을 삭제 후 재시도. |
 | 며칠 뒤 `invalid_grant`                           | 동의 화면이 테스트 상태라 토큰이 만료됐습니다. 프로덕션으로 게시하고 다시 발급하세요.                         |
