@@ -143,10 +143,11 @@ interface SourceAdapter {
 #### 5.2.2 Play Developer API 어댑터 — 보조 신호
 
 - **FR-SRC-API-1 (P1)** 서비스 계정 JSON으로 `androidpublisher` v3에 인증하고, 설정된 앱·트랙에 대해 `edits.insert → edits.tracks.get → edits.delete`(읽기 전용 흐름)로 릴리즈 목록을 조회한다.
-- **FR-SRC-API-2 (P1)** 이전 상태와 비교해 새 `versionCode`가 트랙에 나타나면 `SUBMITTED`(confidence: medium)를 발생시킨다.
+- **FR-SRC-API-2 (P1)** 이전 상태와 비교해 새 `versionCode`가 설정된 트랙에 나타나면 `SUBMITTED`(confidence: medium)를 발생시킨다. 릴리즈 이름을 `versionName`으로 쓴다. 이벤트 id는 `emit`과 같은 `api:<pkg>:<track>:<versionCode>:SUBMITTED`로 중복을 막는다. 처음 관측하는 패키지·트랙과 베이스라인 실행은 기록만 한다.
 - **FR-SRC-API-3 (P1)** 릴리즈 `status`가 `completed` 또는 `inProgress`로 관측되고 스토어 리스팅 어댑터 또는 이메일이 승인을 확인하면 `LIVE`를 발생시킨다. API 단독으로는 `LIVE`를 발생시키지 않는다(기본값). 설정으로 단독 발생 허용 가능(confidence: low).
 - **FR-SRC-API-4 (P1)** 이전에 관측된 versionCode가 더 높은 버전 없이 트랙에서 사라지면 `REJECTED` 후보로 기록만 하고, 이메일 확인 없이는 알리지 않는다(오탐 방지).
-- **FR-SRC-API-5 (P0)** Phase 0 스파이크에서 실제 계정으로 위 추론 규칙을 검증한 뒤 결정표(decision table)를 이 문서 부록에 확정한다. 검증 전까지 API 어댑터의 이벤트 발생 규칙은 "가설"로 표기한다.
+- **FR-SRC-API-5 (P0)** ~~Phase 0 스파이크에서 실제 계정으로 위 추론 규칙을 검증한 뒤 결정표를 확정한다.~~ → 확정(2026-09-08): 심사 중인 릴리즈가 제출 직후부터 `status: completed`로 노출되므로 API는 SUBMITTED만 담당하고 LIVE는 스토어 리스팅이 담당한다(§8.2).
+- **FR-SRC-API-6 (P1)** 앱 하나의 조회 실패는 로그와 실패 횟수 기록으로 처리하고 다른 앱은 계속 조회한다. 모든 앱이 실패하면 소스 실패로 보고한다(종료 코드 2).
 - 필요 권한: 서비스 계정에 Play Console "앱 정보 보기(읽기 전용)" 권한. 앱 업로드 권한은 요구하지 않는다.
 
 #### 5.2.3 스토어 리스팅 어댑터 — 라이브(승인) 확인
@@ -498,17 +499,20 @@ dist/index.js  # ncc 번들 (커밋)
 - 룰은 위에서 아래로 평가하고 첫 매치를 채택한다. 매치 없음 + 발신자 allowlist 통과 = `UNKNOWN_NOTICE`.
 - Phase 0(2026-09-08)에서 실제 이메일을 수집해 `REJECTED`·`POLICY_WARNING` 룰(en, ko)을 확정했다. 정책 메일은 거절과 경고가 같은 제목을 쓰므로 본문의 `앱 상태: 거부됨` / `App Status: Rejected` 줄로 거절을 판정한다. `APPROVED`·`REMOVED`·`SUSPENDED` 패턴은 아직 관측 전 초안이다. 상세는 [phase0-notes.md](./phase0-notes.md).
 
-### 8.2 Play API 추론 결정표 (가설 — Phase 0에서 확정)
+### 8.2 Play API 추론 결정표 (Phase 0에서 확정, 2026-09-08)
+
+관측 결과: 첫 출시 릴리즈가 심사 중이고 스토어에 없는 시점에 `tracks.list`는 production 트랙에 해당 릴리즈를 `status: completed`로 보여줬다(관리형 게시 사용 중). 즉 `status`는 개발자가 설정한 상태이며 심사 결과와 무관하다.
 
 | 이전 상태 | 현재 관측 | 이벤트 | confidence |
 | --- | --- | --- | --- |
-| versionCode V 없음 | 트랙에 V (completed/inProgress) | `SUBMITTED` | medium |
-| V 관측됨, LIVE 미확인 | 이메일 APPROVED 또는 스토어 리스팅 변경 | `LIVE` | high |
-| V 관측됨 | V 사라짐, 더 높은 버전 없음 | (기록만) 거절 후보 | low |
+| 패키지/트랙 첫 관측 | 무엇이든 | (기록만) | — |
+| versionCode V 없음 | 트랙에 V 등장 | `SUBMITTED` | medium |
+| V 관측됨 | 스토어 리스팅 404→200 또는 업데이트 날짜 변화 | `LIVE` (스토어 리스팅 어댑터가 발생) | medium |
+| V 관측됨 | V 사라짐, 더 높은 버전 없음 | (로그만) 거절 후보 — 거절 메일이 확정 | — |
 | V 관측됨 | V 사라짐, 더 높은 버전 W 등장 | `SUBMITTED`(W) | medium |
-| status halted | — | (기록만) | — |
+| — | `completed`/`inProgress` | `emitLiveWithoutConfirmation: true`일 때만 `LIVE` | low |
 
-검증 항목: 심사 중 상태에서 `edits.tracks.get`이 새 릴리즈를 어떻게 노출하는지, 거절 후 릴리즈가 트랙에서 제거되는지, 관리형 게시(managed publishing) 사용 시 차이.
+미확정: 거절 후 릴리즈가 트랙에서 제거되는지, 관리형 게시의 "승인됨(게시 대기)"이 API에 드러나는지. 다음 관측(승인/거절 시점 스냅샷)으로 보완한다.
 
 ### 8.3 상태 스키마
 

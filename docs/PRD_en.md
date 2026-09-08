@@ -143,10 +143,11 @@ interface SourceAdapter {
 #### 5.2.2 Play Developer API adapter: secondary signal
 
 - **FR-SRC-API-1 (P1)** Authenticates to `androidpublisher` v3 with a service account JSON and reads releases for configured apps and tracks using a read-only flow (`edits.insert → edits.tracks.get → edits.delete`).
-- **FR-SRC-API-2 (P1)** When a new `versionCode` appears on a track compared to the previous state, emit `SUBMITTED` (confidence: medium).
+- **FR-SRC-API-2 (P1)** When a new `versionCode` appears on a configured track compared to the previous state, emit `SUBMITTED` (confidence: medium), using the release name as `versionName`. The event id is `api:<pkg>:<track>:<versionCode>:SUBMITTED`, the same as `emit`, so the two never duplicate. A package/track seen for the first time, or a baseline run, is recorded only.
 - **FR-SRC-API-3 (P1)** When a release is observed as `completed` or `inProgress` and either the store listing adapter or an email confirms approval, emit `LIVE`. The API alone does not emit `LIVE` by default; configuration may allow it (confidence: low).
 - **FR-SRC-API-4 (P1)** When a previously observed versionCode disappears from a track with no higher version present, record a rejection candidate only. Do not notify without email confirmation (false-positive prevention).
-- **FR-SRC-API-5 (P0)** The Phase 0 spike validates these inference rules against a real account and finalizes the decision table in the appendix. Until then the API adapter's rules are labeled "hypothesis".
+- **FR-SRC-API-5 (P0)** ~~The Phase 0 spike validates these inference rules against a real account and finalizes the decision table.~~ → Done (2026-09-08): a release under review is exposed as `status: completed` right after submission, so the API only reports SUBMITTED and LIVE comes from the store listing adapter (§8.2).
+- **FR-SRC-API-6 (P1)** A failure for one app is logged and counted while the other apps are still polled. When every app fails the source is reported as failed (exit code 2).
 - Required permission: the service account needs only the Play Console "View app information (read-only)" permission. No upload permission.
 
 #### 5.2.3 Store listing adapter: live (approval) confirmation
@@ -498,18 +499,20 @@ dist/index.js  # ncc bundle (committed)
 - Rules are evaluated top to bottom; the first match wins. No match plus a passing sender allowlist yields `UNKNOWN_NOTICE`.
 - Phase 0 (2026-09-08) collected real emails and finalized the `REJECTED` and `POLICY_WARNING` rules (en, ko). Policy emails share one subject for rejections and warnings, so rejection is decided by the body line `App Status: Rejected` / `앱 상태: 거부됨`. `APPROVED`, `REMOVED`, and `SUSPENDED` patterns remain unobserved drafts. Details: [phase0-notes.md](./phase0-notes.md).
 
-### 8.2 Play API inference decision table (hypothesis, finalized in Phase 0)
+### 8.2 Play API inference decision table (finalized in Phase 0, 2026-09-08)
 
-| Previous state | Current observation | Event | Confidence |
+Observation: with a first release under review and no store listing yet, `tracks.list` already showed that release on the production track with `status: completed` (managed publishing enabled). `status` therefore reflects what the developer configured, not the review outcome.
+
+| Previous state | Current observation | Event | confidence |
 | --- | --- | --- | --- |
-| versionCode V absent | V on track (completed/inProgress) | `SUBMITTED` | medium |
-| V observed, LIVE unconfirmed | Email APPROVED or store listing changed | `LIVE` | high |
-| V observed | V gone, no higher version | rejection candidate (record only) | low |
-| V observed | V gone, higher version W appears | `SUBMITTED` (W) | medium |
-| status halted | — | record only | — |
+| Package/track seen for the first time | anything | (record only) | — |
+| versionCode V absent | V appears on the track | `SUBMITTED` | medium |
+| V observed | store listing 404→200 or updated date changed | `LIVE` (emitted by the store listing adapter) | medium |
+| V observed | V disappears, no higher version | (log only) rejection candidate; the rejection email confirms | — |
+| V observed | V disappears, higher version W appears | `SUBMITTED`(W) | medium |
+| — | `completed` / `inProgress` | `LIVE` only with `emitLiveWithoutConfirmation: true` | low |
 
-To validate: how `edits.tracks.get` exposes a release while under review, whether a rejected release disappears from the track, and how managed publishing changes the picture.
-
+Still open: whether a rejected release is removed from the track, and whether managed publishing's "approved, pending publish" state is visible in the API. To be filled in from the next snapshots (approval / rejection).
 ### 8.3 State schema
 
 ```json

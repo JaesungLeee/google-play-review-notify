@@ -3,13 +3,14 @@
 Google Play 앱 심사 결과(승인/거절/정책 알림 등)를 감지해 Slack·Discord 또는 임의의 Webhook(n8n 등)으로 알리는 범용 워크플로우.
 GitHub Action과 CLI 두 형태로 제공됩니다.
 
-> 상태: Phase 0 진행 중. 이메일 어댑터의 거절·정책 경고 룰(영어·한국어)은 실제 Play Console 메일로 검증됐고, 승인 관련 룰은 아직 초안입니다. 스토어 리스팅 어댑터(라이브 확인)는 구현됐고, Play API 어댑터는 스텁입니다. 로드맵은 [PRD](docs/PRD_ko.md#10-로드맵)를 참고하세요.
+> 상태: Phase 0 진행 중. 이메일 어댑터의 거절·정책 경고 룰(영어·한국어)은 실제 Play Console 메일로 검증됐고, 승인 관련 룰은 아직 초안입니다. 스토어 리스팅 어댑터(라이브 확인)와 Play API 어댑터(제출 감지)도 구현돼 있습니다. 로드맵은 [PRD](docs/PRD_ko.md#10-로드맵)를 참고하세요.
 
 ## Docs
 
 - [PRD (한국어, 기본)](docs/PRD_ko.md)
 - [PRD (English)](docs/PRD_en.md)
 - [Gmail 연동 설정 (OAuth Refresh Token 발급)](docs/gmail-oauth.md)
+- [Play Developer API 연동 설정 (서비스 계정)](docs/play-api-setup.md)
 - [Phase 0 관측 노트](docs/phase0-notes.md)
 
 ## Quick start (CLI)
