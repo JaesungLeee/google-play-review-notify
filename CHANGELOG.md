@@ -26,7 +26,7 @@ All notable changes to this project are documented here. The format follows
 - Play Developer API source: detects `SUBMITTED` when a new versionCode appears on a
   configured track. Event ids match `emit`, so CI-emitted events never duplicate.
 - `auth gmail` command: loopback OAuth flow that prints a `gmail.readonly` refresh token.
-- Guides: `docs/gmail-oauth.md`, `docs/play-api-setup.md`, Phase 0 notes.
+- Guides: `docs/gmail-oauth.md`, `docs/play-api-setup.md`.
 
 ### Changed
 

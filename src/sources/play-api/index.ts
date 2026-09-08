@@ -1,7 +1,7 @@
 /**
  * Play Developer API adapter: SUBMITTED detection. See docs/PRD_ko.md §5.2.2 and §8.2.
  *
- * Phase 0 (docs/phase0-notes.md) established what the API can and cannot tell us:
+ * Phase 0 (docs/PRD_ko.md §8.2) established what the API can and cannot tell us:
  *   - a release appears in `tracks.list` as soon as it is submitted, already with
  *     `status: completed`, even while it is still under review → a new versionCode in a
  *     configured track means SUBMITTED (confidence medium);

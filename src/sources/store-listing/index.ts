@@ -1,6 +1,6 @@
 /**
  * Public Play Store listing adapter: LIVE confirmation for the production track.
- * See docs/PRD_ko.md §5.2.3 and docs/phase0-notes.md.
+ * See docs/PRD_ko.md §5.2.3 and §8.2.
  *
  * Phase 0 showed that the Play Developer API reports a release as `completed` while it is
  * still under review, and that Google sends no approval email. The public listing is
