@@ -8,5 +8,4 @@
 - [ ] `npm run build` was run and `dist/action/index.js` is committed (required for changes under `src/` or `rules/`)
 - [ ] Tests added or updated (fixtures are masked; no real emails or secrets)
 - [ ] Docs updated (README, `docs/`, `examples/`) where behavior changed
-- [ ] `CHANGELOG.md` has an entry under "Unreleased" for user-visible changes
-- [ ] Title follows Conventional Commits (`feat(scope): ...`, `fix: ...`, `docs: ...`)
+- [ ] Title follows Conventional Commits (`feat(scope): ...`, `fix: ...`, `docs: ...`); the changelog and version are generated from it, do not edit them by hand

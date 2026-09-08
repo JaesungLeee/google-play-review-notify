@@ -100,8 +100,36 @@ inject fakes (see `test/sources/*.test.ts` for the pattern; no network in tests)
   (`feat(email): ...`, `fix(store-listing): ...`, `docs: ...`). Changelog entries are derived
   from them.
 - Keep the PR focused; documentation updates that describe the change belong in the same PR.
-- Update `CHANGELOG.md` under an "Unreleased" heading for user-visible changes.
-- Do not bump the version; maintainers do that at release time.
+- Do not edit `CHANGELOG.md` or bump the version: both are generated from the commit titles
+  by Release Please (see below).
+
+## Releasing (maintainers)
+
+Releases are automated:
+
+1. Every push to `main` runs **Release Please**, which opens or updates a "chore(main): release
+   x.y.z" PR. The version comes from the Conventional Commit titles since the last release
+   (`fix` → patch, `feat` → minor while below 1.0, `!`/`BREAKING CHANGE` → minor as well).
+   The PR also rewrites `CHANGELOG.md`, `package.json` and the manifest.
+2. Merging that PR creates the GitHub Release and the `vX.Y.Z` tag.
+3. The **Publish** workflow runs on the release: tests, build, a check that the tag, `package.json`
+   and the built CLI agree, `npm publish --provenance` through npm trusted publishing, and
+   finally moves the floating `v1` tag so GitHub Action users pick up the release.
+
+One-time setup, repository settings:
+
+- **Settings → Actions → General → Workflow permissions**: enable "Allow GitHub Actions to
+  create and approve pull requests".
+- Optional but recommended: a fine-grained PAT (contents + pull requests: write) saved as the
+  `RELEASE_PLEASE_TOKEN` secret. Without it the release PR is created with the default token and
+  CI does not run on it; you would merge it unchecked.
+- **npmjs.com → package `play-review-notify` → Settings → Trusted Publisher**: add GitHub
+  Actions with owner `JaesungLeee`, repository `google-play-review-notify`, workflow
+  `publish.yml`. No npm token is stored anywhere.
+- The first time, publish the Action to the GitHub Marketplace by editing the release and
+  checking "Publish this Action to the GitHub Marketplace". Later releases update the listing.
+
+Rule-set-only changes are `fix(email): ...` commits and therefore ship as patch releases.
 
 ## Code of conduct
 
