@@ -119833,6 +119833,14 @@ function createGmailClient(auth) {
   oauth2.setCredentials({ refresh_token: auth.refreshToken });
   const gmail = (0, import_gmail.gmail)({ version: "v1", auth: oauth2 });
   return {
+    async profile() {
+      const p = await gmail.users.getProfile({ userId: "me" });
+      const out = {
+        emailAddress: p.data.emailAddress ?? ""
+      };
+      if (typeof p.data.messagesTotal === "number") out.messagesTotal = p.data.messagesTotal;
+      return out;
+    },
     async search(query, max = 50) {
       const list = await gmail.users.messages.list({ userId: "me", q: query, maxResults: max });
       const ids = (list.data.messages ?? []).map((m2) => m2.id).filter((id) => !!id);

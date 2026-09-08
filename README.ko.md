@@ -58,6 +58,17 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
 
+권한·체크아웃·Action을 묶은 재사용 워크플로우를 호출해도 됩니다.
+
+```yaml
+jobs:
+  notify:
+    uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
+    with:
+      config-path: play-review-notify.yml
+    secrets: inherit
+```
+
 설정 파일 없이 쓰고 싶으면 주요 항목을 Action 입력으로 줄 수 있고(`packages`, `gmail-*`, `play-service-account-json`, `slack-webhook-url`, `discord-webhook-url`, `webhook-url`, `webhook-secret`, `state-store`, `dry-run`, `emit-event`), 후속 스텝용으로 `events`, `events-count`, `has-rejection` 출력을 제공합니다. [action.yml](action.yml)을 참고하세요.
 
 GitHub 스케줄 트리거는 최소 5분 간격이며 지연될 수 있습니다. 더 빠른 알림이 필요하면 CLI를 크론으로 실행하세요.
@@ -72,6 +83,7 @@ export GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... # docs/gmail-oauth.ko.md
 play-review-notify auth gmail                      # 브라우저 동의 → GMAIL_REFRESH_TOKEN 출력
 export GMAIL_REFRESH_TOKEN=... SLACK_WEBHOOK_URL=...
 
+play-review-notify doctor                          # 인증과 설정을 점검하고 고칠 점을 알려줌
 play-review-notify test-notify                     # 샘플 REJECTED를 채널로 전송
 play-review-notify run --dry-run --verbose         # 감지 결과만 출력, 전송 없음
 play-review-notify run                             # 첫 실행은 기준점 기록, 이후 실행부터 알림
@@ -83,6 +95,7 @@ play-review-notify run                             # 첫 실행은 기준점 기
 | --------------------- | ------------------------------------------------------------- |
 | `run`                 | 활성화된 소스를 한 번 폴링하고 알림 후 상태 저장, 종료          |
 | `auth gmail`          | `gmail.readonly` Refresh Token을 발급하는 최초 1회 OAuth 흐름   |
+| `doctor`              | 설정·인증·소스·채널·상태 저장소를 점검하고 해결 방법 안내         |
 | `test-notify`         | 설정된 채널로 샘플 이벤트 전송                                  |
 | `emit`                | 파이프라인에서 이벤트 직접 발행 (예: 업로드 직후 `SUBMITTED`)   |
 | `state show \| reset` | 저장된 상태 확인·초기화                                         |

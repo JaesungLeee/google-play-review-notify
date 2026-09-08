@@ -185,7 +185,8 @@ newest is restored with a prefix match; entries expire after 7 days without acce
 - Secrets are referenced as `${ENV_VAR}` and never stored in the file; every referenced value is
   redacted from logs.
 - CLI exit codes: `0` ok, `1` configuration or authentication error, `2` at least one source
-  failed (notifications still sent), `3` at least one notification failed. `--json` prints
+  failed (notifications still sent), `3` at least one notification failed. `doctor` exits `1`
+  when any check fails and `0` otherwise, and never sends anything. `--json` prints
   `{ "events": ReviewEvent[], "summary": {...} }`.
 
 ## Extending

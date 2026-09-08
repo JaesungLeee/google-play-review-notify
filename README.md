@@ -68,6 +68,17 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
 
+Or call the reusable workflow, which bundles the permissions, checkout and the Action:
+
+```yaml
+jobs:
+  notify:
+    uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
+    with:
+      config-path: play-review-notify.yml
+    secrets: inherit
+```
+
 The Action also accepts the main settings as inputs when you do not want a config file
 (`packages`, `gmail-*`, `play-service-account-json`, `slack-webhook-url`, `discord-webhook-url`,
 `webhook-url`, `webhook-secret`, `state-store`, `dry-run`, `emit-event`) and exposes `events`,
@@ -86,6 +97,7 @@ export GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... # docs/gmail-oauth.md
 play-review-notify auth gmail                      # browser consent → prints GMAIL_REFRESH_TOKEN
 export GMAIL_REFRESH_TOKEN=... SLACK_WEBHOOK_URL=...
 
+play-review-notify doctor                          # verifies credentials and config, explains what to fix
 play-review-notify test-notify                     # sends a sample REJECTED to your channels
 play-review-notify run --dry-run --verbose         # shows what would be detected, sends nothing
 play-review-notify run                             # first run records a baseline, later runs notify
@@ -98,6 +110,7 @@ Schedule Trigger; state lives in `.play-review-notify/state.json` by default.
 | --------------------- | ------------------------------------------------------------------ |
 | `run`                 | Poll all enabled sources once, notify, save state, exit            |
 | `auth gmail`          | One-time OAuth flow that prints a `gmail.readonly` refresh token   |
+| `doctor`              | Check config, credentials, sources, channels and state, with fixes |
 | `test-notify`         | Send a sample event to the configured channels                     |
 | `emit`                | Emit an event from a pipeline, e.g. `SUBMITTED` right after upload |
 | `state show \| reset` | Inspect or clear the persisted state                               |
