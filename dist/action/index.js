@@ -37750,9 +37750,9 @@ var require_json_bigint = __commonJS({
   }
 });
 
-// node_modules/gcp-metadata/build/src/gcp-residency.js
+// node_modules/googleapis-common/node_modules/gcp-metadata/build/src/gcp-residency.js
 var require_gcp_residency = __commonJS({
-  "node_modules/gcp-metadata/build/src/gcp-residency.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/gcp-metadata/build/src/gcp-residency.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GCE_LINUX_BIOS_PATHS = void 0;
@@ -38180,9 +38180,9 @@ var require_src3 = __commonJS({
   }
 });
 
-// node_modules/gcp-metadata/build/src/index.js
+// node_modules/googleapis-common/node_modules/gcp-metadata/build/src/index.js
 var require_src4 = __commonJS({
-  "node_modules/gcp-metadata/build/src/index.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/gcp-metadata/build/src/index.js"(exports2) {
     "use strict";
     var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m2, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -38541,9 +38541,9 @@ var require_base64_js = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/crypto/shared.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/shared.js
 var require_shared = __commonJS({
-  "node_modules/google-auth-library/build/src/crypto/shared.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/shared.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.fromArrayBufferToHex = fromArrayBufferToHex;
@@ -38556,9 +38556,9 @@ var require_shared = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/crypto/browser/crypto.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/browser/crypto.js
 var require_crypto = __commonJS({
-  "node_modules/google-auth-library/build/src/crypto/browser/crypto.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/browser/crypto.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.BrowserCrypto = void 0;
@@ -38652,9 +38652,9 @@ var require_crypto = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/crypto/node/crypto.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/node/crypto.js
 var require_crypto2 = __commonJS({
-  "node_modules/google-auth-library/build/src/crypto/node/crypto.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/node/crypto.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.NodeCrypto = void 0;
@@ -38716,9 +38716,9 @@ var require_crypto2 = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/crypto/crypto.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/crypto.js
 var require_crypto3 = __commonJS({
-  "node_modules/google-auth-library/build/src/crypto/crypto.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/crypto.js"(exports2) {
     "use strict";
     var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m2, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -38977,9 +38977,9 @@ var require_ecdsa_sig_formatter = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/util.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/util.js
 var require_util9 = __commonJS({
-  "node_modules/google-auth-library/build/src/util.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/util.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.LRUCache = void 0;
@@ -39092,9 +39092,9 @@ var require_util9 = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/package.json
+// node_modules/googleapis-common/node_modules/google-auth-library/package.json
 var require_package2 = __commonJS({
-  "node_modules/google-auth-library/package.json"(exports2, module2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/package.json"(exports2, module2) {
     module2.exports = {
       name: "google-auth-library",
       version: "10.5.0",
@@ -39186,9 +39186,9 @@ var require_package2 = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/shared.cjs
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/shared.cjs
 var require_shared2 = __commonJS({
-  "node_modules/google-auth-library/build/src/shared.cjs"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/shared.cjs"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.USER_AGENT = exports2.PRODUCT_NAME = exports2.pkg = void 0;
@@ -39201,9 +39201,9 @@ var require_shared2 = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/authclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/authclient.js
 var require_authclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/authclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/authclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AuthClient = exports2.DEFAULT_EAGER_REFRESH_THRESHOLD_MILLIS = exports2.DEFAULT_UNIVERSE = void 0;
@@ -39436,9 +39436,9 @@ var require_authclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/loginticket.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/loginticket.js
 var require_loginticket = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/loginticket.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/loginticket.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.LoginTicket = void 0;
@@ -39488,9 +39488,9 @@ var require_loginticket = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/oauth2client.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2client.js
 var require_oauth2client = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/oauth2client.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2client.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.OAuth2Client = exports2.ClientAuthentication = exports2.CertificateFormat = exports2.CodeChallengeMethod = void 0;
@@ -40169,9 +40169,9 @@ var require_oauth2client = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/computeclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/computeclient.js
 var require_computeclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/computeclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/computeclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Compute = void 0;
@@ -40261,9 +40261,9 @@ var require_computeclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/idtokenclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/idtokenclient.js
 var require_idtokenclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/idtokenclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/idtokenclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.IdTokenClient = void 0;
@@ -40307,9 +40307,9 @@ var require_idtokenclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/envDetect.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/envDetect.js
 var require_envDetect = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/envDetect.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/envDetect.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GCPEnv = void 0;
@@ -41572,9 +41572,9 @@ var require_src5 = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/jwtaccess.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtaccess.js
 var require_jwtaccess = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/jwtaccess.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtaccess.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.JWTAccess = void 0;
@@ -41742,9 +41742,9 @@ var require_jwtaccess = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/jwtclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtclient.js
 var require_jwtclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/jwtclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.JWT = void 0;
@@ -42013,9 +42013,9 @@ var require_jwtclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/refreshclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/refreshclient.js
 var require_refreshclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/refreshclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/refreshclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.UserRefreshClient = exports2.USER_REFRESH_ACCOUNT_TYPE = void 0;
@@ -42140,9 +42140,9 @@ var require_refreshclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/impersonated.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/impersonated.js
 var require_impersonated = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/impersonated.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/impersonated.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Impersonated = exports2.IMPERSONATED_ACCOUNT_TYPE = void 0;
@@ -42319,9 +42319,9 @@ var require_impersonated = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/oauth2common.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2common.js
 var require_oauth2common = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/oauth2common.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2common.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.OAuthClientAuthHandler = void 0;
@@ -42467,9 +42467,9 @@ var require_oauth2common = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/stscredentials.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/stscredentials.js
 var require_stscredentials = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/stscredentials.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/stscredentials.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.StsCredentials = void 0;
@@ -42554,9 +42554,9 @@ var require_stscredentials = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/baseexternalclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/baseexternalclient.js
 var require_baseexternalclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/baseexternalclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/baseexternalclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.BaseExternalAccountClient = exports2.CLOUD_RESOURCE_MANAGER = exports2.EXTERNAL_ACCOUNT_TYPE = exports2.EXPIRATION_TIME_OFFSET = void 0;
@@ -42931,9 +42931,9 @@ var require_baseexternalclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js
 var require_filesubjecttokensupplier = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.FileSubjectTokenSupplier = void 0;
@@ -42996,9 +42996,9 @@ var require_filesubjecttokensupplier = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js
 var require_urlsubjecttokensupplier = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.UrlSubjectTokenSupplier = void 0;
@@ -43053,9 +43053,9 @@ var require_urlsubjecttokensupplier = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js
 var require_certificatesubjecttokensupplier = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.CertificateSubjectTokenSupplier = exports2.InvalidConfigurationError = exports2.CertificateSourceUnavailableError = exports2.CERTIFICATE_CONFIGURATION_ENV_VARIABLE = void 0;
@@ -43237,9 +43237,9 @@ var require_certificatesubjecttokensupplier = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/identitypoolclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/identitypoolclient.js
 var require_identitypoolclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/identitypoolclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/identitypoolclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.IdentityPoolClient = void 0;
@@ -43349,9 +43349,9 @@ var require_identitypoolclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/awsrequestsigner.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsrequestsigner.js
 var require_awsrequestsigner = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/awsrequestsigner.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsrequestsigner.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AwsRequestSigner = void 0;
@@ -43499,9 +43499,9 @@ ${credentialScope}
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js
 var require_defaultawssecuritycredentialssupplier = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DefaultAwsSecurityCredentialsSupplier = void 0;
@@ -43650,9 +43650,9 @@ var require_defaultawssecuritycredentialssupplier = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/awsclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsclient.js
 var require_awsclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/awsclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AwsClient = void 0;
@@ -43764,9 +43764,9 @@ var require_awsclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/executable-response.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/executable-response.js
 var require_executable_response = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/executable-response.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/executable-response.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.InvalidSubjectTokenError = exports2.InvalidMessageFieldError = exports2.InvalidCodeFieldError = exports2.InvalidTokenTypeFieldError = exports2.InvalidExpirationTimeFieldError = exports2.InvalidSuccessFieldError = exports2.InvalidVersionFieldError = exports2.ExecutableResponseError = exports2.ExecutableResponse = void 0;
@@ -43895,9 +43895,9 @@ var require_executable_response = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js
 var require_pluggable_auth_handler = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PluggableAuthHandler = exports2.ExecutableError = void 0;
@@ -44036,9 +44036,9 @@ var require_pluggable_auth_handler = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js
 var require_pluggable_auth_client = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PluggableAuthClient = exports2.ExecutableError = void 0;
@@ -44163,9 +44163,9 @@ var require_pluggable_auth_client = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/externalclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalclient.js
 var require_externalclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/externalclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ExternalAccountClient = void 0;
@@ -44212,9 +44212,9 @@ var require_externalclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js
 var require_externalAccountAuthorizedUserClient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ExternalAccountAuthorizedUserClient = exports2.EXTERNAL_ACCOUNT_AUTHORIZED_USER_TYPE = void 0;
@@ -44398,9 +44398,9 @@ var require_externalAccountAuthorizedUserClient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/googleauth.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/googleauth.js
 var require_googleauth = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/googleauth.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/googleauth.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GoogleAuth = exports2.GoogleAuthExceptionMessages = void 0;
@@ -45188,9 +45188,9 @@ var require_googleauth = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/iam.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/iam.js
 var require_iam = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/iam.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/iam.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.IAMAuth = void 0;
@@ -45224,9 +45224,9 @@ var require_iam = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/downscopedclient.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/downscopedclient.js
 var require_downscopedclient = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/downscopedclient.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/downscopedclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DownscopedClient = exports2.EXPIRATION_TIME_OFFSET = exports2.MAX_ACCESS_BOUNDARY_RULES_COUNT = void 0;
@@ -45409,9 +45409,9 @@ var require_downscopedclient = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/auth/passthrough.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/passthrough.js
 var require_passthrough = __commonJS({
-  "node_modules/google-auth-library/build/src/auth/passthrough.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/passthrough.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PassThroughClient = void 0;
@@ -45454,9 +45454,9 @@ var require_passthrough = __commonJS({
   }
 });
 
-// node_modules/google-auth-library/build/src/index.js
+// node_modules/googleapis-common/node_modules/google-auth-library/build/src/index.js
 var require_src6 = __commonJS({
-  "node_modules/google-auth-library/build/src/index.js"(exports2) {
+  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GoogleAuth = exports2.auth = exports2.PassThroughClient = exports2.ExternalAccountAuthorizedUserClient = exports2.EXTERNAL_ACCOUNT_AUTHORIZED_USER_TYPE = exports2.ExecutableError = exports2.PluggableAuthClient = exports2.DownscopedClient = exports2.BaseExternalAccountClient = exports2.ExternalAccountClient = exports2.IdentityPoolClient = exports2.AwsRequestSigner = exports2.AwsClient = exports2.UserRefreshClient = exports2.LoginTicket = exports2.ClientAuthentication = exports2.OAuth2Client = exports2.CodeChallengeMethod = exports2.Impersonated = exports2.JWT = exports2.JWTAccess = exports2.IdTokenClient = exports2.IAMAuth = exports2.GCPEnv = exports2.Compute = exports2.DEFAULT_UNIVERSE = exports2.AuthClient = exports2.gaxios = exports2.gcpMetadata = void 0;
@@ -113924,7 +113924,13 @@ var emailSourceSchema = external_exports.object({
     refreshToken: external_exports.string()
   }).optional(),
   lookbackHours: external_exports.number().int().positive().default(24),
-  senderAllowlist: external_exports.array(external_exports.string()).default(["googleplay-noreply@google.com", "googleplay-developer-support@google.com"]),
+  senderAllowlist: external_exports.array(external_exports.string()).default([
+    // Policy / review outcome notices ("Google Play Support"), observed in Phase 0.
+    "no-reply-googleplay-developer@google.com",
+    // General Play Console announcements ("Google Play").
+    "googleplay-noreply@google.com",
+    "googleplay-developer-support@google.com"
+  ]),
   /** 'builtin' or paths to rule files. */
   rules: external_exports.union([external_exports.literal("builtin"), external_exports.array(external_exports.string())]).default("builtin"),
   reasonMaxLength: external_exports.number().int().positive().default(1e3)
@@ -114540,7 +114546,7 @@ var import_node_fs3 = require("fs");
 
 // rules/email/en.json
 var en_default2 = {
-  $comment: "DRAFT rule set (English). Patterns are unvalidated until Phase 0 collects real Play Console emails as fixtures. See docs/PRD_ko.md \xA78.1.",
+  $comment: "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (Phase 0, see docs/phase0-notes.md): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
   locale: "en",
   rules: [
     {
@@ -114549,28 +114555,31 @@ var en_default2 = {
         "has been suspended",
         "account has been terminated",
         "developer account has been suspended"
-      ]
+      ],
+      body: ["App Status: Suspended"]
     },
     {
       type: "REMOVED",
-      subject: ["has been removed from Google Play", "Removal of your app"]
+      subject: ["has been removed from Google Play", "Removal of your app"],
+      body: ["App Status: Removed"]
     },
     {
       type: "REJECTED",
-      subject: [
-        "has been rejected",
-        "Update rejected",
-        "wasn't published",
-        "was not published",
-        "Action required"
-      ]
+      subject: ["has been rejected", "Update rejected", "wasn't published", "was not published"],
+      body: ["App Status: Rejected"]
     },
     {
       type: "POLICY_WARNING",
-      subject: ["Policy", "policy violation", "policy issue", "Warning"]
+      subject: [
+        "not compliant with Google Play Policies",
+        "Action Required:",
+        "target API level requirement"
+      ],
+      body: ["Status: Further action required", "Status: Additional action required"]
     },
     {
       type: "APPROVED",
+      $comment: "Unverified draft: no approval email has been observed yet.",
       subject: [
         "has been approved",
         "is now available on Google Play",
@@ -114582,21 +114591,68 @@ var en_default2 = {
   ],
   extract: {
     packageName: [
+      "regex:\\(([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+)\\)",
       "regex:\\b([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)+)\\b(?=[\\s\\)\\]]|$)"
     ],
     appName: [
-      `regex:[Yy]our app,? (?:"|\u201C)?(.+?)(?:"|\u201D)?,? (?:\\(|has |is |was |wasn't )`,
-      'regex:app (?:"|\u201C)(.+?)(?:"|\u201D)'
+      "regex:[Yy]our app,? (\\S[^\\n]*?)\\s*\\([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+\\)",
+      `regex:[Yy]our app,? (?:"|\u201C)?(.+?)(?:"|\u201D)?,? (?:has |is |was |wasn't )`,
+      'regex:app (?:"|\u201C)(.+?)(?:"|\u201D)',
+      "regex:not compliant with Google Play Policies \\((.+)\\)\\s*$"
     ],
     versionName: ["regex:[Vv]ersion(?: name)?:? ([0-9]+(?:\\.[0-9]+)+)"],
-    versionCode: ["regex:[Vv]ersion code:? ([0-9]+)", "regex:\\(([0-9]{2,})\\)"],
-    reason: ["section:Issue|Reason|Policy|Why"]
+    versionCode: ["regex:[Vv]ersion code:? ([0-9]+)"],
+    reason: ["section:Issue found|Issue|Reason"]
+  }
+};
+
+// rules/email/ko.json
+var ko_default = {
+  $comment: "Korean rule set, validated against real Play Console emails collected in Phase 0 (2026-09-08; see docs/phase0-notes.md). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '\uC571 \uC0C1\uD0DC: \uAC70\uBD80\uB428'. APPROVED patterns are still unobserved.",
+  locale: "ko",
+  rules: [
+    {
+      type: "SUSPENDED",
+      subject: ["\uACC4\uC815\uC774 \uC815\uC9C0\uB418\uC5C8\uC2B5\uB2C8\uB2E4", "\uAC1C\uBC1C\uC790 \uACC4\uC815\uC774 \uD574\uC9C0\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
+      body: ["\uC571 \uC0C1\uD0DC: \uC815\uC9C0\uB428", "\uACC4\uC815 \uC0C1\uD0DC: \uC815\uC9C0\uB428"]
+    },
+    {
+      type: "REMOVED",
+      subject: ["Google Play\uC5D0\uC11C \uC0AD\uC81C\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
+      body: ["\uC571 \uC0C1\uD0DC: \uC0AD\uC81C\uB428"]
+    },
+    {
+      type: "REJECTED",
+      subject: ["\uC571\uC774 \uAC70\uBD80\uB418\uC5C8\uC2B5\uB2C8\uB2E4", "\uC5C5\uB370\uC774\uD2B8\uAC00 \uAC70\uBD80\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
+      body: ["\uC571 \uC0C1\uD0DC: \uAC70\uBD80\uB428"]
+    },
+    {
+      type: "POLICY_WARNING",
+      subject: ["\uC815\uCC45\uC744 \uC900\uC218\uD558\uC9C0 \uC54A\uC74C", "\uB300\uC0C1 API \uC218\uC900 \uC694\uAD6C\uC0AC\uD56D", "[\uC870\uCE58 \uD544\uC694]"],
+      body: ["\uC0C1\uD0DC: \uCD94\uAC00 \uC870\uCE58 \uD544\uC694"]
+    },
+    {
+      type: "APPROVED",
+      $comment: "Unverified draft: no approval email has been observed yet.",
+      subject: ["\uC571\uC774 \uC2B9\uC778\uB418\uC5C8\uC2B5\uB2C8\uB2E4", "\uC5C5\uB370\uC774\uD2B8\uAC00 \uAC8C\uC2DC\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
+      body: ["\uC571 \uC0C1\uD0DC: \uAC8C\uC2DC\uB428"]
+    }
+  ],
+  extract: {
+    packageName: ["regex:\\(([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+)\\)"],
+    appName: [
+      "regex:(?:\uCD5C\uADFC )?(\\S[^\\n]*?)\\([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+\\)\\s*\uC571\uC744",
+      "regex:\uC900\uC218\uD558\uC9C0 \uC54A\uC74C\\((.+)\\)\\s*$"
+    ],
+    versionName: ["regex:\uBC84\uC804(?: \uC774\uB984)?:?\\s*([0-9]+(?:\\.[0-9]+)+)"],
+    versionCode: ["regex:\uBC84\uC804 \uCF54\uB4DC:?\\s*([0-9]+)"],
+    reason: ["section:\uBC1C\uACAC\uB41C \uBB38\uC81C|\uC0AC\uC720|\uC774\uC720"]
   }
 };
 
 // src/sources/email/rules.ts
 function loadBuiltinRuleSets() {
-  return [en_default2];
+  return [en_default2, ko_default];
 }
 function loadRuleSetFiles(paths) {
   return paths.map((p) => JSON.parse((0, import_node_fs3.readFileSync)(p, "utf8")));
@@ -114623,8 +114679,8 @@ function runExtractor(pattern, text) {
     const lines = text.split(/\r?\n/);
     for (let i2 = 0; i2 < lines.length; i2++) {
       const line = lines[i2]?.trim() ?? "";
-      if (headings.some((h2) => new RegExp(`^${h2}\\b[:\\s]*`, "i").test(line))) {
-        const inline = line.replace(new RegExp(`^(?:${headings.join("|")})\\b[:\\s]*`, "i"), "").trim();
+      if (headings.some((h2) => new RegExp(`^${h2}(?=[:\uFF1A\\s]|$)`, "i").test(line))) {
+        const inline = line.replace(new RegExp(`^(?:${headings.join("|")})[:\uFF1A\\s]*`, "i"), "").trim();
         const collected = inline ? [inline] : [];
         for (let j = i2 + 1; j < lines.length; j++) {
           const next = lines[j]?.trim() ?? "";

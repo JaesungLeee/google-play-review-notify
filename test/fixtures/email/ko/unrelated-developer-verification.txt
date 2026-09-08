@@ -1,0 +1,118 @@
+From: Google Play <googleplay-noreply@google.com>
+Date: Thu, 03 Sep 2026 19:55:24 -0700
+Subject: Sample Team: [최종 알림] Android 개발자 인증 요구사항을 충족할 수 있도록 2026년 9월 30일 전까지 앱과 서명 키를 등록하세요
+
+
+[최종 알림] Android 개발자 인증 요구사항을 충족할 수 있도록 2026년 9월 30일
+전까지 앱과 서명 키를 등록하세요
+
+
+  Google Play 개발자님, 안녕하세요.
+
+
+<https://c.gle/ACT4xYweKB5XKOD_ddPcPpM4mzyW7umZ5dgjl72PqiRcde0r0pAkXAB6LqBj8PlbCdjDqmKgTlEkZYxzt4vpwW2aJEhutcX8myHvGVXgYN3Ps8dnUGIA5P4kk8hX_GcdSe5w3en0TcRKT_jYxr7afepll-MbuiBAOlIX1D8hEn8T0dOYTeV3oRHskp3HOtet-m_FnwoVhN7YiPfuP8MA7V6UbkrQonc2wHp_ZvIoDmKZeJBvYLVhx1W2mUFHAILNKpp34jP9_N88esLXvKAF7yB8iXrexWE2bmulxrvExg9AlUP550d1g6cB>Play
+Console
+요건을 충족할 수 있도록 2026년 9월 30일까지 모든 Google Play 앱이
+등록되어야 합니다. 등록되지 않은 모든 Google Play 앱은 전 세계 Google
+Play에서 삭제될 예정입니다.
+
+Google Play 앱의 99% 이상이 자동 등록되었지만,
+<https://c.gle/ACT4xYztH66m02ae2nGtZjEhZ1fnqxPjmPH-iPrrg9lM_uoCVFYMG1Z5Fu3z22h4LPKgOV478F_R1j0qawYg1PZfV04tBupstFzCEYYFfJysSuTr_TtSmrcMuOR72HItOX8176FYnSxgLQQ5RwWwWSxZcpYMTJxKUx5M9lnvQigXgkQjlbs1ukreVxN4wq_SOoil9o9iGslmlBTweDl9cs2qgUS2N3G-DUdmWrZbhKltHKffym1CGREgvUO8ElPjf_fx0Z2EHuBbxh57q-ejzI-a-RgDwyrRSBERI9jfgO0PAUCc45XIeB_MIhquohrkqr6EYaMX>Play
+Console 홈페이지에서 자동 등록되지 않은 앱 중에 계속 배포하려는 앱이 있는지
+확인하시기 바랍니다.
+
+또한 Play Console을 사용하여 Google Play 외부에서 배포하는 Android 앱과
+Play 외부에서 서명하는 데 사용하는 Google Play 앱의 추가 키를 등록하실 수도
+있습니다. 2026년 9월 30일부터
+<https://c.gle/ACT4xYxMuCAGvw3vrTzK5uowGNJH0ZFhmm0U9ETqhtmGmtxwewoaDT3XRLChUTOANxs2GAPbIMMBEUBnmebprWPM_k4WpakhcFg8getM66bWV4XORVhkW8Aue2xNLysuog7eq41QoFnHmSe_URTTcazkLIsgC4SAnwbZMfXJf13CJbj2Fd54buID-letRZF5p7syxNMOMDqxNSVYu6vIJYho9WmrTpuTatmUcQn3qjw0XC3B1GsRoNuuy3hTk1wvN-UpS8CNoLeX1Ewf1ouzckSfTTnMmxeZrigjNTMENTSaO-s>일부
+지역의 참여 스토어를 통해 설치되는 앱은 인증된 개발자가 등록을 완료해야
+<https://c.gle/ACT4xYyeORw6qRNvLQG8UEIqWcGfOWjZUtlcqeTcdQNBU7dNYKBnhWxreeK4fHOGsq03SdjFzz1DX43sxT2tZTtM7Dii2lZyl897jNmo1S62JIn424Va357OgW_K8o_NHhgwamLmfPqaHf5QgaD-jaWO8ykPM49l-7d06bZ1k64VSzt-KXkrSsAN7aa68VFug8vtOdD9nbEp9jxZDC-zztzp1rLVGqosV2rmjaQjV6okL5W_0W-NlWOG4kv0y9twTYs_UHvNmuqxZb-opw>인증된
+Android 기기에 설치 가능합니다.
+
+
+Android 개발자 인증 준비 상태 확인 방법
+
+
+Google Play 외부에서 배포하는 앱 등록을 포함하여 Android 개발자 인증
+요구사항을 충족하는 데 필요한 모든 단계를 Play Console에서 완료하실 수
+있습니다. Android Developer Console 계정을 별도로 만들지 않으셔도 됩니다.
+
+2026년 9월 30일까지 준비를 완료하려면 다음 단계를 따르세요.
+
+
+-
+
+등록되지 않은 Google Play 앱을 Play Console의
+<https://c.gle/ACT4xYw-Smv8z8iZzE0OLqKvHhHXdozP6czrrjYjFxBq-0TTg4kbdQnMdPS3ptVv_VMMYf2ZgApXygDPylPHEiGXpxLYttnmLOdRIhM0AZ8l_vSgz6uYDuWfcBTY66bzrxLb0D9KB0EGFaHoFis8AHH2BJ9StxnOdT_rFEHJDSitmkjABm8okeTM0pwZ2P5eELxaqdYfE1GTUMTUFMJ_EGZYu1RUWyVYlccWyJkzeMkJDuv-W-rUsQ2WXq_yxHc5LThfGRDRU-grAENmbRzjvCWTwFA-F5biwBKqf1H_GXVgQz_LNsXTluzbGzdD9V5eMA>Android
+개발자 인증 페이지에서 등록하세요
+
+자격 요건을 충족하는 Google Play 앱은 자동으로 등록되었으며, 전체 Google
+Play 앱의 99% 이상이 Google Play 서명 키를 사용하여 자동 등록되었습니다.
+
+Play Console 홈페이지에서 등록된 Google Play 앱과 그렇지 않은 앱을 확인하실
+수 있습니다. 각 앱 옆에 패키지 이름 상태가 표시되며, 필터링을 통해 등록되지
+않은 앱 확인이 가능합니다.
+
+계속 배포하고자 하는 미등록 앱에 대해서만 조치를 취하시면 됩니다.
+<https://c.gle/ACT4xYygXftdukqXCMobYS9RgIzUlC1n5FgBDpzMUyAmW5l1A483AyFC_yzuG7sZtlm55os5Yia-L73e3hRsu0v_BQR1FyMNUrsLTazhe_PAnVVZjDfndvmjbZc1p71-5NRwYVBTySmofP-YbpmUPLDw2ArITEVYfIyny6Q26sY82pEUgKMqhfd1HLYw4oGZf8W8S6yOpfR9MLMOYw8ULaSgKdCh6BUyXcNM9uWnlsyYvVIl7dGDHM-ILLI4cNDi58jYj_JSQH9y2hA-uP75RkXP3tCyMI_CLBdo475PWijVzOSmFjyUSBiPdHA>자세히
+알아보기
+
+이미 시작한 임시 패키지 이름 등록이 있는 경우 등록을 완료해 주시기 바랍니다.
+
+
+-
+
+Google Play 외부에서 배포하는 앱을 등록하세요
+
+Play Console에서 이러한 앱을 편리하게 등록하실 수 있습니다. Android
+Developer Console 계정을 별도로 만들지 않으셔도 됩니다.
+<https://c.gle/ACT4xYyCrooiC_-vBwTQRMvO2sSOSajpaSZamWfhVzOHyKY457bQb69dI7ymGbIcEvIIKEzOFtG3vStwiHrHpAVd_aWFQeONqk2Ije0aE3SwsT98WYngdagyQ5xVYwZ7vW_RQp0E9H2mo20CDO7X6Ex_FI0w0giVVpgPw_MA1QNOwdSK8teMzu8qBD-nAzBhH2aPs9j1g9sZc83Zpd_0GTOBX2y2AjbWn0jm07MjI3WwiCYRdX718byUVytp9UdI9UvoKW2ONK8Kryzp2Pj7G2kPvY2jOpTnIHuWl37OUwqXecH_2XiMIyBEa5Buipw>자세히
+알아보기
+
+
+-
+
+Google Play 외부에서 앱에 서명하는 데 사용하는 Google Play 앱의 다른 키를
+추가하세요
+
+2026년 9월 30일부터 다른
+<https://c.gle/ACT4xYwE8WN3sSi1qGtgrCFGyS4eSxADDD1FujlE-Hd3xb_yrBPJKti5TNWjpg3AjMWa8FfFzc1qKUluPSnHFbJ_gBOqnnSSbPfygwyxng76ikVSrYJK2iBfxv_39cl1RfIn3W4QTlUMDvVlKUFhmkOMyNeDl3r8Ls4O6zd1YNos-Ug8PdybuTkEEfRwQMcMTSwEnv6E4x01Dy5OKhNulrbgDbrLPU0ttVCbyWsBsbYBuGf-ujaAx18cUEDs8KjRYpSXdUe-Bi3pka9D7RPgXc6je0Lh-JGKzf2q4SAgQ86pdbO73FzWUnYf>참여
+스토어의 Android 앱에 대한 미등록된 패키지 이름과 서명 키 쌍은
+<https://c.gle/ACT4xYzO1i805T2XdN2bu0Mz6aDL5odB3gcE8c_AksmJJeapzUoJLCAlDd-a-5tUTanHOMBzmetGCOC0SwjSe9LMYS3m8TLhjGIRBXc4G72sR1g8ZbrW794N0mGUT39tU-BO3iCiV0t4IxFQCuMPUcu_QX0ot4UIu1rTobJlMc8NXf8VKVpCTlrtMmqG3F4sP7reCtHmMcb51M7cBpICr4d9EkVTNeaqfXbzBFze8aVGrT-p1lUR0svTWvk3xCeRp2J6PZZbaxelRQ3hN6DplU3fp1gZu1z6FTXipbQZWPUwfFH8yJECXUbUwZAkoQ>일부
+국가의
+<https://c.gle/ACT4xYwcA5YrE68BDlRhGJUK3c03LICqDWV0TrpO0Qg3BLLlE1CmXiEk-9vMkTAZdpmAQ9FWfMvhSigMcCWcxyCLOdssS8b4vkiSaodhcZOzv27tJkS8UqWNkn5BFaKiWo7bPHDNA08-cM6V19rj-E_Ft_9RUHGNukF8TxI2jb5B_BGBk65saOOF4dXMZGJ_Ce_UC7uaQMn_zcHC3peqJrzSTHaoKMK1g2gIB2nJosfoQeB2BuNl2fEf-sNKkq-BykAD0HIiTMQMnzT3Elcpt5iOEeI>인증된
+Android 기기에 더 이상 설치할 수 없게 됩니다.
+<https://c.gle/ACT4xYxGsZuFwVpdZMQQkmj7eFvwgKS0FKcWbyzSL_rEa8tKdQddFi4kOs5NAoVt792tMWaICrcKPrjxTrv7vD2o1QRgy7Cmxi1xtps_o7Odh5G9d86tz_1-vWa-ZI-i00XKOOXv8jryvXxNoAhb7neBjeNEPJlYVG56mX3qFsXuhlyC8t2aUkm8kQUFfqV01p9pCw9P5hqSgTDZlAzmUo_LfQD4mzAqgP7sTGRreme2FBeuQHaFVDKAQF1eyw8FAeIiuZgp9jUBZ1wGxxVkza9HKIdP_rEnUJXVfbAAlCIIkg2YrHy9Pjt3ZKq_0StHftSaSAkMu6e4fqd5dnkrD5Z3>자세히
+알아보기
+
+
+즉시 이 단계를 완료하시기 바랍니다.
+
+
+자세히 알아보기
+
+
+요구사항, 패키지 이름 등록 절차, 기한에 관한 자세한 내용은
+<https://c.gle/ACT4xYz6mNE7SrqS5z5NJFK7DcPt_o0R70wk2enD5vZeUoccL4OCQ9ZKI3BtNtfvOfUazeReY63eWbEqgbj8ZthT7wdkN0Uu_H6dMK1swCf6I0XO4gBHvUdD-lOEtEW8lNI7wHoAnM_3jvJtRfqe6XfDVHwmWtLGPVp2Fe1tvwjz-PtMRoKKKwe8qv4uexmXMV_XWsXJdInfKt18PG1cLivOzEnqScfASiXOVN3wlKZSAroALkKWxldzU4usAJELPftgTiaAzxUntqk75pFQ02TQEs3g9Q5Oe8TW5vF2M0i4-d8r6N8>Android
+개발자 인증 웹사이트를 참고하세요.
+
+
+Android 개발자 인증으로 이동
+https://play.google.com/console/android-developer-verification?utm_source=email&utm_medium=msa&utm_campaign=adi-30-rem-q3-2026
+
+
+감사합니다.
+Google Play팀
+
+고객센터:
+https://c.gle/ACT4xYzHc7PoTn2y9ReAv-v52eEzMcYMnmBiCLGuxxkhrKj_NOEburdiNZHe_PPEwHBwzBuP-qD4dV38IWsaQXPlrN237xGOM44tfyzomTD-DnEwxZZY45WjeWeqtKGLl-HFaF5_C6cCABC0fDjm95S0r-at37k5hAas_4Nsn-iVsHI0H3Ou_DcSFEZCaFGkkrvGUfZtSklaU9ZQ8Z0LAqqQzkJgrNbZ6hLj5lrCQdEdoS0dJNtDOvnW1X3sj2m8uO1Q7addpguzqw
+커뮤니티 센터:
+https://c.gle/ACT4xYwJ238Y8RUL3APX3p7R0kzsr3ubZi8pohS8biAjD6LGNBgD_7K0CN4MO7V3hG-4vmyQA0YY5JDSf6FtGlQ6NMjTy8O_8CK7RgwMjM-lIbJWCZqWIQnC6l228pEUJTNE8_lUZpzBw_jqy3HHEnmYTZgp48izDn6eHxqemrIeopvL_65eXhGxHonEBJa2r_Bc8hikE7GfE-113tab7AT7De4Vujq-_GFvZhRVOdRtYW4TwPozLbggqc5MMoZRuYGgxn8kXL-8Kr5fvyjHd6fyAilwsAygP287mxeHIg
+알림:
+https://c.gle/ACT4xYzUe5ibyIvFGMVNk9Bs3Gct-7_R1gf2BaXOXe6dgCljGPINbU5eiXnhzssVkSJxvrxej4Rte7YhYSoF-Rg7mhVp8xCKTtRZWTnEAG3PAa_xlAshyFx_typDXNrR5HdQRtC56hfZdxzctMiFCXBW0XIeup6IxI0Uk45oE1Mh4_E2d78JTMb-Ln8zY2WOFCWnzKPxn0WIS_evhB7jdcefMWZbRsL931mQIEuiLkwHF8NAxgeHswTLD_8TLzSUnctrG_MHNhUkSVg
+
+© 2026 Google LLC
+1600 Amphitheatre Parkway, Mountain View, CA 94043, USA
+
+Google Play 개발자 계정에 관한 중요한 변경사항을 알려 드리기 위해
+<#>developer@example.com 주소로 발송된 이메일입니다.

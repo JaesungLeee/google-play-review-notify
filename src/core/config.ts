@@ -27,9 +27,13 @@ export const emailSourceSchema = z.object({
     })
     .optional(),
   lookbackHours: z.number().int().positive().default(24),
-  senderAllowlist: z
-    .array(z.string())
-    .default(['googleplay-noreply@google.com', 'googleplay-developer-support@google.com']),
+  senderAllowlist: z.array(z.string()).default([
+    // Policy / review outcome notices ("Google Play Support"), observed in Phase 0.
+    'no-reply-googleplay-developer@google.com',
+    // General Play Console announcements ("Google Play").
+    'googleplay-noreply@google.com',
+    'googleplay-developer-support@google.com',
+  ]),
   /** 'builtin' or paths to rule files. */
   rules: z.union([z.literal('builtin'), z.array(z.string())]).default('builtin'),
   reasonMaxLength: z.number().int().positive().default(1000),

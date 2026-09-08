@@ -1,0 +1,100 @@
+From: Google Play <googleplay-noreply@google.com>
+Date: Mon, 09 Mar 2026 14:52:30 -0700
+Subject: Sample Team: Supporting you for the Brazil Digital Child and Adolescent Statute
+
+Supporting you for the Brazil Digital Child and Adolescent Statute
+
+SERVICE UPDATE
+
+Hi android,
+
+You are receiving this email because you have at least one app on Google
+Play that is available
+<https://c.gle/AEJ26qsSEFKgRL7CuEMp-uwBIUHItAynPDcpUCSRC-PNtYWkrtFymMAk47WoGOhRhhaxCcXODfu2CCsxqldaYQbg-AX3t7wuq5gnPH61-9zixeuMl-OJjYKQVZKNHbEWJ3oavpDrTMID8Xbi0x1xkWXPIgGgjC58uBFLHJKymiMb65Zl_o5WVkIBY2Sk7d0QYUoqjIE>
+to or used by users in Brazil.
+
+What’s happening
+
+Brazil has passed a law, the Digital Child and Adolescent Statute (Digital
+ECA)
+<https://c.gle/AEJ26qvx5TnaxVzowNgcEPhzAYEP60SOZyyHfKxp8c9QzMoj5CxuqwAlXgV8dvP4BWYYAik-BQTe3Ecia9uxX1jHfEZYPvL5_lHdtrHbAry5bPl3H4bx6Ingj-xICwMiOvaNJNB629dMQqi0Z7cftCoqVO-ka4H5UmJEZbGN23uppWRv-rESbuXskjlJPogPx8kZiqpx89wCUbDQJwB3sizqoiRG02B4WuVMhO-Crmhl-56GG44nT7X6-2w9>,
+outlining new obligations for app developers. Key provisions include:
+
+• Requiring developers of apps aimed at children and adolescents or likely
+to be accessed by them to ingest age range data from app stores; and
+
+• Prohibiting loot boxes in electronic games aimed at children and
+adolescents or likely to be accessed by them.
+
+It is scheduled to take effect on March 17, 2026. We recommend that you
+take action to determine whether and how the Digital ECA applies to your
+app and implement any necessary changes to ensure compliance.
+
+What this means for you
+
+Age Signals API
+
+Last year, we announced the Play Age Signals API (beta)
+<https://c.gle/AEJ26qvJGfiZG4WymVsk4e9Tz-GzK4i6UVRYZM_8WW8zWYj3z2HZH3lq0ddkAUP5Xl7VH6dm3vP2kkU4TOmuYeY6x4VBWi-gfqOtDWC26LbMFU8y6QjB0EJwlZfkHbpt8QXLuNM6utkZAA3fM1KVNguoVBMq3vVkWiL429nmrrk7lxNULwBnhB5BK3DWmTVGCO_CmriMe-Y0_vcs6Q>
+to help developers meet their obligations under age verification laws in
+applicable U.S. states. Starting March 17, 2026, we will roll out age range
+information via this API for users in Brazil, beginning with supervised
+users and scaling to all users over the coming months. The API will return
+an age range when the user or the parent of a supervised user agrees to
+share age signals with apps.
+
+If you plan to use the API, use library version 0.0.3 or higher of the Play
+Age Signals API (beta). Review the updated API documentation, which
+includes example responses
+<https://c.gle/AEJ26qtBgbTcnbT5ea8N17rdlfY8pXtcZmss67JtIQLj-z6CgpZAW_vBODfjygVvT7Y9KUeAdrcutMsSASXxrDcgIeZGeZc7YvyDsphZS4Yxt4P2Fj1aQRKMXwjc0Cd4A3VPVAWbyXuSMryboOSg09xl0kpUhO6omMOKFE9TgPQkZGJAVSpseMj-_ChvsPCgr8bj4BtfrZ65_dR4v6_hRjul219MfSHbudMiwDmDq_qvb752gA>
+for users in Brazil.
+
+Apps and games rated 18+
+
+Effective March 17, 2026, Google Play will start blocking or filtering 18+
+rated apps and games for users in Brazil that are determined to be minors,
+as described here
+<https://c.gle/AEJ26qvm03oP4boCIUAP7Z8sEtN1WR_R6W9H7n_k1o3oXROWqeuHfEGeYho1U2y6FycoYp38g7TCT7DZMfUlvNk67smfcOdP_9Asz1QOEGYfRNbH8Ti-UR5TrUYhtT5r9n4YnMeiIUKt403L7FuoWZUMQeohINXco8HGys7zea59X3fL6mh883Wm1SO1sK3y>.
+
+Age ratings on the Play Store are assigned by the International Age Rating
+Coalition (IARC). The ClassInd age ratings classification for Brazil is
+currently being updated. You may need to resubmit your content rating
+questionnaire in the Play Console in order to obtain an updated ClassInd
+rating from IARC under the new classification, particularly if your app or
+game offers loot boxes to users in Brazil. For any further questions
+related to your app rating, you can contact IARC directly
+<https://c.gle/AEJ26quTnjvhve27vSaRvu3yknhHvnxYVRESeC2CGd9B31GK82bR74L5F00KkiD4bHRx7eUvjziFUISSsOWoVcXrroPuBxoy60uUvHDhNNOSGjjofTeCmYrABq0uMLUpEnPtAOs0ZFSOyK6Ckc96ddh4iZ-263sLfWQ5hpLBFQ3tPISa0-S2TAPmYML53jZCG9grFxwuSartD38jVgHBYiE>.
+You are responsible for implementing any necessary changes to ensure
+compliance with the Digital ECA.
+
+For more information, see this Help Center article
+<https://c.gle/AEJ26qtScALXXTEm8A0VioEC2nxQknDXtMCmc0fSTGNH0wAJ-FN55p9am_NJiBlJ-u4ObX1jjYwwXEqihLRlIsMu1jIgzpvto8dk01cGzyd90xziMzio1we49E8e4M9i9OarAXrZS7Ewx8Krr5PXJYOv9RwWBFOWuv_EHiuW799317O8uu_XkdTXXiH38k0hG2LNuy41TygV3wQZrKm4>.
+If you have any additional questions, please contact
+<https://c.gle/AEJ26qu1-cJUbIe_RxEmwMcRtGPws1jn6z0HpsSqoWnjbHTrqDmRNOtJfaKcyHa0E8O4KzFSWmQj5PkrQDfKxv11brCl7CmgEqulcBUfXtvOG2nAKNvfDwkIX8Ywvv5iFiuJo8GDSoalLCXsMUeIXGGZGffnl0YlsP_cei3h84l0D9RRioCNkmnM6JA>
+our support team.
+
+Thank you,
+
+Your Google Play team
+
+<https://c.gle/AEJ26qtii2gM0koZidaVIrUwVY5JCK5el2SuXuS3KUVureHsEBlkXgbe9rCCKU-o5gzf5wssjwpa7U7BOAmGj9dEA1T39W07C8snI8fVYSSxze8izjo9Ck1JRhB8SE9p0G5UruGq7WGHHnayPSm84NnlCg_D511X7bG6z9fU4NAqO4TLYcNTw2IekAUxoTQ>
+
+Help Center
+<https://c.gle/AEJ26qsXmVwFVYV0LJVUyf0Ro80FUD8368aXTwXJf5BdXHwI4h13u_1POZXpN9LPlCcSGEQxV8q2k3pWhgwHRGBoV0lm4aOwml-JipYCIXRuqMlt09YMLUiYOEkDrzX2Zg_ulCJ8DeiSjn1J0uQxhD2S9MaQfvroDAevVuDljr0TFp7KTaI6YWtL>
+
+<https://c.gle/AEJ26qtmLr1eA9p8l9_q_p4QTtBWpJFyePX9jeJ02RfWlUWqTedvlowypA_vnBdGsfcF-9IuTOKIvOXyXrHMcxSVfnhELfQN_rLGe7OUiFr9TjJt922gymUSYrMYf_P7eZRC7A0AuvyEU2XXyo85iezGHoO-9i20c04kQZT5wPSC7oWa_i9DsO_cqcaaRqa0I0xr2YdXjahg9pG3GZk>
+
+Community Center
+<https://c.gle/AEJ26qtOM9gpSMpU1TCxOO2wpCH_4Mz2LY8SusuF8V4Z5x5ua-VJYf2AwZKcEmHsbfjSkMONLkT9Mna6BCXs1wpceN8paym2VmJj28UI0kSicLe0H_W-2f2tbIoTYu78SCJ0QxlzTa5GVbnC1Oo4WMwliUtm2_3EFwLy1nWd8GcjalFuwjIOiPzy7A-rAwF0egfAQxXw7us9>
+
+<https://c.gle/AEJ26quFa-2azuWRDzZLTvpBmuxU2wuKyeOo9nnASLPm3JvE-3R4c3HlGvEWzxP1ObNlWof1ueFCOh-JDQ-5UOK_30ljp0bjzni2mZHBbb974lWmzCUoi7pnxBRZB5csEoH6RdDmVWeNn3yRZTI2y09UQ9aOLpTA_1lyOQtwtsquJpEnyIWk5VhhUb6h_vZZ>
+
+Notifications
+<https://c.gle/AEJ26qvQLFDZRe8DJuwe4XKbnqK0Smn1p6QcnprAYTVCHspXmRzQpTcj_3itr7OKCyw6LSxXdAFPVnAnptph_ECBna-W-Ti4_kqxLxRUVSzcMnoT1EKdYAfVt4PAPLjbfIBoq_seKMP-vy2RFajTEHzsq2h5ccbdNxBoBqkqFGDhqd8cU6usO3dfig>
+
+(c) 2026 Google LLC
+1600 Amphitheatre Parkway,
+Mountain View, CA 94043, USA
+
+This message was sent to developer@example.com to inform you about important
+updates on your Google Play developer account.

@@ -130,7 +130,7 @@ interface SourceAdapter {
 #### 5.2.1 Email adapter (Gmail): primary signal
 
 - **FR-SRC-EMAIL-1 (P0)** Calls the Gmail API with an OAuth2 refresh token; the only required scope is `https://www.googleapis.com/auth/gmail.readonly`.
-- **FR-SRC-EMAIL-2 (P0)** Selects Play Console notifications using a sender allowlist (default: `googleplay-noreply@google.com`, `googleplay-developer-support@google.com`, domain `@google.com`) plus a subject/body rule set. The rule set must be extensible and overridable via configuration.
+- **FR-SRC-EMAIL-2 (P0)** Selects Play Console notifications using a sender allowlist (default: `no-reply-googleplay-developer@google.com` (policy / review outcome notices, confirmed in Phase 0), `googleplay-noreply@google.com`, `googleplay-developer-support@google.com`) plus a subject/body rule set. The rule set must be extensible and overridable via configuration.
 - **FR-SRC-EMAIL-3 (P0)** The rule set classifies emails into `APPROVED / REJECTED / POLICY_WARNING / REMOVED / SUSPENDED / UNKNOWN_NOTICE` and extracts app name, package name, version, and reason where possible.
 - **FR-SRC-EMAIL-4 (P0)** On first run or after state loss, only messages within `lookbackHours` (default 24) are read, and the run records a baseline without sending notifications (D11).
 - **FR-SRC-EMAIL-5 (P0)** Normal runs keep a processing watermark and a list of recently processed message IDs in state to prevent duplicates.
@@ -234,6 +234,7 @@ sources:
       refreshToken: ${GMAIL_REFRESH_TOKEN}
     lookbackHours: 24
     senderAllowlist:
+      - no-reply-googleplay-developer@google.com
       - googleplay-noreply@google.com
       - googleplay-developer-support@google.com
     rules: builtin               # or an array of user rule file paths
@@ -492,7 +493,7 @@ dist/index.js  # ncc bundle (committed)
 ```
 
 - Rules are evaluated top to bottom; the first match wins. No match plus a passing sender allowlist yields `UNKNOWN_NOTICE`.
-- Phase 0 collects real samples (approval, rejection, policy warning, removal, suspension), stores them as fixtures, and finalizes the rules. The pattern strings in this document are unvalidated drafts.
+- Phase 0 (2026-09-08) collected real emails and finalized the `REJECTED` and `POLICY_WARNING` rules (en, ko). Policy emails share one subject for rejections and warnings, so rejection is decided by the body line `App Status: Rejected` / `앱 상태: 거부됨`. `APPROVED`, `REMOVED`, and `SUSPENDED` patterns remain unobserved drafts. Details: [phase0-notes.md](./phase0-notes.md).
 
 ### 8.2 Play API inference decision table (hypothesis, finalized in Phase 0)
 

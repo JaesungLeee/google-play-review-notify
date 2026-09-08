@@ -1,0 +1,36 @@
+From: Google Play <googleplay-noreply@google.com>
+Date: Wed, 08 Jul 2026 07:40:29 -0700
+Subject: Google Play 서비스 약관 업데이트
+
+2026년 7월 29일, Google Play 서비스 약관 일부에 변경사항이 적용됩니다.
+
+여기
+<https://c.gle/AOPyDKTIyhFPkW5uBrGK3G-OD0bbzq2waE47J5fAP2C1_qON4eMB-nMEfaxmGhgtBIhxXClk7gZrPhkzqejF016xyLxp1LqnHoQpYqYJdLrohynsXfbUiLt5kI0gw7om8BTbDFanknKmQg-tOmoHKNxAfzpyCdTxPmIC3zq2ocziiIbxeOw>에서
+새로운 약관을 확인하실 수 있습니다. 이번 업데이트가 사용자에게 미치는
+영향을 간략하게 정리하면 다음과 같습니다.
+
+
+• 시스템 서비스: 인증된 Android 기기에서 서비스 및 업데이트를 제공하는
+Google의 시스템 서비스는 네트워크 연결을 필요로 할 수 있으며, 모바일
+데이터를 사용할 수 있다는 점을 설명하는 문구를 추가했습니다.
+
+• 계정 공유: 사용자가 약관을 위반하여 계정 세부정보를 공유함으로써 발생하는
+계정 관련 문제에 대한 책임은 사용자에게 있다는 사실을 명확히 설명하는
+문구를 추가했습니다.
+
+• 정기 결제 관리: Google이 사용자가 지정한 결제 수단에 청구할 수 없는 경우
+Play 계정의 잔액에 대한 책임은 사용자에게 있음을 설명하는 문구를
+추가했습니다.
+
+Family Link로 다른 사용자의 Google 계정을 관리하는 경우, 시간을 내어 해당
+계정 사용자와 이러한 변경사항에 관해 이야기하시기 바랍니다.
+
+
+Google Play를 이용해 주셔서 감사합니다.
+
+Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA
+
+(c) 2026 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA
+
+본 이메일은 Google Play 제품 또는 계정과 관련된 중요 변경사항을 알려 드리기
+위해 발송되는 필수 서비스 공지 이메일입니다.

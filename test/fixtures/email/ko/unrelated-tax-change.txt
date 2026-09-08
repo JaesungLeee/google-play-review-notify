@@ -1,0 +1,60 @@
+From: Google Play <googleplay-noreply@google.com>
+Date: Wed, 12 Aug 2026 09:33:47 -0700
+Subject: [중요 알림] 2026년 9월 1일부터 북마케도니아에서 적용되는 세금 관련 변경사항
+
+
+중요 업데이트: 2026년 9월 1일부터 북마케도니아에서 적용되는 세금 관련
+변경사항
+
+서비스 업데이트
+
+  android님, 안녕하세요.
+
+2026년 9월 1일부터 적용될 다음 세금 관련 변경사항을 알려드립니다.이 날짜부터
+모든 개발자에 대해 북마케도니아 고객이 Google Play 스토어에서 구매하는 모든
+유료 앱 및 인앱 구매에 대해 18%의 부가가치세(VAT)를 산정 및 청구하여 납부할
+책임은 Google이 지게 됩니다. 또한
+북마케도니아에 소재한 개발자의 경우 Google이 청구된 서비스 수수료에 대해
+18%의 VAT를 징수하여 관할 당국에 납부합니다(해당하는 경우).
+북마케도니아에서 납세자로 등록되어 있고 Google에 세금 식별 번호(TIN)를
+제공한 경우 Google은 서비스 수수료에 현지 VAT를 적용하지 않습니다. 다만
+VAT를 자진 신고해야 할 수 있습니다.Google에 TIN을 제공하는 방법은 다음과
+같습니다.
+
+- Play Console을 열고
+<https://c.gle/AKMee0c0xlwugL9WcE8CRg7G5oAAy_0fbnsvvXtxEpC-KI6CnRUkD4YQIKSfVKvpB3E3PUmah5KSfxaZGGZFC154Y8z437QkKvvyzzYGFVevgECthsENpF23Uxb8PRmitoFQooRRAWw4dKXlJrUjGwKHG54_s7PDRYwlm8o92jZXgZ4soE0tIDVcJKQ_ci9wTExOn9Cqm-04DRC2ZiH5uqmEfI7w7ruQ-h71U9a3GoRhflNGFefWX8SnSjefaOR4gKHMcHh8YIfciKb6DZD_F5LdqMBB0ItSP2BUOxCoPE2Ogg>결제
+프로필 페이지로 이동합니다.
+- '설정' 섹션에서
+설정 관리를 클릭합니다.
+- '북마케도니아 세금 정보'까지 아래로 스크롤한 다음 연필 아이콘(✏️)을
+클릭하고
+세금 정보 관리를 클릭합니다.
+- TIN을 입력합니다.
+-
+저장을 클릭합니다.
+
+
+&#xa0;
+유효한 TIN이 없는 경우 Google은 북마케도니아 외 지역 고객의 유료 앱 및 인앱
+구매로 발생한 서비스 수수료에 18%의 VAT를 적용해야 합니다.
+
+세율에 관한 자세한 내용은
+<https://c.gle/AKMee0c6oetTqwYWa6N8aYFS9m9VH_lqKtb7atSA-NTRKEtnaD8jTrkPW4oKm2xwHjm0u8LXTeXZl43uxSFNGndX4FUjoQCh6UZqtrM_nCpsU-sop1fYu7-g4xMsH8ElPGsJqln_892TbRuk6W5la8gcOzZlnTxXSBvzwMFEM12nJJYh2S2ay3SHLeqrux1st-a_uHL-t2s80abHDK6UccCZjzpMshBnPor6CZa0ilw9c4Ay0TWVWM3YaXTCU35BJkN2fe6AYic8zCa0Mxty8VPMm2yNXLtvVvqh_EKWvbkBhaiZFhTb9oID>고객센터에서
+확인하세요. 더 궁금한 점이 있으면 세무 전문가에게 문의하시기 바랍니다.
+
+
+감사합니다.
+Google Play팀
+
+고객센터:
+https://c.gle/AKMee0dkmkbtdZlwTGqg21PJGb0VpAw0P5_81Ot9ch74_PQlgAFSLBFRb0SQwULfFuF1FhtZTva5ijmkLgU0wAt7vlHv_TCGr1Deeo43urDrZGtlNJyxlbV-fRHyiqerzYFjYRRa2v1yFiKUUxozPbemyYs9ZNrG5RcJfxEBAjDa0oYFowydt2--mvMwQ9I7VX_BcjYExWh7Z3OelFrOyThLKx9LV1FgfNxR3nQrxEI2EDO0sSUWfK4Icxv8nKI1eOmF49s9rKJ3Q4FK3NzukWeQzCh4gQ
+커뮤니티 센터:
+https://c.gle/AKMee0cFdyib1rkEL1U-cy4DK_XQnulwRHhT3Q_M_07Q11yqpudlcydzwL6uH-LFl3QSm0TZ13V2zh680Dm7ACa_Y-jHIDI78YSFYynPTuysgwexDoyssC5MlvmicbrL0H4uSqTtwtffbcrVS3hjqhZBbxQ4yxbG_BBZ0oVsYxdvhMV9SPnFEn-mqSBfI5aylV-yhYewAEQz7H4a0z7M-doOig_NpWqq1f720-jnmI6jWajzjEqpY49UHuW4aATO_BR8WVRqm4Da_qsp7TMlmXtFbzDOIc_wBW9nf2VAja8QYSCmAKz91q5Q
+알림:
+https://c.gle/AKMee0f4DzJOZLYZlwHzwAnRk9S7HcYngfnyyoAE0dIfnoN6Ch11l7qASYgXj2M1AHWpFfIinBs9EL-RbsMKRkI0RaJWD1ZnaJOvt0dkHeUy4QoGeZ4Ts46Yx4tg65EsO4biE_qXLlnaY02XTKavgJG86hkxV_rKkLK7aby2cZ_GjbqgGoajTxN4FCeT68ZNAFZ6idvdbodXgbTnnx29lPEmXa8nJ7IoipkMwRScxnpgGFR_42JaCp95F0tOe8OlmC_W2ekKDyOk-tPd2JyRf5EOJhSSnpc
+
+© 2026 Google LLC
+1600 Amphitheatre Parkway, Mountain View, CA 94043, USA
+
+Google Play 개발자 계정에 관한 중요한 소식을 알려 드리기 위해
+<#>developer@example.com 주소로 발송된 이메일입니다.

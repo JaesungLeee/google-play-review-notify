@@ -130,7 +130,7 @@ interface SourceAdapter {
 #### 5.2.1 이메일 어댑터 (Gmail) — 1차 신호
 
 - **FR-SRC-EMAIL-1 (P0)** Gmail API를 OAuth2 Refresh Token으로 호출하며, 필요한 스코프는 `https://www.googleapis.com/auth/gmail.readonly`뿐이어야 한다.
-- **FR-SRC-EMAIL-2 (P0)** 발신자 allowlist(기본: `googleplay-noreply@google.com`, `googleplay-developer-support@google.com`, 도메인 `@google.com`)와 제목/본문 패턴 룰셋으로 Play Console 알림만 선별한다. 룰셋은 설정으로 확장·재정의 가능해야 한다.
+- **FR-SRC-EMAIL-2 (P0)** 발신자 allowlist(기본: `no-reply-googleplay-developer@google.com`(정책·심사 결과 알림, Phase 0에서 확인), `googleplay-noreply@google.com`, `googleplay-developer-support@google.com`)와 제목/본문 패턴 룰셋으로 Play Console 알림만 선별한다. 룰셋은 설정으로 확장·재정의 가능해야 한다.
 - **FR-SRC-EMAIL-3 (P0)** 룰셋은 이메일을 `APPROVED / REJECTED / POLICY_WARNING / REMOVED / SUSPENDED / UNKNOWN_NOTICE`로 분류하고, 가능한 경우 앱명, 패키지명, 버전, 거절 사유를 추출한다.
 - **FR-SRC-EMAIL-4 (P0)** 최초 실행 또는 상태 유실 시 `lookbackHours`(기본 24) 이내의 메시지만 조회하고, 이 실행은 베이스라인 기록만 하며 알림을 보내지 않는다(D11).
 - **FR-SRC-EMAIL-5 (P0)** 정상 실행 시 마지막 처리 시각(watermark)과 최근 처리 messageId 목록을 상태로 보관해 중복을 방지한다.
@@ -234,6 +234,7 @@ sources:
       refreshToken: ${GMAIL_REFRESH_TOKEN}
     lookbackHours: 24
     senderAllowlist:
+      - no-reply-googleplay-developer@google.com
       - googleplay-noreply@google.com
       - googleplay-developer-support@google.com
     rules: builtin               # 또는 사용자 룰 파일 경로 배열
@@ -492,7 +493,7 @@ dist/index.js  # ncc 번들 (커밋)
 ```
 
 - 룰은 위에서 아래로 평가하고 첫 매치를 채택한다. 매치 없음 + 발신자 allowlist 통과 = `UNKNOWN_NOTICE`.
-- Phase 0에서 실제 이메일 샘플(승인, 거절, 정책 경고, 삭제, 계정 정지)을 수집해 픽스처로 저장하고 룰을 확정한다. 이 문서의 패턴 문자열은 검증 전 초안이다.
+- Phase 0(2026-09-08)에서 실제 이메일을 수집해 `REJECTED`·`POLICY_WARNING` 룰(en, ko)을 확정했다. 정책 메일은 거절과 경고가 같은 제목을 쓰므로 본문의 `앱 상태: 거부됨` / `App Status: Rejected` 줄로 거절을 판정한다. `APPROVED`·`REMOVED`·`SUSPENDED` 패턴은 아직 관측 전 초안이다. 상세는 [phase0-notes.md](./phase0-notes.md).
 
 ### 8.2 Play API 추론 결정표 (가설 — Phase 0에서 확정)
 

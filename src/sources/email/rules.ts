@@ -39,10 +39,14 @@ export interface Classification {
 }
 
 import enRules from '../../../rules/email/en.json';
+import koRules from '../../../rules/email/ko.json';
 
-/** Rule sets bundled with the package (embedded at build time, no filesystem lookup). */
+/**
+ * Rule sets bundled with the package (embedded at build time, no filesystem lookup).
+ * Evaluated in order; English first so its extractors act as the fallback for unmatched mail.
+ */
 export function loadBuiltinRuleSets(): EmailRuleSet[] {
-  return [enRules as EmailRuleSet];
+  return [enRules as EmailRuleSet, koRules as EmailRuleSet];
 }
 
 export function loadRuleSetFiles(paths: string[]): EmailRuleSet[] {
@@ -76,9 +80,10 @@ function runExtractor(pattern: string, text: string): string | undefined {
     const lines = text.split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]?.trim() ?? '';
-      if (headings.some((h) => new RegExp(`^${h}\\b[:\\s]*`, 'i').test(line))) {
+      // No `\b` here: JS word boundaries are ASCII-only and never match after Korean text.
+      if (headings.some((h) => new RegExp(`^${h}(?=[:：\\s]|$)`, 'i').test(line))) {
         const inline = line
-          .replace(new RegExp(`^(?:${headings.join('|')})\\b[:\\s]*`, 'i'), '')
+          .replace(new RegExp(`^(?:${headings.join('|')})[:：\\s]*`, 'i'), '')
           .trim();
         const collected: string[] = inline ? [inline] : [];
         for (let j = i + 1; j < lines.length; j++) {

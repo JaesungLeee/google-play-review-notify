@@ -1,0 +1,40 @@
+From: Google Play Support <no-reply-googleplay-developer@google.com>
+Date: Tue, 21 Jul 2026 15:05:57 -0700
+Subject: [조치 필요] 귀하의 앱이 Google Play 대상 API 수준 요구사항의 영향을 받습니다
+
+Google Play Console 로고
+
+
+중요한 메시지 귀하의 앱 3개가 Google Play의 대상 API 수준 요구사항의 영향을
+받습니다
+
+
+앱 3개가 이전 버전의 Android를 타겟팅하는 것으로 확인되었습니다. 사용자에게
+안전하고 보안이 유지되는 환경을 제공하기 위해 Google Play의 모든 앱은 2026.
+8. 31. 전에 대상 API 수준 요구사항을 충족해야 합니다.
+
+조치 필요
+
+최신 Android 버전을 타겟팅하도록 다음 앱을 업데이트하세요.
+
+
+Sample Chat Sample Chat 보기
+
+Sample App B Sample App B 보기
+
+Sample App C Sample App C 보기
+
+
+감사합니다.
+
+Google Play Console팀
+
+Google과 소통하기
+
+Play Console 리소스 가이드 Play 아카데미 고객센터 뉴스레터
+
+
+© 2026년 Google Ireland Ltd, Gordon House, Barrow Street, Dublin 4, Ireland
+
+Google Play Console 개발자 계정에 관한 중요한 소식을 알려 드리기 위해
+발송된 이메일입니다.
