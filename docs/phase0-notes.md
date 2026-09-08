@@ -74,6 +74,8 @@ PRD §10 Phase 0(기술 검증) 진행 기록. 실제 계정으로 확인한 사
 - 2026-09-08: 이메일 룰셋(en/ko) 확정, 기본 allowlist 교체 (PR #3).
 - 2026-09-08: 스토어 리스팅 어댑터 구현. 페이지 데이터의 `"<날짜 문자열>",[<epoch초>,<nanos>]` 항목을 locale 무관하게 비교하고, 404→200 전환 또는 날짜 변화 시 `LIVE` 발생. 표시 버전명은 페이지에 다른 앱 버전이 섞여 있어 사용하지 않음.
 
+- 2026-09-08: Play API 어댑터 구현. 설정된 트랙에 새 versionCode가 나타나면 `SUBMITTED`(medium), 사라지면 거절 후보로 로그만. `emitLiveWithoutConfirmation`일 때만 low-confidence `LIVE`.
+
 ## 미결
 
 - 관리형 게시 "게시 대기" 상태를 API가 구분해 주는지.

@@ -17,7 +17,9 @@ sources:
       refreshToken: ${GMAIL_REFRESH_TOKEN}
     lookbackHours: 24
   playApi:
+    # Detects SUBMITTED when a new versionCode appears on a configured track. See docs/play-api-setup.md.
     enabled: false
+    serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}
   storeListing:
     # Detects LIVE (production only) by watching the public store page's "Updated on" date.
     # Google sends no approval email, so this is how you learn that a release actually shipped.

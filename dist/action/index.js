@@ -51851,6 +51851,5095 @@ var require_build = __commonJS({
   }
 });
 
+// node_modules/@googleapis/androidpublisher/build/v1.1.js
+var require_v1_1 = __commonJS({
+  "node_modules/@googleapis/androidpublisher/build/v1.1.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.androidpublisher_v1_1 = void 0;
+    var googleapis_common_1 = require_src7();
+    var androidpublisher_v1_1;
+    (function(androidpublisher_v1_12) {
+      class Androidpublisher {
+        context;
+        inapppurchases;
+        constructor(options, google) {
+          this.context = {
+            _options: options || {},
+            google
+          };
+          this.inapppurchases = new Resource$Inapppurchases(this.context);
+        }
+      }
+      androidpublisher_v1_12.Androidpublisher = Androidpublisher;
+      class Resource$Inapppurchases {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://www.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v1.1/applications/{packageName}/inapp/{productId}/purchases/{token}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET"
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "token"],
+            pathParams: ["packageName", "productId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v1_12.Resource$Inapppurchases = Resource$Inapppurchases;
+    })(androidpublisher_v1_1 || (exports2.androidpublisher_v1_1 = androidpublisher_v1_1 = {}));
+  }
+});
+
+// node_modules/@googleapis/androidpublisher/build/v1.js
+var require_v12 = __commonJS({
+  "node_modules/@googleapis/androidpublisher/build/v1.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.androidpublisher_v1 = void 0;
+    var androidpublisher_v1;
+    (function(androidpublisher_v12) {
+      class Androidpublisher {
+        context;
+        constructor(options, google) {
+          this.context = {
+            _options: options || {},
+            google
+          };
+        }
+      }
+      androidpublisher_v12.Androidpublisher = Androidpublisher;
+    })(androidpublisher_v1 || (exports2.androidpublisher_v1 = androidpublisher_v1 = {}));
+  }
+});
+
+// node_modules/@googleapis/androidpublisher/build/v2.js
+var require_v2 = __commonJS({
+  "node_modules/@googleapis/androidpublisher/build/v2.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.androidpublisher_v2 = void 0;
+    var googleapis_common_1 = require_src7();
+    var androidpublisher_v2;
+    (function(androidpublisher_v22) {
+      class Androidpublisher {
+        context;
+        purchases;
+        constructor(options, google) {
+          this.context = {
+            _options: options || {},
+            google
+          };
+          this.purchases = new Resource$Purchases(this.context);
+        }
+      }
+      androidpublisher_v22.Androidpublisher = Androidpublisher;
+      class Resource$Purchases {
+        context;
+        products;
+        voidedpurchases;
+        constructor(context) {
+          this.context = context;
+          this.products = new Resource$Purchases$Products(this.context);
+          this.voidedpurchases = new Resource$Purchases$Voidedpurchases(this.context);
+        }
+      }
+      androidpublisher_v22.Resource$Purchases = Resource$Purchases;
+      class Resource$Purchases$Products {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://www.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v2/applications/{packageName}/purchases/products/{productId}/tokens/{token}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET"
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "token"],
+            pathParams: ["packageName", "productId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v22.Resource$Purchases$Products = Resource$Purchases$Products;
+      class Resource$Purchases$Voidedpurchases {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://www.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v2/applications/{packageName}/purchases/voidedpurchases").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET"
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v22.Resource$Purchases$Voidedpurchases = Resource$Purchases$Voidedpurchases;
+    })(androidpublisher_v2 || (exports2.androidpublisher_v2 = androidpublisher_v2 = {}));
+  }
+});
+
+// node_modules/@googleapis/androidpublisher/build/v3.js
+var require_v3 = __commonJS({
+  "node_modules/@googleapis/androidpublisher/build/v3.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.androidpublisher_v3 = void 0;
+    var googleapis_common_1 = require_src7();
+    var androidpublisher_v3;
+    (function(androidpublisher_v32) {
+      class Androidpublisher {
+        context;
+        applications;
+        apprecovery;
+        appsigning;
+        appstoreappsreview;
+        appstorecatalog;
+        edits;
+        externaltransactions;
+        generatedapks;
+        grants;
+        inappproducts;
+        internalappsharingartifacts;
+        monetization;
+        orders;
+        purchases;
+        reviews;
+        systemapks;
+        users;
+        constructor(options, google) {
+          this.context = {
+            _options: options || {},
+            google
+          };
+          this.applications = new Resource$Applications(this.context);
+          this.apprecovery = new Resource$Apprecovery(this.context);
+          this.appsigning = new Resource$Appsigning(this.context);
+          this.appstoreappsreview = new Resource$Appstoreappsreview(this.context);
+          this.appstorecatalog = new Resource$Appstorecatalog(this.context);
+          this.edits = new Resource$Edits(this.context);
+          this.externaltransactions = new Resource$Externaltransactions(this.context);
+          this.generatedapks = new Resource$Generatedapks(this.context);
+          this.grants = new Resource$Grants(this.context);
+          this.inappproducts = new Resource$Inappproducts(this.context);
+          this.internalappsharingartifacts = new Resource$Internalappsharingartifacts(this.context);
+          this.monetization = new Resource$Monetization(this.context);
+          this.orders = new Resource$Orders(this.context);
+          this.purchases = new Resource$Purchases(this.context);
+          this.reviews = new Resource$Reviews(this.context);
+          this.systemapks = new Resource$Systemapks(this.context);
+          this.users = new Resource$Users(this.context);
+        }
+      }
+      androidpublisher_v32.Androidpublisher = Androidpublisher;
+      class Resource$Applications {
+        context;
+        deviceTierConfigs;
+        tracks;
+        constructor(context) {
+          this.context = context;
+          this.deviceTierConfigs = new Resource$Applications$Devicetierconfigs(this.context);
+          this.tracks = new Resource$Applications$Tracks(this.context);
+        }
+        dataSafety(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/dataSafety").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Applications = Resource$Applications;
+      class Resource$Applications$Devicetierconfigs {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/deviceTierConfigs").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/deviceTierConfigs/{deviceTierConfigId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "deviceTierConfigId"],
+            pathParams: ["deviceTierConfigId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/deviceTierConfigs").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Applications$Devicetierconfigs = Resource$Applications$Devicetierconfigs;
+      class Resource$Applications$Tracks {
+        context;
+        releases;
+        constructor(context) {
+          this.context = context;
+          this.releases = new Resource$Applications$Tracks$Releases(this.context);
+        }
+      }
+      androidpublisher_v32.Resource$Applications$Tracks = Resource$Applications$Tracks;
+      class Resource$Applications$Tracks$Releases {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+parent}/releases").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["parent"],
+            pathParams: ["parent"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Applications$Tracks$Releases = Resource$Applications$Tracks$Releases;
+      class Resource$Apprecovery {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        addTargeting(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/appRecoveries/{appRecoveryId}:addTargeting").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "appRecoveryId"],
+            pathParams: ["appRecoveryId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        cancel(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/appRecoveries/{appRecoveryId}:cancel").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "appRecoveryId"],
+            pathParams: ["appRecoveryId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/appRecoveries").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        deploy(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/appRecoveries/{appRecoveryId}:deploy").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "appRecoveryId"],
+            pathParams: ["appRecoveryId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/appRecoveries").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Apprecovery = Resource$Apprecovery;
+      class Resource$Appsigning {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        enrollApp(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{name}/appSigning:enrollApp").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        rotateAppSigningKey(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{name}/appSigning:rotateAppSigningKey").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Appsigning = Resource$Appsigning;
+      class Resource$Appstoreappsreview {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        createappstorehostedapp(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstore/{appStorePackageName}/apps:create").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["appStorePackageName"],
+            pathParams: ["appStorePackageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        updateappstorehostedapp(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstore/{appStorePackageName}/apps:update").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["appStorePackageName"],
+            pathParams: ["appStorePackageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        updateappstorehostedapppublishstatus(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstore/{appStorePackageName}/apps/{packageName}:updateAppStoreHostedAppPublishStatus").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["appStorePackageName", "packageName"],
+            pathParams: ["appStorePackageName", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        uploadapk(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstore/{appStorePackageName}/apps/{packageName}/apks:upload").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/appstore/{appStorePackageName}/apps/{packageName}/apks:upload").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["appStorePackageName", "packageName"],
+            pathParams: ["appStorePackageName", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        uploadappstoreapppolicydeclarationfile(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstore/{appStorePackageName}/apps/{packageName}/policyDeclarationFiles:upload").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/appstore/{appStorePackageName}/apps/{packageName}/policyDeclarationFiles:upload").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["appStorePackageName", "packageName"],
+            pathParams: ["appStorePackageName", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        uploadimage(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstore/{appStorePackageName}/apps/{packageName}/images:upload").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/appstore/{appStorePackageName}/apps/{packageName}/images:upload").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["appStorePackageName", "packageName"],
+            pathParams: ["appStorePackageName", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Appstoreappsreview = Resource$Appstoreappsreview;
+      class Resource$Appstorecatalog {
+        context;
+        recentappviews;
+        recentupdateevents;
+        constructor(context) {
+          this.context = context;
+          this.recentappviews = new Resource$Appstorecatalog$Recentappviews(this.context);
+          this.recentupdateevents = new Resource$Appstorecatalog$Recentupdateevents(this.context);
+        }
+      }
+      androidpublisher_v32.Resource$Appstorecatalog = Resource$Appstorecatalog;
+      class Resource$Appstorecatalog$Recentappviews {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstorecatalog/{appStorePackageName}/recentAppViews/{playAppPackageName}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["appStorePackageName", "playAppPackageName"],
+            pathParams: ["appStorePackageName", "playAppPackageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Appstorecatalog$Recentappviews = Resource$Appstorecatalog$Recentappviews;
+      class Resource$Appstorecatalog$Recentupdateevents {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/appstorecatalog/{appStorePackageName}/recentUpdateEvents").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["appStorePackageName"],
+            pathParams: ["appStorePackageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Appstorecatalog$Recentupdateevents = Resource$Appstorecatalog$Recentupdateevents;
+      class Resource$Edits {
+        context;
+        apks;
+        bundles;
+        countryavailability;
+        deobfuscationfiles;
+        details;
+        expansionfiles;
+        images;
+        listings;
+        testers;
+        tracks;
+        constructor(context) {
+          this.context = context;
+          this.apks = new Resource$Edits$Apks(this.context);
+          this.bundles = new Resource$Edits$Bundles(this.context);
+          this.countryavailability = new Resource$Edits$Countryavailability(this.context);
+          this.deobfuscationfiles = new Resource$Edits$Deobfuscationfiles(this.context);
+          this.details = new Resource$Edits$Details(this.context);
+          this.expansionfiles = new Resource$Edits$Expansionfiles(this.context);
+          this.images = new Resource$Edits$Images(this.context);
+          this.listings = new Resource$Edits$Listings(this.context);
+          this.testers = new Resource$Edits$Testers(this.context);
+          this.tracks = new Resource$Edits$Tracks(this.context);
+        }
+        commit(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}:commit").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        insert(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        validate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}:validate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits = Resource$Edits;
+      class Resource$Edits$Apks {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        addexternallyhosted(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/externallyHosted").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        upload(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Apks = Resource$Edits$Apks;
+      class Resource$Edits$Bundles {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/bundles").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        upload(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/bundles").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/bundles").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Bundles = Resource$Edits$Bundles;
+      class Resource$Edits$Countryavailability {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/countryAvailability/{track}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "track"],
+            pathParams: ["editId", "packageName", "track"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Countryavailability = Resource$Edits$Countryavailability;
+      class Resource$Edits$Deobfuscationfiles {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        upload(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: [
+              "packageName",
+              "editId",
+              "apkVersionCode",
+              "deobfuscationFileType"
+            ],
+            pathParams: [
+              "apkVersionCode",
+              "deobfuscationFileType",
+              "editId",
+              "packageName"
+            ],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Deobfuscationfiles = Resource$Edits$Deobfuscationfiles;
+      class Resource$Edits$Details {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/details").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/details").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        update(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/details").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PUT",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Details = Resource$Edits$Details;
+      class Resource$Edits$Expansionfiles {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: [
+              "packageName",
+              "editId",
+              "apkVersionCode",
+              "expansionFileType"
+            ],
+            pathParams: [
+              "apkVersionCode",
+              "editId",
+              "expansionFileType",
+              "packageName"
+            ],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: [
+              "packageName",
+              "editId",
+              "apkVersionCode",
+              "expansionFileType"
+            ],
+            pathParams: [
+              "apkVersionCode",
+              "editId",
+              "expansionFileType",
+              "packageName"
+            ],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        update(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PUT",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: [
+              "packageName",
+              "editId",
+              "apkVersionCode",
+              "expansionFileType"
+            ],
+            pathParams: [
+              "apkVersionCode",
+              "editId",
+              "expansionFileType",
+              "packageName"
+            ],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        upload(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: [
+              "packageName",
+              "editId",
+              "apkVersionCode",
+              "expansionFileType"
+            ],
+            pathParams: [
+              "apkVersionCode",
+              "editId",
+              "expansionFileType",
+              "packageName"
+            ],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Expansionfiles = Resource$Edits$Expansionfiles;
+      class Resource$Edits$Images {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}/{imageId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: [
+              "packageName",
+              "editId",
+              "language",
+              "imageType",
+              "imageId"
+            ],
+            pathParams: [
+              "editId",
+              "imageId",
+              "imageType",
+              "language",
+              "packageName"
+            ],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        deleteall(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "language", "imageType"],
+            pathParams: ["editId", "imageType", "language", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "language", "imageType"],
+            pathParams: ["editId", "imageType", "language", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        upload(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["packageName", "editId", "language", "imageType"],
+            pathParams: ["editId", "imageType", "language", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Images = Resource$Edits$Images;
+      class Resource$Edits$Listings {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "language"],
+            pathParams: ["editId", "language", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        deleteall(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "language"],
+            pathParams: ["editId", "language", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "language"],
+            pathParams: ["editId", "language", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        update(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PUT",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "language"],
+            pathParams: ["editId", "language", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Listings = Resource$Edits$Listings;
+      class Resource$Edits$Testers {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/testers/{track}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "track"],
+            pathParams: ["editId", "packageName", "track"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/testers/{track}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "track"],
+            pathParams: ["editId", "packageName", "track"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        update(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/testers/{track}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PUT",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "track"],
+            pathParams: ["editId", "packageName", "track"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Testers = Resource$Edits$Testers;
+      class Resource$Edits$Tracks {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks/{track}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "track"],
+            pathParams: ["editId", "packageName", "track"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId"],
+            pathParams: ["editId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks/{track}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "track"],
+            pathParams: ["editId", "packageName", "track"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        update(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks/{track}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PUT",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "editId", "track"],
+            pathParams: ["editId", "packageName", "track"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Edits$Tracks = Resource$Edits$Tracks;
+      class Resource$Externaltransactions {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        createexternaltransaction(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+parent}/externalTransactions").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["parent"],
+            pathParams: ["parent"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        getexternaltransaction(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+name}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        refundexternaltransaction(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+name}:refund").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Externaltransactions = Resource$Externaltransactions;
+      class Resource$Generatedapks {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        download(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/generatedApks/{versionCode}/downloads/{downloadId}:download").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "versionCode", "downloadId"],
+            pathParams: ["downloadId", "packageName", "versionCode"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/generatedApks/{versionCode}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "versionCode"],
+            pathParams: ["packageName", "versionCode"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Generatedapks = Resource$Generatedapks;
+      class Resource$Grants {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+parent}/grants").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["parent"],
+            pathParams: ["parent"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+name}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+name}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Grants = Resource$Grants;
+      class Resource$Inappproducts {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        batchDelete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts:batchDelete").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchGet(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts:batchGet").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts:batchUpdate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts/{sku}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "sku"],
+            pathParams: ["packageName", "sku"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts/{sku}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "sku"],
+            pathParams: ["packageName", "sku"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        insert(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts/{sku}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "sku"],
+            pathParams: ["packageName", "sku"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        update(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/inappproducts/{sku}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PUT",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "sku"],
+            pathParams: ["packageName", "sku"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Inappproducts = Resource$Inappproducts;
+      class Resource$Internalappsharingartifacts {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        uploadapk(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/apk").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/apk").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        uploadbundle(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            mediaUrl: (rootUrl + "/upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle").replace(/([^:]\/)\/+/g, "$1"),
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Internalappsharingartifacts = Resource$Internalappsharingartifacts;
+      class Resource$Monetization {
+        context;
+        onetimeproducts;
+        subscriptions;
+        constructor(context) {
+          this.context = context;
+          this.onetimeproducts = new Resource$Monetization$Onetimeproducts(this.context);
+          this.subscriptions = new Resource$Monetization$Subscriptions(this.context);
+        }
+        convertRegionPrices(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/pricing:convertRegionPrices").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Monetization = Resource$Monetization;
+      class Resource$Monetization$Onetimeproducts {
+        context;
+        purchaseOptions;
+        constructor(context) {
+          this.context = context;
+          this.purchaseOptions = new Resource$Monetization$Onetimeproducts$Purchaseoptions(this.context);
+        }
+        batchDelete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts:batchDelete").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchGet(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts:batchGet").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts:batchUpdate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/onetimeproducts/{productId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Monetization$Onetimeproducts = Resource$Monetization$Onetimeproducts;
+      class Resource$Monetization$Onetimeproducts$Purchaseoptions {
+        context;
+        offers;
+        constructor(context) {
+          this.context = context;
+          this.offers = new Resource$Monetization$Onetimeproducts$Purchaseoptions$Offers(this.context);
+        }
+        batchDelete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions:batchDelete").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdateStates(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions:batchUpdateStates").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Monetization$Onetimeproducts$Purchaseoptions = Resource$Monetization$Onetimeproducts$Purchaseoptions;
+      class Resource$Monetization$Onetimeproducts$Purchaseoptions$Offers {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        activate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers/{offerId}:activate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: [
+              "packageName",
+              "productId",
+              "purchaseOptionId",
+              "offerId"
+            ],
+            pathParams: ["offerId", "packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchDelete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers:batchDelete").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "purchaseOptionId"],
+            pathParams: ["packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchGet(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers:batchGet").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "purchaseOptionId"],
+            pathParams: ["packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers:batchUpdate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "purchaseOptionId"],
+            pathParams: ["packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdateStates(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers:batchUpdateStates").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "purchaseOptionId"],
+            pathParams: ["packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        cancel(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers/{offerId}:cancel").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: [
+              "packageName",
+              "productId",
+              "purchaseOptionId",
+              "offerId"
+            ],
+            pathParams: ["offerId", "packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        deactivate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers/{offerId}:deactivate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: [
+              "packageName",
+              "productId",
+              "purchaseOptionId",
+              "offerId"
+            ],
+            pathParams: ["offerId", "packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/oneTimeProducts/{productId}/purchaseOptions/{purchaseOptionId}/offers").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "purchaseOptionId"],
+            pathParams: ["packageName", "productId", "purchaseOptionId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Monetization$Onetimeproducts$Purchaseoptions$Offers = Resource$Monetization$Onetimeproducts$Purchaseoptions$Offers;
+      class Resource$Monetization$Subscriptions {
+        context;
+        basePlans;
+        constructor(context) {
+          this.context = context;
+          this.basePlans = new Resource$Monetization$Subscriptions$Baseplans(this.context);
+        }
+        archive(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}:archive").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchGet(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions:batchGet").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions:batchUpdate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Monetization$Subscriptions = Resource$Monetization$Subscriptions;
+      class Resource$Monetization$Subscriptions$Baseplans {
+        context;
+        offers;
+        constructor(context) {
+          this.context = context;
+          this.offers = new Resource$Monetization$Subscriptions$Baseplans$Offers(this.context);
+        }
+        activate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}:activate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchMigratePrices(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans:batchMigratePrices").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdateStates(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans:batchUpdateStates").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId"],
+            pathParams: ["packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        deactivate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}:deactivate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        migratePrices(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}:migratePrices").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Monetization$Subscriptions$Baseplans = Resource$Monetization$Subscriptions$Baseplans;
+      class Resource$Monetization$Subscriptions$Baseplans$Offers {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        activate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers/{offerId}:activate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId", "offerId"],
+            pathParams: ["basePlanId", "offerId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchGet(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers:batchGet").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers:batchUpdate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        batchUpdateStates(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers:batchUpdateStates").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        deactivate(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers/{offerId}:deactivate").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId", "offerId"],
+            pathParams: ["basePlanId", "offerId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers/{offerId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId", "offerId"],
+            pathParams: ["basePlanId", "offerId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers/{offerId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId", "offerId"],
+            pathParams: ["basePlanId", "offerId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId"],
+            pathParams: ["basePlanId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers/{offerId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "basePlanId", "offerId"],
+            pathParams: ["basePlanId", "offerId", "packageName", "productId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Monetization$Subscriptions$Baseplans$Offers = Resource$Monetization$Subscriptions$Baseplans$Offers;
+      class Resource$Orders {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        batchget(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/orders:batchGet").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/orders/{orderId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "orderId"],
+            pathParams: ["orderId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        refund(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/orders/{orderId}:refund").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "orderId"],
+            pathParams: ["orderId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        reviewrefund(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/orders/{orderId}:reviewrefund").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "orderId"],
+            pathParams: ["orderId", "packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Orders = Resource$Orders;
+      class Resource$Purchases {
+        context;
+        products;
+        productsv2;
+        subscriptions;
+        subscriptionsv2;
+        voidedpurchases;
+        constructor(context) {
+          this.context = context;
+          this.products = new Resource$Purchases$Products(this.context);
+          this.productsv2 = new Resource$Purchases$Productsv2(this.context);
+          this.subscriptions = new Resource$Purchases$Subscriptions(this.context);
+          this.subscriptionsv2 = new Resource$Purchases$Subscriptionsv2(this.context);
+          this.voidedpurchases = new Resource$Purchases$Voidedpurchases(this.context);
+        }
+      }
+      androidpublisher_v32.Resource$Purchases = Resource$Purchases;
+      class Resource$Purchases$Products {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        acknowledge(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "token"],
+            pathParams: ["packageName", "productId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        consume(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:consume").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "token"],
+            pathParams: ["packageName", "productId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "productId", "token"],
+            pathParams: ["packageName", "productId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Purchases$Products = Resource$Purchases$Products;
+      class Resource$Purchases$Productsv2 {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        getproductpurchasev2(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/productsv2/tokens/{token}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "token"],
+            pathParams: ["packageName", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Purchases$Productsv2 = Resource$Purchases$Productsv2;
+      class Resource$Purchases$Subscriptions {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        acknowledge(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:acknowledge").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "subscriptionId", "token"],
+            pathParams: ["packageName", "subscriptionId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        cancel(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:cancel").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "subscriptionId", "token"],
+            pathParams: ["packageName", "subscriptionId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        defer(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:defer").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "subscriptionId", "token"],
+            pathParams: ["packageName", "subscriptionId", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Purchases$Subscriptions = Resource$Purchases$Subscriptions;
+      class Resource$Purchases$Subscriptionsv2 {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        cancel(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/subscriptionsv2/tokens/{token}:cancel").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "token"],
+            pathParams: ["packageName", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        defer(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/subscriptionsv2/tokens/{token}:defer").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "token"],
+            pathParams: ["packageName", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/subscriptionsv2/tokens/{token}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "token"],
+            pathParams: ["packageName", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        revoke(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/subscriptionsv2/tokens/{token}:revoke").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "token"],
+            pathParams: ["packageName", "token"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Purchases$Subscriptionsv2 = Resource$Purchases$Subscriptionsv2;
+      class Resource$Purchases$Voidedpurchases {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/purchases/voidedpurchases").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Purchases$Voidedpurchases = Resource$Purchases$Voidedpurchases;
+      class Resource$Reviews {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/reviews/{reviewId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "reviewId"],
+            pathParams: ["packageName", "reviewId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/reviews").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName"],
+            pathParams: ["packageName"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        reply(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/reviews/{reviewId}:reply").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "reviewId"],
+            pathParams: ["packageName", "reviewId"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Reviews = Resource$Reviews;
+      class Resource$Systemapks {
+        context;
+        variants;
+        constructor(context) {
+          this.context = context;
+          this.variants = new Resource$Systemapks$Variants(this.context);
+        }
+      }
+      androidpublisher_v32.Resource$Systemapks = Resource$Systemapks;
+      class Resource$Systemapks$Variants {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "versionCode"],
+            pathParams: ["packageName", "versionCode"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        download(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants/{variantId}:download").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "versionCode", "variantId"],
+            pathParams: ["packageName", "variantId", "versionCode"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        get(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants/{variantId}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "versionCode", "variantId"],
+            pathParams: ["packageName", "variantId", "versionCode"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["packageName", "versionCode"],
+            pathParams: ["packageName", "versionCode"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Systemapks$Variants = Resource$Systemapks$Variants;
+      class Resource$Users {
+        context;
+        constructor(context) {
+          this.context = context;
+        }
+        create(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+parent}/users").replace(/([^:]\/)\/+/g, "$1"),
+              method: "POST",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["parent"],
+            pathParams: ["parent"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        delete(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+name}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "DELETE",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        list(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+parent}/users").replace(/([^:]\/)\/+/g, "$1"),
+              method: "GET",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["parent"],
+            pathParams: ["parent"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+        patch(paramsOrCallback, optionsOrCallback, callback) {
+          let params = paramsOrCallback || {};
+          let options = optionsOrCallback || {};
+          if (typeof paramsOrCallback === "function") {
+            callback = paramsOrCallback;
+            params = {};
+            options = {};
+          }
+          if (typeof optionsOrCallback === "function") {
+            callback = optionsOrCallback;
+            options = {};
+          }
+          const rootUrl = options.rootUrl || "https://androidpublisher.googleapis.com/";
+          const parameters = {
+            options: Object.assign({
+              url: (rootUrl + "/androidpublisher/v3/{+name}").replace(/([^:]\/)\/+/g, "$1"),
+              method: "PATCH",
+              apiVersion: ""
+            }, options),
+            params,
+            requiredParams: ["name"],
+            pathParams: ["name"],
+            context: this.context
+          };
+          if (callback) {
+            (0, googleapis_common_1.createAPIRequest)(parameters, callback);
+          } else {
+            return (0, googleapis_common_1.createAPIRequest)(parameters);
+          }
+        }
+      }
+      androidpublisher_v32.Resource$Users = Resource$Users;
+    })(androidpublisher_v3 || (exports2.androidpublisher_v3 = androidpublisher_v3 = {}));
+  }
+});
+
+// node_modules/@googleapis/androidpublisher/build/index.js
+var require_build2 = __commonJS({
+  "node_modules/@googleapis/androidpublisher/build/index.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.AuthPlus = exports2.androidpublisher_v3 = exports2.androidpublisher_v2 = exports2.androidpublisher_v1 = exports2.androidpublisher_v1_1 = exports2.auth = exports2.VERSIONS = void 0;
+    exports2.androidpublisher = androidpublisher2;
+    var googleapis_common_1 = require_src7();
+    var v1_1_1 = require_v1_1();
+    Object.defineProperty(exports2, "androidpublisher_v1_1", { enumerable: true, get: function() {
+      return v1_1_1.androidpublisher_v1_1;
+    } });
+    var v1_1 = require_v12();
+    Object.defineProperty(exports2, "androidpublisher_v1", { enumerable: true, get: function() {
+      return v1_1.androidpublisher_v1;
+    } });
+    var v2_1 = require_v2();
+    Object.defineProperty(exports2, "androidpublisher_v2", { enumerable: true, get: function() {
+      return v2_1.androidpublisher_v2;
+    } });
+    var v3_1 = require_v3();
+    Object.defineProperty(exports2, "androidpublisher_v3", { enumerable: true, get: function() {
+      return v3_1.androidpublisher_v3;
+    } });
+    exports2.VERSIONS = {
+      "v1.1": v1_1_1.androidpublisher_v1_1.Androidpublisher,
+      v1: v1_1.androidpublisher_v1.Androidpublisher,
+      v2: v2_1.androidpublisher_v2.Androidpublisher,
+      v3: v3_1.androidpublisher_v3.Androidpublisher
+    };
+    function androidpublisher2(versionOrOptions) {
+      return (0, googleapis_common_1.getAPI)("androidpublisher", versionOrOptions, exports2.VERSIONS, this);
+    }
+    var auth = new googleapis_common_1.AuthPlus();
+    exports2.auth = auth;
+    var googleapis_common_2 = require_src7();
+    Object.defineProperty(exports2, "AuthPlus", { enumerable: true, get: function() {
+      return googleapis_common_2.AuthPlus;
+    } });
+  }
+});
+
 // node_modules/@actions/glob/lib/internal-glob-options-helper.js
 var require_internal_glob_options_helper = __commonJS({
   "node_modules/@actions/glob/lib/internal-glob-options-helper.js"(exports2) {
@@ -96007,7 +101096,7 @@ var require_utils5 = __commonJS({
       streamToBuffer3: () => streamToBuffer3
     });
     module2.exports = __toCommonJS2(utils_exports);
-    var import_node_fs8 = __toESM2(require("fs"));
+    var import_node_fs9 = __toESM2(require("fs"));
     var import_node_util4 = __toESM2(require("util"));
     var import_constants = require_constants10();
     async function streamToBuffer(stream, buffer, offset, end, encoding) {
@@ -96094,7 +101183,7 @@ var require_utils5 = __commonJS({
     }
     async function readStreamToLocalFile(rs, file) {
       return new Promise((resolve4, reject) => {
-        const ws = import_node_fs8.default.createWriteStream(file);
+        const ws = import_node_fs9.default.createWriteStream(file);
         rs.on("error", (err) => {
           reject(err);
         });
@@ -96105,8 +101194,8 @@ var require_utils5 = __commonJS({
         rs.pipe(ws);
       });
     }
-    var fsStat = import_node_util4.default.promisify(import_node_fs8.default.stat);
-    var fsCreateReadStream = import_node_fs8.default.createReadStream;
+    var fsStat = import_node_util4.default.promisify(import_node_fs9.default.stat);
+    var fsCreateReadStream = import_node_fs9.default.createReadStream;
   }
 });
 
@@ -109845,9 +114934,9 @@ __export(action_exports, {
 });
 module.exports = __toCommonJS(action_exports);
 var core = __toESM(require_core());
-var import_node_fs6 = require("fs");
-var import_yaml2 = __toESM(require_dist());
 var import_node_fs7 = require("fs");
+var import_yaml2 = __toESM(require_dist());
+var import_node_fs8 = require("fs");
 
 // src/core/config.ts
 var import_node_fs = require("fs");
@@ -114854,12 +119943,62 @@ function consoleUrlFor(packageName) {
   return `https://play.google.com/console/developers/app-list?search=${encodeURIComponent(packageName)}`;
 }
 
+// src/sources/manual/index.ts
+var ManualSourceAdapter = class {
+  constructor(events) {
+    this.events = events;
+  }
+  events;
+  name = "manual";
+  async poll(_ctx, state) {
+    return { events: this.events, nextState: state ?? {} };
+  }
+};
+function manualEventId(e2) {
+  return `api:${e2.packageName ?? "unknown"}:${e2.track ?? "production"}:${e2.versionCode ?? "unknown"}:${e2.type}`;
+}
+
+// src/sources/play-api/client.ts
+var import_androidpublisher = __toESM(require_build2());
+var import_node_fs4 = require("fs");
+var SCOPE = "https://www.googleapis.com/auth/androidpublisher";
+function createPlayApiClient(serviceAccount) {
+  const raw = serviceAccount.trim().startsWith("{") ? serviceAccount : (0, import_node_fs4.readFileSync)(serviceAccount, "utf8");
+  const credentials = JSON.parse(raw);
+  const auth = new import_androidpublisher.auth.GoogleAuth({ credentials, scopes: [SCOPE] });
+  const api = (0, import_androidpublisher.androidpublisher)({ version: "v3", auth });
+  return {
+    async listTracks(packageName) {
+      const edit = await api.edits.insert({ packageName });
+      const editId = edit.data.id;
+      if (!editId) throw new Error(`edits.insert returned no edit id for ${packageName}`);
+      try {
+        const res = await api.edits.tracks.list({ packageName, editId });
+        return (res.data.tracks ?? []).filter((t2) => !!t2.track).map((t2) => ({
+          track: t2.track,
+          releases: (t2.releases ?? []).map((r2) => {
+            const rel = { versionCodes: [...r2.versionCodes ?? []] };
+            if (r2.name) rel.name = r2.name;
+            if (r2.status) rel.status = r2.status;
+            if (typeof r2.userFraction === "number") rel.userFraction = r2.userFraction;
+            return rel;
+          })
+        }));
+      } finally {
+        await api.edits.delete({ packageName, editId }).catch(() => void 0);
+      }
+    }
+  };
+}
+
 // src/sources/play-api/index.ts
 var PlayApiSourceAdapter = class _PlayApiSourceAdapter {
-  constructor(cfg) {
+  constructor(cfg, client) {
     this.cfg = cfg;
+    this.client = client;
   }
   cfg;
+  client;
   name = "play-api";
   static fromConfig(config) {
     const cfg = config.sources.playApi;
@@ -114868,13 +120007,86 @@ var PlayApiSourceAdapter = class _PlayApiSourceAdapter {
         "sources.playApi.serviceAccountJson is required when the Play API source is enabled"
       );
     }
-    return new _PlayApiSourceAdapter(cfg);
+    return new _PlayApiSourceAdapter(cfg, createPlayApiClient(cfg.serviceAccountJson));
   }
-  async poll(_ctx, _state) {
-    void this.cfg;
-    throw new Error("Play API source is not implemented yet (planned for Phase 2; see PRD \xA75.2.2)");
+  async poll(ctx, prev) {
+    const previous = prev?.packages ?? {};
+    const packages = { ...previous };
+    const events = [];
+    const errors = [];
+    for (const app of ctx.apps) {
+      const pkg = app.packageName;
+      const before = previous[pkg];
+      let tracks;
+      try {
+        tracks = await this.client.listTracks(pkg);
+      } catch (e2) {
+        const msg = e2 instanceof Error ? e2.message : String(e2);
+        errors.push(`${pkg}: ${msg}`);
+        ctx.logger.warn(`Play API ${pkg}: tracks.list failed: ${msg}`);
+        packages[pkg] = { tracks: before?.tracks ?? {}, failures: (before?.failures ?? 0) + 1 };
+        continue;
+      }
+      const now = { tracks: {}, failures: 0 };
+      for (const t2 of tracks.filter((t3) => app.tracks.includes(t3.track))) {
+        now.tracks[t2.track] = snapshotTrack(t2);
+      }
+      packages[pkg] = now;
+      if (!before || ctx.baseline) continue;
+      for (const track of app.tracks) {
+        const seen = before.tracks[track]?.versions;
+        const current = now.tracks[track]?.versions ?? {};
+        if (!seen) continue;
+        const added = Object.keys(current).filter((v) => !(v in seen));
+        const removed = Object.keys(seen).filter((v) => !(v in current));
+        const highestNow = Math.max(0, ...Object.keys(current).map(Number));
+        for (const versionCode of added) {
+          const release = tracks.find((t2) => t2.track === track)?.releases.find((r2) => r2.versionCodes.includes(versionCode));
+          events.push(
+            this.event(ctx, app, track, versionCode, "SUBMITTED", "medium", release?.name)
+          );
+          if (this.cfg.emitLiveWithoutConfirmation && (release?.status === "completed" || release?.status === "inProgress")) {
+            events.push(this.event(ctx, app, track, versionCode, "LIVE", "low", release?.name));
+          }
+        }
+        for (const versionCode of removed) {
+          if (Number(versionCode) >= highestNow) {
+            ctx.logger.info(
+              `Play API ${pkg}/${track}: versionCode ${versionCode} disappeared without a higher replacement (rejection candidate; waiting for the email to confirm)`
+            );
+          }
+        }
+      }
+    }
+    if (errors.length && errors.length === ctx.apps.length) {
+      throw new Error(`Play API failed for every app: ${errors.join("; ")}`);
+    }
+    return { events, nextState: { packages } };
+  }
+  event(ctx, app, track, versionCode, type, confidence, versionName) {
+    const ev = {
+      id: manualEventId({ type, packageName: app.packageName, track, versionCode }),
+      type,
+      packageName: app.packageName,
+      track,
+      versionCode,
+      source: "play-api",
+      confidence,
+      observedAt: ctx.now.toISOString(),
+      consoleUrl: consoleUrlFor(app.packageName)
+    };
+    if (app.name) ev.appName = app.name;
+    if (versionName) ev.versionName = versionName;
+    return ev;
   }
 };
+function snapshotTrack(t2) {
+  const versions = {};
+  for (const r2 of t2.releases) {
+    for (const v of r2.versionCodes) versions[v] = r2.name ?? null;
+  }
+  return { versions };
+}
 
 // src/sources/store-listing/index.ts
 function storeListingUrl(packageName, locale, country) {
@@ -114987,21 +120199,6 @@ var StoreListingSourceAdapter = class _StoreListingSourceAdapter {
   }
 };
 
-// src/sources/manual/index.ts
-var ManualSourceAdapter = class {
-  constructor(events) {
-    this.events = events;
-  }
-  events;
-  name = "manual";
-  async poll(_ctx, state) {
-    return { events: this.events, nextState: state ?? {} };
-  }
-};
-function manualEventId(e2) {
-  return `api:${e2.packageName ?? "unknown"}:${e2.track ?? "production"}:${e2.versionCode ?? "unknown"}:${e2.type}`;
-}
-
 // src/sources/index.ts
 function createSources(config, logger2, opts = {}) {
   const out = [];
@@ -115017,7 +120214,7 @@ function createSources(config, logger2, opts = {}) {
 var import_node_path5 = require("path");
 
 // src/state/file.ts
-var import_node_fs4 = require("fs");
+var import_node_fs5 = require("fs");
 var import_node_path3 = require("path");
 var FileStateStore = class {
   name = "file";
@@ -115028,7 +120225,7 @@ var FileStateStore = class {
   async load() {
     let text;
     try {
-      text = (0, import_node_fs4.readFileSync)(this.path, "utf8");
+      text = (0, import_node_fs5.readFileSync)(this.path, "utf8");
     } catch (e2) {
       if (e2.code === "ENOENT") return null;
       throw e2;
@@ -115040,15 +120237,15 @@ var FileStateStore = class {
     }
   }
   async save(state) {
-    (0, import_node_fs4.mkdirSync)((0, import_node_path3.dirname)(this.path), { recursive: true });
+    (0, import_node_fs5.mkdirSync)((0, import_node_path3.dirname)(this.path), { recursive: true });
     const tmp = `${this.path}.${process.pid}.tmp`;
-    (0, import_node_fs4.writeFileSync)(tmp, JSON.stringify(state, null, 2) + "\n", "utf8");
-    (0, import_node_fs4.renameSync)(tmp, this.path);
+    (0, import_node_fs5.writeFileSync)(tmp, JSON.stringify(state, null, 2) + "\n", "utf8");
+    (0, import_node_fs5.renameSync)(tmp, this.path);
   }
 };
 
 // src/state/github-cache.ts
-var import_node_fs5 = require("fs");
+var import_node_fs6 = require("fs");
 var import_node_path4 = require("path");
 var GithubCacheStateStore = class {
   name = "github-cache";
@@ -115073,7 +120270,7 @@ var GithubCacheStateStore = class {
     return Promise.resolve().then(() => __toESM(require_cache4()));
   }
   async load() {
-    (0, import_node_fs5.mkdirSync)(this.dir, { recursive: true });
+    (0, import_node_fs6.mkdirSync)(this.dir, { recursive: true });
     const c = await this.cache();
     const hit = await c.restoreCache([this.file], `${this.prefix}-${this.runId}-`, [
       `${this.prefix}-`
@@ -115084,14 +120281,14 @@ var GithubCacheStateStore = class {
     }
     this.logger?.debug(`Restored state from cache key ${hit}`);
     try {
-      return migrateState(JSON.parse((0, import_node_fs5.readFileSync)(this.file, "utf8")));
+      return migrateState(JSON.parse((0, import_node_fs6.readFileSync)(this.file, "utf8")));
     } catch {
       return null;
     }
   }
   async save(state) {
-    (0, import_node_fs5.mkdirSync)(this.dir, { recursive: true });
-    (0, import_node_fs5.writeFileSync)(this.file, JSON.stringify(state), "utf8");
+    (0, import_node_fs6.mkdirSync)(this.dir, { recursive: true });
+    (0, import_node_fs6.writeFileSync)(this.file, JSON.stringify(state), "utf8");
     const key = `${this.prefix}-${this.runId}-${this.attempt}-${Date.now()}`;
     const c = await this.cache();
     await c.saveCache([this.file], key);
@@ -115150,7 +120347,7 @@ function input(name) {
 }
 function buildConfigInput() {
   const path = input("config-path") ?? "play-review-notify.yml";
-  const base = (0, import_node_fs6.existsSync)(path) ? (0, import_yaml2.parse)((0, import_node_fs7.readFileSync)(path, "utf8")) ?? {} : {};
+  const base = (0, import_node_fs7.existsSync)(path) ? (0, import_yaml2.parse)((0, import_node_fs8.readFileSync)(path, "utf8")) ?? {} : {};
   const cfg = base;
   cfg.sources = cfg.sources ?? {};
   cfg.channels = cfg.channels ?? {};
@@ -115291,5 +120488,6 @@ gtoken/build/cjs/src/index.cjs:
   (*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE *)
 
 @googleapis/gmail/build/index.js:
+@googleapis/androidpublisher/build/index.js:
   (*! THIS FILE IS AUTO-GENERATED *)
 */
