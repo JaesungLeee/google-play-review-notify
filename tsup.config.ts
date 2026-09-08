@@ -1,4 +1,8 @@
 import { defineConfig } from 'tsup';
+import { version } from './package.json';
+
+// Inlined into every bundle; see src/core/version.ts.
+const define = { __PKG_VERSION__: JSON.stringify(version) };
 
 export default defineConfig([
   {
@@ -8,6 +12,7 @@ export default defineConfig([
     target: 'node20',
     platform: 'node',
     dts: { entry: { index: 'src/index.ts' } },
+    define,
     sourcemap: true,
     clean: true,
     banner: ({ format }) => (format === 'cjs' ? {} : {}),
@@ -19,6 +24,7 @@ export default defineConfig([
     target: 'node20',
     platform: 'node',
     noExternal: [/.*/],
+    define,
     sourcemap: false,
     minify: false,
     clean: false,

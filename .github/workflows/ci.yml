@@ -26,6 +26,11 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Built CLI reports the package version
+        run: |
+          expected=$(node -p "require('./package.json').version")
+          actual=$(node dist/cli.js --version)
+          test "$actual" = "$expected" || { echo "::error::dist/cli.js --version is $actual, expected $expected"; exit 1; }
       - name: Ensure committed action bundle is up to date
         if: matrix.node == 20
         run: |

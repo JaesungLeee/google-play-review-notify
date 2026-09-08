@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] - 2026-09-08
+
+### Fixed
+
+- The published CLI reported `0.1.0` for `--version` and in User-Agent headers: the version is
+  now inlined at build time instead of read from npm's environment. CI verifies
+  `dist/cli.js --version` against `package.json`.
+
 ## [0.1.1] - 2026-09-08
 
 ### Added
