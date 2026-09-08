@@ -33770,20 +33770,20 @@ var require_node_domexception = __commonJS({
 });
 
 // node_modules/fetch-blob/from.js
-var import_node_fs2, import_node_path2, import_node_domexception, stat, blobFromSync, blobFrom, fileFrom, fileFromSync, fromBlob, fromFile, BlobDataItem;
+var import_node_fs3, import_node_path3, import_node_domexception, stat, blobFromSync, blobFrom, fileFrom, fileFromSync, fromBlob, fromFile, BlobDataItem;
 var init_from = __esm({
   "node_modules/fetch-blob/from.js"() {
     "use strict";
-    import_node_fs2 = require("fs");
-    import_node_path2 = require("path");
+    import_node_fs3 = require("fs");
+    import_node_path3 = require("path");
     import_node_domexception = __toESM(require_node_domexception(), 1);
     init_file();
     init_fetch_blob();
-    ({ stat } = import_node_fs2.promises);
-    blobFromSync = (path, type) => fromBlob((0, import_node_fs2.statSync)(path), path, type);
+    ({ stat } = import_node_fs3.promises);
+    blobFromSync = (path, type) => fromBlob((0, import_node_fs3.statSync)(path), path, type);
     blobFrom = (path, type) => stat(path).then((stat2) => fromBlob(stat2, path, type));
     fileFrom = (path, type) => stat(path).then((stat2) => fromFile(stat2, path, type));
-    fileFromSync = (path, type) => fromFile((0, import_node_fs2.statSync)(path), path, type);
+    fileFromSync = (path, type) => fromFile((0, import_node_fs3.statSync)(path), path, type);
     fromBlob = (stat2, path, type = "") => new fetch_blob_default([new BlobDataItem({
       path,
       size: stat2.size,
@@ -33795,7 +33795,7 @@ var init_from = __esm({
       size: stat2.size,
       lastModified: stat2.mtimeMs,
       start: 0
-    })], (0, import_node_path2.basename)(path), { type, lastModified: stat2.mtimeMs });
+    })], (0, import_node_path3.basename)(path), { type, lastModified: stat2.mtimeMs });
     BlobDataItem = class _BlobDataItem {
       #path;
       #start;
@@ -33822,7 +33822,7 @@ var init_from = __esm({
         if (mtimeMs > this.lastModified) {
           throw new import_node_domexception.default("The requested file could not be read, typically due to permission problems that have occurred after a reference to a file was acquired.", "NotReadableError");
         }
-        yield* (0, import_node_fs2.createReadStream)(this.#path, {
+        yield* (0, import_node_fs3.createReadStream)(this.#path, {
           start: this.#start,
           end: this.#start + this.size - 1
         });
@@ -57031,7 +57031,7 @@ var require_internal_path_helper = __commonJS({
     var path = __importStar2(require("path"));
     var assert_1 = __importDefault2(require("assert"));
     var IS_WINDOWS = process.platform === "win32";
-    function dirname2(p) {
+    function dirname3(p) {
       p = safeTrimTrailingSeparator(p);
       if (IS_WINDOWS && /^\\\\[^\\]+(\\[^\\]+)?$/.test(p)) {
         return p;
@@ -57042,7 +57042,7 @@ var require_internal_path_helper = __commonJS({
       }
       return result;
     }
-    exports2.dirname = dirname2;
+    exports2.dirname = dirname3;
     function ensureAbsoluteRoot(root, itemPath) {
       assert_1.default(root, `ensureAbsoluteRoot parameter 'root' must not be empty`);
       assert_1.default(itemPath, `ensureAbsoluteRoot parameter 'itemPath' must not be empty`);
@@ -101096,7 +101096,7 @@ var require_utils5 = __commonJS({
       streamToBuffer3: () => streamToBuffer3
     });
     module2.exports = __toCommonJS2(utils_exports);
-    var import_node_fs9 = __toESM2(require("fs"));
+    var import_node_fs10 = __toESM2(require("fs"));
     var import_node_util4 = __toESM2(require("util"));
     var import_constants = require_constants10();
     async function streamToBuffer(stream, buffer, offset, end, encoding) {
@@ -101183,7 +101183,7 @@ var require_utils5 = __commonJS({
     }
     async function readStreamToLocalFile(rs, file) {
       return new Promise((resolve4, reject) => {
-        const ws = import_node_fs9.default.createWriteStream(file);
+        const ws = import_node_fs10.default.createWriteStream(file);
         rs.on("error", (err) => {
           reject(err);
         });
@@ -101194,8 +101194,8 @@ var require_utils5 = __commonJS({
         rs.pipe(ws);
       });
     }
-    var fsStat = import_node_util4.default.promisify(import_node_fs9.default.stat);
-    var fsCreateReadStream = import_node_fs9.default.createReadStream;
+    var fsStat = import_node_util4.default.promisify(import_node_fs10.default.stat);
+    var fsCreateReadStream = import_node_fs10.default.createReadStream;
   }
 });
 
@@ -114935,17 +114935,31 @@ __export(action_exports, {
 module.exports = __toCommonJS(action_exports);
 
 // src/core/version.ts
-var PACKAGE_VERSION = true ? "0.1.2" : process.env["npm_package_version"] ?? "0.0.0-dev";
+var import_node_fs = require("fs");
+var import_node_path = require("path");
+function readPackageJsonVersion() {
+  let dir = __dirname;
+  for (let i2 = 0; i2 < 3; i2++) {
+    try {
+      const pkg = JSON.parse((0, import_node_fs.readFileSync)((0, import_node_path.join)(dir, "package.json"), "utf8"));
+      if (pkg.name === "play-review-notify" && typeof pkg.version === "string") return pkg.version;
+    } catch {
+    }
+    dir = (0, import_node_path.dirname)(dir);
+  }
+  return void 0;
+}
+var PACKAGE_VERSION = typeof __PKG_VERSION__ === "string" ? __PKG_VERSION__ : readPackageJsonVersion() ?? process.env["npm_package_version"] ?? "0.0.0-dev";
 
 // src/action/index.ts
 var core = __toESM(require_core());
-var import_node_fs7 = require("fs");
-var import_yaml2 = __toESM(require_dist());
 var import_node_fs8 = require("fs");
+var import_yaml2 = __toESM(require_dist());
+var import_node_fs9 = require("fs");
 
 // src/core/config.ts
-var import_node_fs = require("fs");
-var import_node_path = require("path");
+var import_node_fs2 = require("fs");
+var import_node_path2 = require("path");
 var import_yaml = __toESM(require_dist());
 
 // node_modules/zod/v3/external.js
@@ -119636,7 +119650,7 @@ function createDefaultNotifiers(webhookOpts = {}) {
 var import_gmail = __toESM(require_build());
 
 // src/sources/email/rules.ts
-var import_node_fs3 = require("fs");
+var import_node_fs4 = require("fs");
 
 // rules/email/en.json
 var en_default2 = {
@@ -119749,7 +119763,7 @@ function loadBuiltinRuleSets() {
   return [en_default2, ko_default];
 }
 function loadRuleSetFiles(paths) {
-  return paths.map((p) => JSON.parse((0, import_node_fs3.readFileSync)(p, "utf8")));
+  return paths.map((p) => JSON.parse((0, import_node_fs4.readFileSync)(p, "utf8")));
 }
 function senderAllowed(from, allowlist) {
   const addr = (from.match(/<([^>]+)>/)?.[1] ?? from).trim().toLowerCase();
@@ -119973,10 +119987,10 @@ function manualEventId(e2) {
 
 // src/sources/play-api/client.ts
 var import_androidpublisher = __toESM(require_build2());
-var import_node_fs4 = require("fs");
+var import_node_fs5 = require("fs");
 var SCOPE = "https://www.googleapis.com/auth/androidpublisher";
 function createPlayApiClient(serviceAccount) {
-  const raw = serviceAccount.trim().startsWith("{") ? serviceAccount : (0, import_node_fs4.readFileSync)(serviceAccount, "utf8");
+  const raw = serviceAccount.trim().startsWith("{") ? serviceAccount : (0, import_node_fs5.readFileSync)(serviceAccount, "utf8");
   const credentials = JSON.parse(raw);
   const auth = new import_androidpublisher.auth.GoogleAuth({ credentials, scopes: [SCOPE] });
   const api = (0, import_androidpublisher.androidpublisher)({ version: "v3", auth });
@@ -120224,21 +120238,21 @@ function createSources(config, logger2, opts = {}) {
 }
 
 // src/state/index.ts
-var import_node_path5 = require("path");
+var import_node_path6 = require("path");
 
 // src/state/file.ts
-var import_node_fs5 = require("fs");
-var import_node_path3 = require("path");
+var import_node_fs6 = require("fs");
+var import_node_path4 = require("path");
 var FileStateStore = class {
   name = "file";
   path;
   constructor(path = ".play-review-notify/state.json") {
-    this.path = (0, import_node_path3.resolve)(path);
+    this.path = (0, import_node_path4.resolve)(path);
   }
   async load() {
     let text;
     try {
-      text = (0, import_node_fs5.readFileSync)(this.path, "utf8");
+      text = (0, import_node_fs6.readFileSync)(this.path, "utf8");
     } catch (e2) {
       if (e2.code === "ENOENT") return null;
       throw e2;
@@ -120250,16 +120264,16 @@ var FileStateStore = class {
     }
   }
   async save(state) {
-    (0, import_node_fs5.mkdirSync)((0, import_node_path3.dirname)(this.path), { recursive: true });
+    (0, import_node_fs6.mkdirSync)((0, import_node_path4.dirname)(this.path), { recursive: true });
     const tmp = `${this.path}.${process.pid}.tmp`;
-    (0, import_node_fs5.writeFileSync)(tmp, JSON.stringify(state, null, 2) + "\n", "utf8");
-    (0, import_node_fs5.renameSync)(tmp, this.path);
+    (0, import_node_fs6.writeFileSync)(tmp, JSON.stringify(state, null, 2) + "\n", "utf8");
+    (0, import_node_fs6.renameSync)(tmp, this.path);
   }
 };
 
 // src/state/github-cache.ts
-var import_node_fs6 = require("fs");
-var import_node_path4 = require("path");
+var import_node_fs7 = require("fs");
+var import_node_path5 = require("path");
 var GithubCacheStateStore = class {
   name = "github-cache";
   prefix;
@@ -120271,8 +120285,8 @@ var GithubCacheStateStore = class {
   attempt;
   constructor(opts = {}) {
     this.prefix = opts.keyPrefix ?? "play-review-notify-state";
-    this.dir = opts.dir ?? (0, import_node_path4.join)(process.env["RUNNER_TEMP"] ?? process.cwd(), ".play-review-notify");
-    this.file = (0, import_node_path4.join)(this.dir, "state.json");
+    this.dir = opts.dir ?? (0, import_node_path5.join)(process.env["RUNNER_TEMP"] ?? process.cwd(), ".play-review-notify");
+    this.file = (0, import_node_path5.join)(this.dir, "state.json");
     this.cacheImpl = opts.cache;
     this.logger = opts.logger;
     this.runId = opts.runId ?? process.env["GITHUB_RUN_ID"] ?? String(Date.now());
@@ -120283,7 +120297,7 @@ var GithubCacheStateStore = class {
     return Promise.resolve().then(() => __toESM(require_cache4()));
   }
   async load() {
-    (0, import_node_fs6.mkdirSync)(this.dir, { recursive: true });
+    (0, import_node_fs7.mkdirSync)(this.dir, { recursive: true });
     const c = await this.cache();
     const hit = await c.restoreCache([this.file], `${this.prefix}-${this.runId}-`, [
       `${this.prefix}-`
@@ -120294,14 +120308,14 @@ var GithubCacheStateStore = class {
     }
     this.logger?.debug(`Restored state from cache key ${hit}`);
     try {
-      return migrateState(JSON.parse((0, import_node_fs6.readFileSync)(this.file, "utf8")));
+      return migrateState(JSON.parse((0, import_node_fs7.readFileSync)(this.file, "utf8")));
     } catch {
       return null;
     }
   }
   async save(state) {
-    (0, import_node_fs6.mkdirSync)(this.dir, { recursive: true });
-    (0, import_node_fs6.writeFileSync)(this.file, JSON.stringify(state), "utf8");
+    (0, import_node_fs7.mkdirSync)(this.dir, { recursive: true });
+    (0, import_node_fs7.writeFileSync)(this.file, JSON.stringify(state), "utf8");
     const key = `${this.prefix}-${this.runId}-${this.attempt}-${Date.now()}`;
     const c = await this.cache();
     await c.saveCache([this.file], key);
@@ -120332,7 +120346,7 @@ async function createStateStore(config, logger2) {
     case "none":
       return new NoneStateStore();
     case "custom": {
-      const mod = await import((0, import_node_path5.resolve)(cfg.module));
+      const mod = await import((0, import_node_path6.resolve)(cfg.module));
       const store = mod.createStateStore?.() ?? (typeof mod.default === "function" ? mod.default() : mod.default);
       if (!store || typeof store.load !== "function") {
         throw new Error(`Custom state store module ${cfg.module} does not export a StateStore`);
@@ -120360,7 +120374,7 @@ function input(name) {
 }
 function buildConfigInput() {
   const path = input("config-path") ?? "play-review-notify.yml";
-  const base = (0, import_node_fs7.existsSync)(path) ? (0, import_yaml2.parse)((0, import_node_fs8.readFileSync)(path, "utf8")) ?? {} : {};
+  const base = (0, import_node_fs8.existsSync)(path) ? (0, import_yaml2.parse)((0, import_node_fs9.readFileSync)(path, "utf8")) ?? {} : {};
   const cfg = base;
   cfg.sources = cfg.sources ?? {};
   cfg.channels = cfg.channels ?? {};
