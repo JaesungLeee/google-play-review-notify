@@ -114933,6 +114933,11 @@ __export(action_exports, {
   buildConfigInput: () => buildConfigInput
 });
 module.exports = __toCommonJS(action_exports);
+
+// src/core/version.ts
+var PACKAGE_VERSION = true ? "0.1.2" : process.env["npm_package_version"] ?? "0.0.0-dev";
+
+// src/action/index.ts
 var core = __toESM(require_core());
 var import_node_fs7 = require("fs");
 var import_yaml2 = __toESM(require_dist());
@@ -120330,7 +120335,7 @@ async function createStateStore(config, logger2) {
 }
 
 // src/action/index.ts
-var VERSION = process.env["npm_package_version"] ?? "0.1.0";
+var VERSION = PACKAGE_VERSION;
 function actionLogger(secrets) {
   for (const s2 of secrets) core.setSecret(s2);
   return {

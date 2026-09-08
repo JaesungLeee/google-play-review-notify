@@ -1,4 +1,5 @@
 /** GitHub Action entry. See docs/PRD_ko.md §5.8. Inputs > env > config file. */
+import { PACKAGE_VERSION } from '../core/version';
 import * as core from '@actions/core';
 import { existsSync } from 'node:fs';
 import { parse as parseYaml } from 'yaml';
@@ -10,7 +11,7 @@ import { createDefaultNotifiers } from '../notifiers';
 import { createSources, ManualSourceAdapter, manualEventId } from '../sources';
 import { createStateStore } from '../state';
 
-const VERSION = process.env['npm_package_version'] ?? '0.1.0';
+const VERSION = PACKAGE_VERSION;
 
 function actionLogger(secrets: string[]): Logger {
   for (const s of secrets) core.setSecret(s);

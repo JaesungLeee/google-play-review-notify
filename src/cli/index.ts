@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import { collectSecrets, loadConfigFile, ConfigError, type Config } from '../core/config';
 import { createConsoleLogger, type LogLevel } from '../core/logger';
+import { PACKAGE_VERSION } from '../core/version';
 import { runOnce } from '../core/run';
 import type { ReviewEvent, RunSummary } from '../core/types';
 import { createDefaultNotifiers } from '../notifiers';
@@ -11,7 +12,7 @@ import { authorizeGmail } from '../sources/email/oauth';
 import { createStateStore, FileStateStore, NoneStateStore } from '../state';
 import { renderMessage } from '../templates';
 
-const VERSION = process.env['npm_package_version'] ?? '0.1.0';
+const VERSION = PACKAGE_VERSION;
 
 export const EXIT = { OK: 0, CONFIG: 1, SOURCE_PARTIAL: 2, NOTIFY_FAILED: 3 } as const;
 
