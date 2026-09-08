@@ -1,0 +1,24 @@
+name: Feature request
+description: A new source, notifier, state store, or option
+title: '[feature] '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the situation, not only the solution. For example "our team uses Microsoft Teams, not Slack".
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Config snippet, command, or message example if you have one in mind.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This is not about scraping the Play Console UI (out of scope, see the PRD)
+        - label: I would be willing to open a pull request for this

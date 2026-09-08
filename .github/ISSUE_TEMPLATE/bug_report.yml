@@ -1,0 +1,43 @@
+name: Bug report
+description: Something does not work as documented
+title: '[bug] '
+labels: ['bug']
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: How are you running it?
+      options: [GitHub Action, CLI (npx / global install), Library, Other]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: '`play-review-notify --version`, or the Action tag'
+      placeholder: 0.1.2
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Config (secrets as ${ENV} references)
+      render: yaml
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output of `run --dry-run --verbose` (or the Action job log)
+      description: Secrets referenced in the config are redacted automatically. Please check anyway before pasting.
+      render: text
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version and OS
+      placeholder: Node 20.17 on ubuntu-latest

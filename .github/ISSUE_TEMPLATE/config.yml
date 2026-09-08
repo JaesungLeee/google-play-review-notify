@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/JaesungLeee/google-play-review-notify/security/advisories/new
+    about: Please report security issues privately, not as a public issue.
+  - name: Setup help (Gmail OAuth, Play API)
+    url: https://github.com/JaesungLeee/google-play-review-notify/tree/main/docs
+    about: The setup guides include troubleshooting tables for the common errors.
