@@ -1,6 +1,6 @@
 {
   "name": "play-review-notify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Detect Google Play app review outcomes (approved, rejected, and more) and notify Slack, Discord, or any webhook.",
   "license": "Apache-2.0",
   "repository": {
