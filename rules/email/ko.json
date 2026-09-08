@@ -1,0 +1,42 @@
+{
+  "$comment": "Korean rule set, validated against real Play Console emails collected in Phase 0 (2026-09-08; see docs/phase0-notes.md). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '앱 상태: 거부됨'. APPROVED patterns are still unobserved.",
+  "locale": "ko",
+  "rules": [
+    {
+      "type": "SUSPENDED",
+      "subject": ["계정이 정지되었습니다", "개발자 계정이 해지되었습니다"],
+      "body": ["앱 상태: 정지됨", "계정 상태: 정지됨"]
+    },
+    {
+      "type": "REMOVED",
+      "subject": ["Google Play에서 삭제되었습니다"],
+      "body": ["앱 상태: 삭제됨"]
+    },
+    {
+      "type": "REJECTED",
+      "subject": ["앱이 거부되었습니다", "업데이트가 거부되었습니다"],
+      "body": ["앱 상태: 거부됨"]
+    },
+    {
+      "type": "POLICY_WARNING",
+      "subject": ["정책을 준수하지 않음", "대상 API 수준 요구사항", "[조치 필요]"],
+      "body": ["상태: 추가 조치 필요"]
+    },
+    {
+      "type": "APPROVED",
+      "$comment": "Unverified draft: no approval email has been observed yet.",
+      "subject": ["앱이 승인되었습니다", "업데이트가 게시되었습니다"],
+      "body": ["앱 상태: 게시됨"]
+    }
+  ],
+  "extract": {
+    "packageName": ["regex:\\(([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+)\\)"],
+    "appName": [
+      "regex:(?:최근 )?(\\S[^\\n]*?)\\([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+\\)\\s*앱을",
+      "regex:준수하지 않음\\((.+)\\)\\s*$"
+    ],
+    "versionName": ["regex:버전(?: 이름)?:?\\s*([0-9]+(?:\\.[0-9]+)+)"],
+    "versionCode": ["regex:버전 코드:?\\s*([0-9]+)"],
+    "reason": ["section:발견된 문제|사유|이유"]
+  }
+}

@@ -9,3 +9,7 @@ coverage/
 .env
 .env.*
 .DS_Store
+# Raw, unredacted Play Console emails collected for Phase 0 (never commit)
+test/fixtures/email/private/
+# Raw Play API snapshots collected for Phase 0 (never commit)
+test/fixtures/play-api/private/

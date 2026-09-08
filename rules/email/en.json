@@ -1,5 +1,5 @@
 {
-  "$comment": "DRAFT rule set (English). Patterns are unvalidated until Phase 0 collects real Play Console emails as fixtures. See docs/PRD_ko.md §8.1.",
+  "$comment": "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (Phase 0, see docs/phase0-notes.md): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
   "locale": "en",
   "rules": [
     {
@@ -8,28 +8,31 @@
         "has been suspended",
         "account has been terminated",
         "developer account has been suspended"
-      ]
+      ],
+      "body": ["App Status: Suspended"]
     },
     {
       "type": "REMOVED",
-      "subject": ["has been removed from Google Play", "Removal of your app"]
+      "subject": ["has been removed from Google Play", "Removal of your app"],
+      "body": ["App Status: Removed"]
     },
     {
       "type": "REJECTED",
-      "subject": [
-        "has been rejected",
-        "Update rejected",
-        "wasn't published",
-        "was not published",
-        "Action required"
-      ]
+      "subject": ["has been rejected", "Update rejected", "wasn't published", "was not published"],
+      "body": ["App Status: Rejected"]
     },
     {
       "type": "POLICY_WARNING",
-      "subject": ["Policy", "policy violation", "policy issue", "Warning"]
+      "subject": [
+        "not compliant with Google Play Policies",
+        "Action Required:",
+        "target API level requirement"
+      ],
+      "body": ["Status: Further action required", "Status: Additional action required"]
     },
     {
       "type": "APPROVED",
+      "$comment": "Unverified draft: no approval email has been observed yet.",
       "subject": [
         "has been approved",
         "is now available on Google Play",
@@ -41,14 +44,17 @@
   ],
   "extract": {
     "packageName": [
+      "regex:\\(([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+)\\)",
       "regex:\\b([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)+)\\b(?=[\\s\\)\\]]|$)"
     ],
     "appName": [
-      "regex:[Yy]our app,? (?:\"|“)?(.+?)(?:\"|”)?,? (?:\\(|has |is |was |wasn't )",
-      "regex:app (?:\"|“)(.+?)(?:\"|”)"
+      "regex:[Yy]our app,? (\\S[^\\n]*?)\\s*\\([a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+\\)",
+      "regex:[Yy]our app,? (?:\"|“)?(.+?)(?:\"|”)?,? (?:has |is |was |wasn't )",
+      "regex:app (?:\"|“)(.+?)(?:\"|”)",
+      "regex:not compliant with Google Play Policies \\((.+)\\)\\s*$"
     ],
     "versionName": ["regex:[Vv]ersion(?: name)?:? ([0-9]+(?:\\.[0-9]+)+)"],
-    "versionCode": ["regex:[Vv]ersion code:? ([0-9]+)", "regex:\\(([0-9]{2,})\\)"],
-    "reason": ["section:Issue|Reason|Policy|Why"]
+    "versionCode": ["regex:[Vv]ersion code:? ([0-9]+)"],
+    "reason": ["section:Issue found|Issue|Reason"]
   }
 }

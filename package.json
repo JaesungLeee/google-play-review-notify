@@ -44,11 +44,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "cli": "tsx src/cli/index.ts",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "spike:play": "tsx scripts/spike/play-tracks.ts"
   },
   "dependencies": {
     "@actions/cache": "^4.0.3",
     "@actions/core": "^1.11.1",
+    "@googleapis/androidpublisher": "^38.0.0",
     "@googleapis/gmail": "^18.0.0",
     "commander": "^13.1.0",
     "yaml": "^2.7.1",

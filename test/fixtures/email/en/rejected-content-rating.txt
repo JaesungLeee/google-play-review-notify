@@ -1,0 +1,121 @@
+From: Google Play Support <no-reply-googleplay-developer@google.com>
+Date: Wed, 02 Aug 2023 19:35:47 -0700
+Subject: Action Required: Your app is not compliant with Google Play Policies (Sample App)
+
+Google Play
+
+Developer update
+
+
+Hi Developers at Sample Team,
+
+After a recent review, we found that your app Sample App (com.example.sampleapp)
+is not compliant with one or more of our Developer Program Policies. See
+below for more information about your app's status and how to correct the
+issue.
+
+
+Publishing Status
+App Status: Rejected
+
+Your app has been rejected and wasn't published due to the policy issue(s)
+listed below. If you submitted an update, the previous version of your app
+is still available on Google Play.
+
+
+Issue found: Violation of Content Ratings policy
+
+After reviewing your app, we believe that the content rating is not
+accurate. Follow the numbered steps in this email to retake your app's
+rating questionnaire. Be sure to provide complete and accurate responses.
+To better understand the ratings categories, regional coverage, and content
+ratings policy, see the Content ratings for apps and games article.
+
+If you have questions about the rating assigned to your app, contact the
+rating authority directly using the link provided in your certificate email.
+
+Issue details
+
+We found an issue in the following area(s):
+
+
+App screenshot (ko-KR): Please see attached screenshot
+APP_SCREENSHOT-2908.png
+
+Additionally, follow these steps to bring your app into compliance:
+
+
+Read the Content Ratings page to better understand content ratings and how
+they're used.
+
+Review the Ratings questionnaire help page for definitions of terms and
+content examples.
+
+Make sure your app category or tag is accurate in your app's store listing
+page.
+
+For guidance, see Choose a category and tags for your app or game.
+
+Retake the rating questionnaire by following the steps listed in the How to
+complete a rating questionnaire section of the Content ratings for apps and
+games. Answer all questions accurately.
+
+About the Content Ratings policy
+Content ratings on Google Play are provided by the International Age Rating
+Coalition (IARC) and are designed to help developers communicate locally
+relevant content ratings to users. Regional IARC authorities maintain
+guidelines which are used to determine the maturity level of the content in
+an app. We don't allow apps without a content rating on Google Play.
+Content ratings are used to inform consumers, especially parents, of
+potentially objectionable content that exists within an app.
+
+
+Visit Google Play's Academy for App Success to get contextual learning on
+this Google Play policy.
+
+
+Action required: Submit an updated app for review
+Here's what to do to help get your app on Google Play:
+
+Make sure to read the applicable policies or requirements listed below:
+
+Content Ratings policy
+
+Make appropriate changes to your app (if possible), and be sure to address
+the issue described above. You may also want to check your app's store
+listing for compliance, if applicable.
+Double check that your app is compliant with all other Developer Program
+Policies.
+If you made changes to your app bundle, store listing, or APK, please sign
+in to your Play Console and submit the update(s).
+
+Contact support
+If you've reviewed the policy and feel our decision may have been in error,
+please reach out to our policy support team. We'll get back to you within 2
+business days.
+Learn More
+
+Visit the Android Developers Blog to learn more about free tools and
+resources for building safe and successful apps. Check out the latest
+Google Play Console Requirements, Device and Network Abuse, Financial
+Services, and more! Watch this #PolicyBytes for all the details.
+
+Thanks for your continued support in helping to make Google Play a positive
+experience for both developers and consumers. We look forward to seeing an
+updated version of your app on Google Play.
+
+Please complete a two question survey to help us improve this experience.
+
+
+The Google Play Team
+
+
+LANG=en|MODE=M|REG=KR|TID=CW
+
+
+© 2023 Google LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043
+
+Click here to configure your notification preferences.
+
+This message was sent to inform you about important updates to your Google
+Play developer account.

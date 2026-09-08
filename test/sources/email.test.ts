@@ -65,6 +65,76 @@ describe('email rules (draft rule set)', () => {
   });
 });
 
+describe('email rules (real-world fixtures, Phase 0)', () => {
+  const sets = loadBuiltinRuleSets();
+
+  it('bundles English and Korean rule sets', () => {
+    expect(sets.map((s) => s.locale)).toEqual(['en', 'ko']);
+  });
+
+  const cases: Array<[string, Partial<ReturnType<typeof classifyEmail>>]> = [
+    [
+      'en/rejected-content-rating.txt',
+      {
+        type: 'REJECTED',
+        packageName: 'com.example.sampleapp',
+        appName: 'Sample App',
+        reason: 'Violation of Content Ratings policy',
+      },
+    ],
+    [
+      'ko/rejected-data-safety.txt',
+      {
+        type: 'REJECTED',
+        packageName: 'com.example.samplechat',
+        appName: 'Sample Chat',
+        versionCode: '1',
+        reason: '데이터 보안 양식 잘못됨',
+      },
+    ],
+    [
+      'ko/rejected-login-credentials.txt',
+      {
+        type: 'REJECTED',
+        packageName: 'com.example.sample',
+        appName: '찰나 - Sample',
+        versionCode: '2',
+        reason: 'Play Console 요구사항 위반',
+      },
+    ],
+    [
+      // Same subject as a rejection, but the body says "상태: 추가 조치 필요" (deadline warning).
+      'ko/policy-warning-account-deletion-link.txt',
+      {
+        type: 'POLICY_WARNING',
+        packageName: 'com.example.samplealbum',
+        appName: 'Sample Album',
+        reason: '데이터 보안 양식의 계정/데이터 삭제 링크가 잘못됨',
+      },
+    ],
+    ['ko/policy-warning-target-api-level.txt', { type: 'POLICY_WARNING' }],
+  ];
+
+  for (const [name, expected] of cases) {
+    it(`classifies ${name}`, () => {
+      const c = classifyEmail(fixture(name), sets);
+      expect(c).toMatchObject(expected);
+      if (!('packageName' in expected)) expect(c.packageName).toBeUndefined();
+    });
+  }
+
+  for (const name of [
+    'en/unrelated-brazil-statute.txt',
+    'ko/unrelated-terms-of-service.txt',
+    'ko/unrelated-tax-change.txt',
+    'ko/unrelated-developer-verification.txt',
+  ]) {
+    it(`does not misclassify ${name}`, () => {
+      expect(classifyEmail(fixture(name), sets).type).toBe('UNKNOWN_NOTICE');
+    });
+  }
+});
+
 describe('senderAllowed', () => {
   it('matches exact addresses and domain suffixes, ignoring display names', () => {
     const allow = ['googleplay-noreply@google.com', '@google.com'];
