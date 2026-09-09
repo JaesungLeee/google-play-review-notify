@@ -77,7 +77,7 @@ jobs:
       events-count: ${{ steps.notify.outputs.events-count }}
       has-rejection: ${{ steps.notify.outputs.has-rejection }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: notify
         uses: JaesungLeee/google-play-review-notify@v1
         with:
