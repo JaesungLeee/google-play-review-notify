@@ -107,6 +107,14 @@ and `test/core/schema.test.ts` fail when the file is stale.
 - Do not edit `CHANGELOG.md` or bump the version: both are generated from the commit titles
   by Release Please (see below).
 
+## Dependencies (maintainers)
+
+Dependabot opens grouped pull requests every Monday. Runtime dependency bumps are titled
+`fix(deps)` so merging one produces a patch release; development and Actions bumps are `chore`
+and `ci` and do not. Review the CI result, merge, and let Release Please do the rest. Security
+advisories for runtime dependencies should be merged promptly; CodeQL runs on every pull request
+and weekly.
+
 ## Releasing (maintainers)
 
 Releases are automated:

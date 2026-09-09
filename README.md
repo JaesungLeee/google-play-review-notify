@@ -1,6 +1,7 @@
 # google-play-review-notify
 
 [![CI](https://github.com/JaesungLeee/google-play-review-notify/actions/workflows/ci.yml/badge.svg)](https://github.com/JaesungLeee/google-play-review-notify/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/JaesungLeee/google-play-review-notify/actions/workflows/codeql.yml/badge.svg)](https://github.com/JaesungLeee/google-play-review-notify/actions/workflows/codeql.yml)
 [![npm](https://img.shields.io/npm/v/play-review-notify)](https://www.npmjs.com/package/play-review-notify)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
