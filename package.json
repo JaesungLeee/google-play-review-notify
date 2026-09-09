@@ -50,7 +50,7 @@
     "schema": "tsx scripts/generate-schema.ts"
   },
   "dependencies": {
-    "@actions/cache": "^4.0.3",
+    "@actions/cache": "^6.2.0",
     "@actions/core": "^1.11.1",
     "@googleapis/androidpublisher": "^38.0.0",
     "@googleapis/gmail": "^18.0.0",
