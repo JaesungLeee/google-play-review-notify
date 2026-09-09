@@ -1,0 +1,39 @@
+# Dependency updates. Runtime dependency bumps use a `fix(deps)` prefix so Release Please ships
+# them as a patch release; development and Actions bumps use `chore`/`ci` and do not trigger one.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'fix(deps)'
+      prefix-development: 'chore(deps)'
+    groups:
+      runtime-minor:
+        dependency-type: production
+        update-types: [minor, patch]
+      dev-minor:
+        dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # Keep the pinned Node.js major of the Action runtime (action.yml) in sync manually.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Asia/Seoul
+    commit-message:
+      prefix: 'ci(deps)'
+    groups:
+      actions:
+        patterns: ['*']
