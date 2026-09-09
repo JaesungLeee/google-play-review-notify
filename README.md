@@ -122,7 +122,13 @@ sent), `3` a notification failed. `--json` switches to structured output.
 
 Secrets are never written to the file; use `${ENV_VAR}` references.
 
+A JSON Schema is published at
+[schemas/config.schema.json](schemas/config.schema.json). Put this comment on the first line of
+your YAML to get completion, hover help, and typo checks in VS Code (with the YAML extension),
+JetBrains IDEs, and other editors that honour it:
+
 ```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas/config.schema.json
 version: 1
 
 apps:

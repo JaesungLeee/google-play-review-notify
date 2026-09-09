@@ -1,0 +1,589 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas/config.schema.json",
+  "title": "play-review-notify configuration",
+  "description": "Configuration file for play-review-notify (play-review-notify.yml). String values may reference environment variables as ${VAR}; they are resolved before validation.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference for editor support (JSON configs)."
+    },
+    "version": {
+      "type": "number",
+      "const": 1,
+      "default": 1,
+      "description": "Config format version."
+    },
+    "apps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "packageName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Android application id, e.g. com.example.app."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name as shown in Play Console. Used to match emails that omit the package name."
+          },
+          "tracks": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["production"],
+            "description": "Tracks watched by the Play API source (production, beta, alpha, internal, ...)."
+          },
+          "channels": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Channel names for this app. Falls back to defaultChannels when omitted."
+          }
+        },
+        "required": ["packageName"],
+        "additionalProperties": false,
+        "description": "One app to watch."
+      },
+      "minItems": 1,
+      "description": "Apps to watch."
+    },
+    "sources": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "auth": {
+              "type": "object",
+              "properties": {
+                "clientId": {
+                  "type": "string",
+                  "description": "OAuth client id (${GMAIL_CLIENT_ID})."
+                },
+                "clientSecret": {
+                  "type": "string",
+                  "description": "OAuth client secret (${GMAIL_CLIENT_SECRET})."
+                },
+                "refreshToken": {
+                  "type": "string",
+                  "description": "Refresh token with the gmail.readonly scope (${GMAIL_REFRESH_TOKEN})."
+                }
+              },
+              "required": ["clientId", "clientSecret", "refreshToken"],
+              "additionalProperties": false,
+              "description": "Gmail OAuth credentials. See docs/gmail-oauth.md. Required when enabled."
+            },
+            "lookbackHours": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "default": 24,
+              "description": "Search window used on the first run and after state loss."
+            },
+            "senderAllowlist": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [
+                "no-reply-googleplay-developer@google.com",
+                "googleplay-noreply@google.com",
+                "googleplay-developer-support@google.com"
+              ],
+              "description": "Sender addresses that count as Google Play. The default covers the known ones."
+            },
+            "rules": {
+              "anyOf": [
+                { "type": "string", "const": "builtin" },
+                { "type": "array", "items": { "type": "string" } }
+              ],
+              "default": "builtin",
+              "description": "'builtin' for the bundled English and Korean rule sets, or paths to rule JSON files."
+            },
+            "reasonMaxLength": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "default": 1000,
+              "description": "Maximum length of the extracted rejection reason."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Gmail source: REJECTED and POLICY_WARNING from Play Console emails.",
+          "default": {}
+        },
+        "playApi": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "serviceAccountJson": {
+              "type": "string",
+              "description": "Service account key: the JSON content (${PLAY_SERVICE_ACCOUNT_JSON}) or a file path."
+            },
+            "emitLiveWithoutConfirmation": {
+              "type": "boolean",
+              "default": false,
+              "description": "Emit a low-confidence LIVE when a release is completed. Only for apps without a public listing."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Play Developer API source: SUBMITTED when a new versionCode appears on a track.",
+          "default": {}
+        },
+        "storeListing": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "locale": {
+              "type": "string",
+              "default": "en",
+              "description": "hl query parameter of the store page."
+            },
+            "country": {
+              "type": "string",
+              "default": "US",
+              "description": "gl query parameter of the store page."
+            },
+            "failureThreshold": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "default": 5,
+              "description": "Consecutive fetch failures before the source reports an error."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Public store listing source: LIVE for the production track.",
+          "default": {}
+        }
+      },
+      "additionalProperties": false,
+      "default": {},
+      "description": "Signal sources. Enable at least one."
+    },
+    "events": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "description": "Per-event-type overrides. Defaults: everything on except SUBMITTED and UNKNOWN_NOTICE.",
+      "properties": {
+        "SUBMITTED": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
+        "APPROVED": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
+        "REJECTED": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
+        "LIVE": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
+        "POLICY_WARNING": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
+        "REMOVED": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
+        "SUSPENDED": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
+        "UNKNOWN_NOTICE": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether this event type is notified."
+            },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        }
+      }
+    },
+    "channels": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Human-readable label for logs."
+              },
+              "type": { "type": "string", "const": "slack" },
+              "webhookUrl": {
+                "type": "string",
+                "description": "Slack Incoming Webhook URL (${SLACK_WEBHOOK_URL}). Must be a URL after ${ENV_VAR} interpolation."
+              }
+            },
+            "required": ["type", "webhookUrl"],
+            "additionalProperties": false,
+            "description": "Slack Incoming Webhook (Block Kit message)."
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Human-readable label for logs."
+              },
+              "type": { "type": "string", "const": "discord" },
+              "webhookUrl": {
+                "type": "string",
+                "description": "Discord webhook URL (${DISCORD_WEBHOOK_URL}). Must be a URL after ${ENV_VAR} interpolation."
+              }
+            },
+            "required": ["type", "webhookUrl"],
+            "additionalProperties": false,
+            "description": "Discord webhook (embed message)."
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Human-readable label for logs."
+              },
+              "type": { "type": "string", "const": "webhook" },
+              "url": {
+                "type": "string",
+                "description": "HTTP endpoint that receives the JSON payload. Must be a URL after ${ENV_VAR} interpolation."
+              },
+              "secret": {
+                "type": "string",
+                "description": "HMAC-SHA256 key for the X-Play-Review-Signature header."
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": { "type": "string" },
+                "default": {},
+                "description": "Extra request headers."
+              },
+              "batch": {
+                "type": "boolean",
+                "default": false,
+                "description": "Send one array of events per run instead of one request per event."
+              }
+            },
+            "required": ["type", "url"],
+            "additionalProperties": false,
+            "description": "Generic webhook: n8n, Make, Zapier, or your own server."
+          }
+        ],
+        "description": "A notification target."
+      },
+      "default": {},
+      "description": "Named notification targets referenced from apps[].channels and defaultChannels."
+    },
+    "defaultChannels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Channels used by apps that do not list their own."
+    },
+    "templates": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "description": "Mustache-style message overrides per event type ({{appName}}, {{reason}}, ...).",
+      "properties": {
+        "SUBMITTED": { "type": "string" },
+        "APPROVED": { "type": "string" },
+        "REJECTED": { "type": "string" },
+        "LIVE": { "type": "string" },
+        "POLICY_WARNING": { "type": "string" },
+        "REMOVED": { "type": "string" },
+        "SUSPENDED": { "type": "string" },
+        "UNKNOWN_NOTICE": { "type": "string" }
+      }
+    },
+    "stateStore": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "const": "file" },
+            "path": {
+              "type": "string",
+              "default": ".play-review-notify/state.json"
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false,
+          "description": "JSON file on disk (CLI default)."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "const": "github-cache" },
+            "keyPrefix": {
+              "type": "string",
+              "default": "play-review-notify-state"
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false,
+          "description": "GitHub Actions cache (Action default). Entries expire after 7 days unused."
+        },
+        {
+          "type": "object",
+          "properties": { "type": { "type": "string", "const": "none" } },
+          "required": ["type"],
+          "additionalProperties": false,
+          "description": "No persistence; relies on lookbackHours only."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "const": "custom" },
+            "module": {
+              "type": "string",
+              "description": "Path to a local module exporting a StateStore."
+            }
+          },
+          "required": ["type", "module"],
+          "additionalProperties": false,
+          "description": "Custom store loaded from a local module."
+        }
+      ],
+      "description": "Where the event ledger and per-source cursors are kept between runs.",
+      "default": { "type": "file" }
+    },
+    "includeReason": {
+      "type": "boolean",
+      "default": true,
+      "description": "Include the extracted rejection reason in notifications."
+    },
+    "maxRetries": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 3,
+      "description": "Retries per notification delivery."
+    }
+  },
+  "required": ["apps"],
+  "additionalProperties": false
+}

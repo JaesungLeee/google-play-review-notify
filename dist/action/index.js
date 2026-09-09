@@ -119019,68 +119019,89 @@ var STATE_SCHEMA_VERSION = 1;
 // src/core/config.ts
 var eventTypeSchema = external_exports.enum(REVIEW_EVENT_TYPES);
 var appConfigSchema = external_exports.object({
-  packageName: external_exports.string().min(1),
-  name: external_exports.string().optional(),
-  tracks: external_exports.array(external_exports.string()).default(["production"]),
-  channels: external_exports.array(external_exports.string()).optional()
-});
+  packageName: external_exports.string().min(1).describe("Android application id, e.g. com.example.app."),
+  name: external_exports.string().optional().describe(
+    "Display name as shown in Play Console. Used to match emails that omit the package name."
+  ),
+  tracks: external_exports.array(external_exports.string()).default(["production"]).describe("Tracks watched by the Play API source (production, beta, alpha, internal, ...)."),
+  channels: external_exports.array(external_exports.string()).optional().describe("Channel names for this app. Falls back to defaultChannels when omitted.")
+}).describe("One app to watch.");
 var emailSourceSchema = external_exports.object({
   enabled: external_exports.boolean().default(false),
   auth: external_exports.object({
-    clientId: external_exports.string(),
-    clientSecret: external_exports.string(),
-    refreshToken: external_exports.string()
-  }).optional(),
-  lookbackHours: external_exports.number().int().positive().default(24),
+    clientId: external_exports.string().describe("OAuth client id (${GMAIL_CLIENT_ID})."),
+    clientSecret: external_exports.string().describe("OAuth client secret (${GMAIL_CLIENT_SECRET})."),
+    refreshToken: external_exports.string().describe("Refresh token with the gmail.readonly scope (${GMAIL_REFRESH_TOKEN}).")
+  }).optional().describe("Gmail OAuth credentials. See docs/gmail-oauth.md. Required when enabled."),
+  lookbackHours: external_exports.number().int().positive().default(24).describe("Search window used on the first run and after state loss."),
   senderAllowlist: external_exports.array(external_exports.string()).default([
     // Policy / review outcome notices ("Google Play Support"), observed in Phase 0.
     "no-reply-googleplay-developer@google.com",
     // General Play Console announcements ("Google Play").
     "googleplay-noreply@google.com",
     "googleplay-developer-support@google.com"
-  ]),
-  /** 'builtin' or paths to rule files. */
-  rules: external_exports.union([external_exports.literal("builtin"), external_exports.array(external_exports.string())]).default("builtin"),
-  reasonMaxLength: external_exports.number().int().positive().default(1e3)
-});
+  ]).describe("Sender addresses that count as Google Play. The default covers the known ones."),
+  rules: external_exports.union([external_exports.literal("builtin"), external_exports.array(external_exports.string())]).default("builtin").describe(
+    "'builtin' for the bundled English and Korean rule sets, or paths to rule JSON files."
+  ),
+  reasonMaxLength: external_exports.number().int().positive().default(1e3).describe("Maximum length of the extracted rejection reason.")
+}).describe("Gmail source: REJECTED and POLICY_WARNING from Play Console emails.");
 var playApiSourceSchema = external_exports.object({
   enabled: external_exports.boolean().default(false),
-  serviceAccountJson: external_exports.string().optional(),
-  emitLiveWithoutConfirmation: external_exports.boolean().default(false)
-});
+  serviceAccountJson: external_exports.string().optional().describe(
+    "Service account key: the JSON content (${PLAY_SERVICE_ACCOUNT_JSON}) or a file path."
+  ),
+  emitLiveWithoutConfirmation: external_exports.boolean().default(false).describe(
+    "Emit a low-confidence LIVE when a release is completed. Only for apps without a public listing."
+  )
+}).describe("Play Developer API source: SUBMITTED when a new versionCode appears on a track.");
 var storeListingSourceSchema = external_exports.object({
   enabled: external_exports.boolean().default(false),
-  locale: external_exports.string().default("en"),
-  country: external_exports.string().default("US"),
-  failureThreshold: external_exports.number().int().positive().default(5)
-});
+  locale: external_exports.string().default("en").describe("hl query parameter of the store page."),
+  country: external_exports.string().default("US").describe("gl query parameter of the store page."),
+  failureThreshold: external_exports.number().int().positive().default(5).describe("Consecutive fetch failures before the source reports an error.")
+}).describe("Public store listing source: LIVE for the production track.");
 var eventConfigSchema = external_exports.object({
-  enabled: external_exports.boolean(),
-  mentions: external_exports.array(external_exports.string()).default([]),
-  mergeInto: eventTypeSchema.optional()
-});
-var channelBase = { name: external_exports.string().optional() };
+  enabled: external_exports.boolean().describe("Whether this event type is notified."),
+  mentions: external_exports.array(external_exports.string()).default([]).describe("Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."),
+  mergeInto: eventTypeSchema.optional().describe("Report this event under another type, e.g. LIVE as APPROVED.")
+}).describe("Per-event-type settings.");
+var channelBase = { name: external_exports.string().optional().describe("Human-readable label for logs.") };
 var channelSchema = external_exports.discriminatedUnion("type", [
-  external_exports.object({ ...channelBase, type: external_exports.literal("slack"), webhookUrl: external_exports.string().url() }),
-  external_exports.object({ ...channelBase, type: external_exports.literal("discord"), webhookUrl: external_exports.string().url() }),
+  external_exports.object({
+    ...channelBase,
+    type: external_exports.literal("slack"),
+    webhookUrl: external_exports.string().url().describe("Slack Incoming Webhook URL (${SLACK_WEBHOOK_URL}).")
+  }).describe("Slack Incoming Webhook (Block Kit message)."),
+  external_exports.object({
+    ...channelBase,
+    type: external_exports.literal("discord"),
+    webhookUrl: external_exports.string().url().describe("Discord webhook URL (${DISCORD_WEBHOOK_URL}).")
+  }).describe("Discord webhook (embed message)."),
   external_exports.object({
     ...channelBase,
     type: external_exports.literal("webhook"),
-    url: external_exports.string().url(),
-    secret: external_exports.string().optional(),
-    headers: external_exports.record(external_exports.string()).default({}),
-    batch: external_exports.boolean().default(false)
-  })
-]);
+    url: external_exports.string().url().describe("HTTP endpoint that receives the JSON payload."),
+    secret: external_exports.string().optional().describe("HMAC-SHA256 key for the X-Play-Review-Signature header."),
+    headers: external_exports.record(external_exports.string()).default({}).describe("Extra request headers."),
+    batch: external_exports.boolean().default(false).describe("Send one array of events per run instead of one request per event.")
+  }).describe("Generic webhook: n8n, Make, Zapier, or your own server.")
+]).describe("A notification target.");
 var stateStoreSchema = external_exports.discriminatedUnion("type", [
-  external_exports.object({ type: external_exports.literal("file"), path: external_exports.string().default(".play-review-notify/state.json") }),
+  external_exports.object({
+    type: external_exports.literal("file"),
+    path: external_exports.string().default(".play-review-notify/state.json")
+  }).describe("JSON file on disk (CLI default)."),
   external_exports.object({
     type: external_exports.literal("github-cache"),
     keyPrefix: external_exports.string().default("play-review-notify-state")
-  }),
-  external_exports.object({ type: external_exports.literal("none") }),
-  external_exports.object({ type: external_exports.literal("custom"), module: external_exports.string() })
-]);
+  }).describe("GitHub Actions cache (Action default). Entries expire after 7 days unused."),
+  external_exports.object({ type: external_exports.literal("none") }).describe("No persistence; relies on lookbackHours only."),
+  external_exports.object({
+    type: external_exports.literal("custom"),
+    module: external_exports.string().describe("Path to a local module exporting a StateStore.")
+  }).describe("Custom store loaded from a local module.")
+]).describe("Where the event ledger and per-source cursors are kept between runs.");
 var DEFAULT_EVENTS = {
   SUBMITTED: { enabled: false },
   APPROVED: { enabled: true },
@@ -119092,26 +119113,28 @@ var DEFAULT_EVENTS = {
   UNKNOWN_NOTICE: { enabled: false }
 };
 var configSchema = external_exports.object({
-  version: external_exports.literal(1).default(1),
-  apps: external_exports.array(appConfigSchema).min(1),
+  version: external_exports.literal(1).default(1).describe("Config format version."),
+  apps: external_exports.array(appConfigSchema).min(1).describe("Apps to watch."),
   sources: external_exports.object({
     email: emailSourceSchema.default({}),
     playApi: playApiSourceSchema.default({}),
     storeListing: storeListingSourceSchema.default({})
-  }).default({}),
-  events: external_exports.record(eventTypeSchema, eventConfigSchema).default({}).transform((given) => {
+  }).default({}).describe("Signal sources. Enable at least one."),
+  events: external_exports.record(eventTypeSchema, eventConfigSchema).default({}).describe(
+    "Per-event-type overrides. Defaults: everything on except SUBMITTED and UNKNOWN_NOTICE."
+  ).transform((given) => {
     const merged = {};
     for (const t2 of REVIEW_EVENT_TYPES) {
       merged[t2] = eventConfigSchema.parse({ ...DEFAULT_EVENTS[t2], ...given[t2] ?? {} });
     }
     return merged;
   }),
-  channels: external_exports.record(external_exports.string(), channelSchema).default({}),
-  defaultChannels: external_exports.array(external_exports.string()).default([]),
-  templates: external_exports.record(eventTypeSchema, external_exports.string()).default({}),
+  channels: external_exports.record(external_exports.string(), channelSchema).default({}).describe("Named notification targets referenced from apps[].channels and defaultChannels."),
+  defaultChannels: external_exports.array(external_exports.string()).default([]).describe("Channels used by apps that do not list their own."),
+  templates: external_exports.record(eventTypeSchema, external_exports.string()).default({}).describe("Mustache-style message overrides per event type ({{appName}}, {{reason}}, ...)."),
   stateStore: stateStoreSchema.default({ type: "file" }),
-  includeReason: external_exports.boolean().default(true),
-  maxRetries: external_exports.number().int().nonnegative().default(3)
+  includeReason: external_exports.boolean().default(true).describe("Include the extracted rejection reason in notifications."),
+  maxRetries: external_exports.number().int().nonnegative().default(3).describe("Retries per notification delivery.")
 });
 var ConfigError = class extends Error {
   name = "ConfigError";

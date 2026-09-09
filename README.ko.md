@@ -106,7 +106,11 @@ play-review-notify run                             # 첫 실행은 기준점 기
 
 시크릿은 파일에 쓰지 않고 `${ENV_VAR}` 참조로 넣습니다.
 
+JSON Schema를 [schemas/config.schema.json](schemas/config.schema.json)에 제공합니다. YAML 첫 줄에
+아래 주석을 넣으면 VS Code(YAML 확장), JetBrains IDE 등에서 자동완성·설명·오타 검사가 됩니다.
+
 ```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas/config.schema.json
 version: 1
 
 apps:

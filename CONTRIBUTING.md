@@ -94,6 +94,10 @@ Wire new implementations in `src/sources/index.ts`, `src/notifiers/index.ts`, or
 `src/state/index.ts`, extend the zod config schema in `src/core/config.ts`, and add tests that
 inject fakes (see `test/sources/*.test.ts` for the pattern; no network in tests).
 
+After changing `src/core/config.ts`, run `npm run schema` and commit the regenerated
+`schemas/config.schema.json`; give new fields a `.describe()` so editors can show help text. CI
+and `test/core/schema.test.ts` fail when the file is stale.
+
 ## Pull requests
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) in the title
