@@ -167,10 +167,7 @@
         "SUBMITTED": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -199,10 +196,7 @@
         "APPROVED": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -231,10 +225,7 @@
         "REJECTED": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -263,10 +254,7 @@
         "LIVE": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -295,10 +283,7 @@
         "POLICY_WARNING": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -327,10 +312,7 @@
         "REMOVED": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -359,10 +341,7 @@
         "SUSPENDED": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -391,10 +370,7 @@
         "UNKNOWN_NOTICE": {
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether this event type is notified."
-            },
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
             "mentions": {
               "type": "array",
               "items": { "type": "string" },
@@ -429,10 +405,7 @@
           {
             "type": "object",
             "properties": {
-              "name": {
-                "type": "string",
-                "description": "Human-readable label for logs."
-              },
+              "name": { "type": "string", "description": "Human-readable label for logs." },
               "type": { "type": "string", "const": "slack" },
               "webhookUrl": {
                 "type": "string",
@@ -446,10 +419,7 @@
           {
             "type": "object",
             "properties": {
-              "name": {
-                "type": "string",
-                "description": "Human-readable label for logs."
-              },
+              "name": { "type": "string", "description": "Human-readable label for logs." },
               "type": { "type": "string", "const": "discord" },
               "webhookUrl": {
                 "type": "string",
@@ -463,10 +433,7 @@
           {
             "type": "object",
             "properties": {
-              "name": {
-                "type": "string",
-                "description": "Human-readable label for logs."
-              },
+              "name": { "type": "string", "description": "Human-readable label for logs." },
               "type": { "type": "string", "const": "webhook" },
               "url": {
                 "type": "string",
@@ -526,10 +493,7 @@
           "type": "object",
           "properties": {
             "type": { "type": "string", "const": "file" },
-            "path": {
-              "type": "string",
-              "default": ".play-review-notify/state.json"
-            }
+            "path": { "type": "string", "default": ".play-review-notify/state.json" }
           },
           "required": ["type"],
           "additionalProperties": false,
@@ -539,10 +503,7 @@
           "type": "object",
           "properties": {
             "type": { "type": "string", "const": "github-cache" },
-            "keyPrefix": {
-              "type": "string",
-              "default": "play-review-notify-state"
-            }
+            "keyPrefix": { "type": "string", "default": "play-review-notify-state" }
           },
           "required": ["type"],
           "additionalProperties": false,

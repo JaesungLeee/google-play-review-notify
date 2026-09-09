@@ -174,9 +174,16 @@ newest is restored with a prefix match; entries expire after 7 days without acce
 | `X-Play-Review-Timestamp` | Unix epoch seconds                                               |
 | `X-Play-Review-Signature` | `sha256=HMAC-SHA256(secret, timestamp + "." + body)` when a secret is set |
 
-`raw` is never included. Non-2xx responses are retried with exponential backoff (429
-`Retry-After` honored); retries keep the same `event.id`, so receivers can deduplicate on it.
-`batch: true` sends one array per run instead of one request per event.
+The body is described by [schemas/webhook-payload.schema.json](../schemas/webhook-payload.schema.json),
+generated from the zod schema in `src/notifiers/webhook.ts`. `raw` is never included. Non-2xx
+responses are retried with exponential backoff (429 `Retry-After` honored); retries keep the same
+`event.id`, so receivers can deduplicate on it.
+
+`batch: true` sends one request per run whose body is a JSON **array** of the payload objects
+above (never empty), with `X-Play-Review-Event: batch`; the signature covers the whole array. The
+batch succeeds or fails as a unit: on failure every event in it stays pending for that channel and
+is retried together on the next run. Channels whose notifier cannot batch fall back to one request
+per event. Importable n8n workflows are in [examples/n8n](../examples/n8n/README.md).
 
 ## Configuration precedence and CLI contract
 

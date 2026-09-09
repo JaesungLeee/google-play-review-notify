@@ -96,6 +96,69 @@ describe('runOnce', () => {
     });
   });
 
+  it('delivers all events of a run in one request to a batch channel and retries the batch', async () => {
+    const config = makeConfig({
+      channels: {
+        hook: { type: 'webhook', url: 'https://n8n/hook', batch: true },
+        single: { type: 'webhook', url: 'https://other/hook' },
+      },
+      defaultChannels: ['hook', 'single'],
+    });
+    const batches: number[] = [];
+    let fail = true;
+    const webhook = {
+      type: 'webhook',
+      sent: [] as string[],
+      send: async (m: { event: { id: string } }) => {
+        webhook.sent.push(m.event.id);
+      },
+      sendBatch: async (ms: Array<{ event: { id: string } }>) => {
+        batches.push(ms.length);
+        if (fail) throw new Error('n8n down');
+      },
+    };
+    const store = new NoneStateStore();
+    const opts = { config, notifiers: new Map([['webhook', webhook]]), stateStore: store, logger };
+    await runOnce({ ...opts, sources: [source([])] });
+
+    const events = [makeEvent(), makeEvent({ id: 'email:msg-2', type: 'LIVE' })];
+    const s1 = await runOnce({ ...opts, sources: [source(events)] });
+    expect(batches).toEqual([2]);
+    expect(webhook.sent).toEqual(['email:msg-1', 'email:msg-2']);
+    expect(s1.deliveries.filter((d) => d.channel === 'hook').map((d) => d.ok)).toEqual([
+      false,
+      false,
+    ]);
+    const state1 = await store.load();
+    expect(state1?.events['email:msg-1']).toMatchObject({
+      delivered: false,
+      pendingChannels: ['hook'],
+      lastError: 'n8n down',
+    });
+    expect(state1?.events['email:msg-2']).toMatchObject({ pendingChannels: ['hook'] });
+
+    fail = false;
+    const s2 = await runOnce({ ...opts, sources: [source([])] });
+    expect(batches).toEqual([2, 2]);
+    expect(webhook.sent).toHaveLength(2); // the non-batch channel was not retried
+    expect(s2.deliveries.every((d) => d.ok && d.channel === 'hook')).toBe(true);
+    expect((await store.load())?.events['email:msg-2']).toMatchObject({
+      delivered: true,
+      attempts: 2,
+    });
+  });
+
+  it('falls back to single sends on a batch channel when the notifier cannot batch', async () => {
+    const config = makeConfig({
+      channels: { hook: { type: 'slack', webhookUrl: 'https://hooks.slack.com/x' } },
+      defaultChannels: ['hook'],
+    });
+    const { run, slack } = await setup([], { ...config, channels: config.channels });
+    await run();
+    await run([makeEvent(), makeEvent({ id: 'email:msg-2' })]);
+    expect(slack.sent).toHaveLength(2);
+  });
+
   it('tolerates a failing source and reports it', async () => {
     const config = makeConfig();
     const bad: SourceAdapter = {

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createHmac } from 'node:crypto';
 import { DiscordNotifier } from '../../src/notifiers/discord';
 import { SlackNotifier } from '../../src/notifiers/slack';
-import { signPayload, WebhookNotifier } from '../../src/notifiers/webhook';
+import { signPayload, webhookBodySchema, WebhookNotifier } from '../../src/notifiers/webhook';
 import { renderMessage } from '../../src/templates';
 import { makeConfig, makeEvent } from '../helpers';
 
@@ -65,7 +65,12 @@ describe('WebhookNotifier', () => {
     expect(body.payloadVersion).toBe(1);
     expect(body.event.raw).toBeUndefined();
     expect(body.event.id).toBe('email:msg-1');
-    expect(body.app).toEqual({ packageName: 'com.example.app', name: 'Example App' });
+    expect(body.app).toEqual({
+      packageName: 'com.example.app',
+      name: 'Example App',
+      tracks: ['production'],
+    });
+    expect(webhookBodySchema.safeParse(body).success).toBe(true);
     expect(body.run).toEqual({ id: 'gha:1', dryRun: false });
 
     expect(headers['user-agent']).toBe('google-play-review-notify/1.2.3');
@@ -77,6 +82,37 @@ describe('WebhookNotifier', () => {
       'sha256=' + createHmac('sha256', 'shh').update(`${ts}.${bodyText}`).digest('hex');
     expect(headers['x-play-review-signature']).toBe(expected);
     expect(signPayload('shh', ts, bodyText)).toBe(expected);
+  });
+
+  it('sends one array per run when batching, signed over the whole body', async () => {
+    const fetchImpl = fetchSpy();
+    const n = new WebhookNotifier({ retry: { fetchImpl }, runId: 'gha:2' });
+    const second = renderMessage(config, makeEvent({ id: 'email:msg-2', type: 'LIVE' }));
+    await n.sendBatch([message, second], {
+      name: 'n8n',
+      type: 'webhook',
+      url: 'https://n8n/hook',
+      secret: 'shh',
+      batch: true,
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    const [, init] = fetchImpl.mock.calls[0]!;
+    const headers = init?.headers as Record<string, string>;
+    const bodyText = String(init?.body);
+    const body = JSON.parse(bodyText);
+    expect(Array.isArray(body)).toBe(true);
+    expect(body.map((p: { event: { id: string } }) => p.event.id)).toEqual([
+      'email:msg-1',
+      'email:msg-2',
+    ]);
+    // An event without a configured app carries no tracks.
+    expect(body[1].app).toEqual({ packageName: 'com.example.app', name: 'Example App' });
+    expect(headers['x-play-review-event']).toBe('batch');
+    expect(headers['x-play-review-signature']).toBe(
+      signPayload('shh', headers['x-play-review-timestamp']!, bodyText),
+    );
+    expect(webhookBodySchema.safeParse(body).success).toBe(true);
+    expect(webhookBodySchema.safeParse([]).success).toBe(false);
   });
 
   it('omits signature without a secret', async () => {

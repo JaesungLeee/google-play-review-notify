@@ -1,0 +1,211 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas/webhook-payload.schema.json",
+  "title": "play-review-notify webhook payload",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "payloadVersion": {
+          "type": "number",
+          "const": 1,
+          "description": "Payload format version."
+        },
+        "sentAt": { "type": "string", "description": "ISO 8601 time the request was built." },
+        "event": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable dedupe key, e.g. \"email:<gmailMessageId>\" or \"api:<pkg>:<track>:<versionCode>:SUBMITTED\". Retries reuse it."
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING",
+                "REMOVED",
+                "SUSPENDED",
+                "UNKNOWN_NOTICE"
+              ],
+              "description": "Event type after mergeInto is applied."
+            },
+            "packageName": {
+              "type": ["string", "null"],
+              "description": "Android application id; null when the source could not identify the app."
+            },
+            "appName": {
+              "type": "string",
+              "description": "Display name from the email or the config."
+            },
+            "track": { "type": "string", "description": "production, beta, alpha, internal, ..." },
+            "versionCode": { "type": "string" },
+            "versionName": { "type": "string" },
+            "reason": {
+              "type": "string",
+              "description": "Rejection or warning reason, plain text, capped at reasonMaxLength."
+            },
+            "consoleUrl": {
+              "type": "string",
+              "description": "Deep link into Play Console when known."
+            },
+            "source": {
+              "type": "string",
+              "enum": ["email", "play-api", "store-listing", "manual"]
+            },
+            "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+            "observedAt": {
+              "type": "string",
+              "description": "ISO 8601 time the signal was observed."
+            }
+          },
+          "required": ["id", "type", "packageName", "source", "confidence", "observedAt"],
+          "additionalProperties": false,
+          "description": "A normalized review event."
+        },
+        "app": {
+          "type": "object",
+          "properties": {
+            "packageName": { "type": ["string", "null"] },
+            "name": {
+              "type": "string",
+              "description": "From the config, or the event when not configured."
+            },
+            "tracks": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Configured tracks for the app."
+            }
+          },
+          "required": ["packageName"],
+          "additionalProperties": false,
+          "description": "The configured app the event belongs to."
+        },
+        "run": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Run identifier, e.g. \"gha:<runId>\" or \"local:<pid>\"."
+            },
+            "dryRun": { "type": "boolean" }
+          },
+          "required": ["id", "dryRun"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["payloadVersion", "sentAt", "event", "app", "run"],
+      "additionalProperties": false,
+      "description": "One event delivered to a webhook channel."
+    },
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "payloadVersion": {
+            "type": "number",
+            "const": 1,
+            "description": "Payload format version."
+          },
+          "sentAt": { "type": "string", "description": "ISO 8601 time the request was built." },
+          "event": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Stable dedupe key, e.g. \"email:<gmailMessageId>\" or \"api:<pkg>:<track>:<versionCode>:SUBMITTED\". Retries reuse it."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SUBMITTED",
+                  "APPROVED",
+                  "REJECTED",
+                  "LIVE",
+                  "POLICY_WARNING",
+                  "REMOVED",
+                  "SUSPENDED",
+                  "UNKNOWN_NOTICE"
+                ],
+                "description": "Event type after mergeInto is applied."
+              },
+              "packageName": {
+                "type": ["string", "null"],
+                "description": "Android application id; null when the source could not identify the app."
+              },
+              "appName": {
+                "type": "string",
+                "description": "Display name from the email or the config."
+              },
+              "track": {
+                "type": "string",
+                "description": "production, beta, alpha, internal, ..."
+              },
+              "versionCode": { "type": "string" },
+              "versionName": { "type": "string" },
+              "reason": {
+                "type": "string",
+                "description": "Rejection or warning reason, plain text, capped at reasonMaxLength."
+              },
+              "consoleUrl": {
+                "type": "string",
+                "description": "Deep link into Play Console when known."
+              },
+              "source": {
+                "type": "string",
+                "enum": ["email", "play-api", "store-listing", "manual"]
+              },
+              "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+              "observedAt": {
+                "type": "string",
+                "description": "ISO 8601 time the signal was observed."
+              }
+            },
+            "required": ["id", "type", "packageName", "source", "confidence", "observedAt"],
+            "additionalProperties": false,
+            "description": "A normalized review event."
+          },
+          "app": {
+            "type": "object",
+            "properties": {
+              "packageName": { "type": ["string", "null"] },
+              "name": {
+                "type": "string",
+                "description": "From the config, or the event when not configured."
+              },
+              "tracks": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Configured tracks for the app."
+              }
+            },
+            "required": ["packageName"],
+            "additionalProperties": false,
+            "description": "The configured app the event belongs to."
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Run identifier, e.g. \"gha:<runId>\" or \"local:<pid>\"."
+              },
+              "dryRun": { "type": "boolean" }
+            },
+            "required": ["id", "dryRun"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["payloadVersion", "sentAt", "event", "app", "run"],
+        "additionalProperties": false,
+        "description": "One event delivered to a webhook channel."
+      },
+      "minItems": 1
+    }
+  ],
+  "description": "Body of a play-review-notify webhook request: one payload, or an array when the channel has batch: true."
+}

@@ -168,7 +168,7 @@ includeReason: true
 maxRetries: 3
 ```
 
-- **채널**: `slack`(Incoming Webhook, Block Kit), `discord`(webhook embed), `webhook`(JSON 페이로드 + `X-Play-Review-Event`, `X-Play-Review-Timestamp`, `X-Play-Review-Signature: sha256=HMAC(secret, timestamp + "." + body)` 헤더. `batch: true`면 실행당 배열 1회 전송).
+- **채널**: `slack`(Incoming Webhook, Block Kit), `discord`(webhook embed), `webhook`(JSON 페이로드 + `X-Play-Review-Event`, `X-Play-Review-Timestamp`, `X-Play-Review-Signature: sha256=HMAC(secret, timestamp + "." + body)` 헤더. `batch: true`면 실행당 배열 1회 전송). 페이로드 형식은 [schemas/webhook-payload.schema.json](schemas/webhook-payload.schema.json)에, 바로 가져올 수 있는 n8n 워크플로우는 [examples/n8n](examples/n8n/README.md)에 있습니다.
 - **상태 저장소**: `file`(CLI 기본), `github-cache`(Action 기본. 7일간 접근 없으면 만료되므로 그보다 짧은 주기면 문제없음), `none`(lookback 창만 사용), `custom`(`StateStore`를 export하는 로컬 모듈).
 - **템플릿**에는 이벤트의 모든 필드와 설정의 `app.*`를 쓸 수 있습니다.
 

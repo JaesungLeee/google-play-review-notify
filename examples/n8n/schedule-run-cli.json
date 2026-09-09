@@ -1,0 +1,42 @@
+{
+  "name": "Play review: scheduled CLI run",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [{ "field": "minutes", "minutesInterval": 10 }] } },
+      "id": "5c1e9a70-0001-4b1f-8a02-000000000001",
+      "name": "Every 10 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "command": "cd /data/play-review-notify && npx --yes play-review-notify run --json"
+      },
+      "id": "5c1e9a70-0002-4b1f-8a02-000000000002",
+      "name": "Run play-review-notify",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// `run --json` prints one JSON document on stdout: { events: ReviewEvent[], summary: {...} }.\n// Exit code 2 means a source failed (events still delivered); 3 means a notification failed.\nconst out = $input.first().json;\nconst text = String(out.stdout ?? '').trim();\nconst lastLine = text.split('\\n').filter(Boolean).pop() ?? '{}';\nconst result = JSON.parse(lastLine);\nif (out.exitCode && out.exitCode !== 0 && out.exitCode !== 2) {\n  throw new Error(`play-review-notify exited with ${out.exitCode}: ${out.stderr}`);\n}\nreturn (result.events ?? []).map((event) => ({ json: { event, summary: result.summary } }));"
+      },
+      "id": "5c1e9a70-0003-4b1f-8a02-000000000003",
+      "name": "One item per event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "Every 10 minutes": {
+      "main": [[{ "node": "Run play-review-notify", "type": "main", "index": 0 }]]
+    },
+    "Run play-review-notify": {
+      "main": [[{ "node": "One item per event", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

@@ -112,6 +112,8 @@ export interface StateStore {
 
 export interface RenderedMessage {
   event: ReviewEvent;
+  /** Config entry for the event's app, when the package is configured. */
+  app?: AppRef;
   title: string;
   body: string;
   /** Hex color without '#', e.g. "d73a49". */
@@ -123,6 +125,11 @@ export interface RenderedMessage {
 export interface Notifier {
   readonly type: string;
   send(message: RenderedMessage, channel: ChannelTarget): Promise<void>;
+  /**
+   * Deliver several messages in one request. Used instead of `send` when the channel has
+   * `batch: true`; the whole batch succeeds or fails together.
+   */
+  sendBatch?(messages: RenderedMessage[], channel: ChannelTarget): Promise<void>;
 }
 
 /** Resolved channel configuration handed to a Notifier. */

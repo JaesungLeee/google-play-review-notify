@@ -83,7 +83,7 @@ export function renderMessage(
   if (event.track) fields.push({ label: 'Track', value: event.track });
   if (ctx.versionLabel) fields.push({ label: 'Version', value: ctx.versionLabel });
   fields.push({ label: 'Source', value: `${event.source} (${event.confidence})` });
-  return {
+  const rendered: RenderedMessage = {
     event,
     title,
     body,
@@ -91,4 +91,6 @@ export function renderMessage(
     mentions: config.events[event.type]?.mentions ?? [],
     fields,
   };
+  if (app) rendered.app = app;
+  return rendered;
 }
