@@ -38,8 +38,9 @@ first run only records a baseline without notifying.
 1. Create the three Gmail secrets by following [docs/gmail-oauth.md](docs/gmail-oauth.md)
    (one-time, about 10 minutes). Optionally add a Play service account with
    [docs/play-api-setup.md](docs/play-api-setup.md) to get `SUBMITTED` events.
-2. Add `play-review-notify.yml` to your repository (start from
-   [examples/play-review-notify.yml](examples/play-review-notify.yml)).
+2. Add `play-review-notify.yml` to your repository. `npx play-review-notify init` writes it and
+   the workflow below after a few questions; or start from
+   [examples/play-review-notify.yml](examples/play-review-notify.yml).
 3. Add a workflow:
 
 ```yaml
@@ -91,7 +92,7 @@ delivery, run the CLI from a cron job.
 
 ```bash
 npm i -g play-review-notify                       # or use npx play-review-notify ...
-cp examples/play-review-notify.yml play-review-notify.yml   # edit apps and channels
+play-review-notify init                            # asks a few questions, writes play-review-notify.yml
 
 export GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... # docs/gmail-oauth.md
 play-review-notify auth gmail                      # browser consent → prints GMAIL_REFRESH_TOKEN
@@ -108,6 +109,7 @@ Schedule Trigger; state lives in `.play-review-notify/state.json` by default.
 
 | Command               | Purpose                                                            |
 | --------------------- | ------------------------------------------------------------------ |
+| `init`                | Generate the config (and a GitHub workflow) from a few questions   |
 | `run`                 | Poll all enabled sources once, notify, save state, exit            |
 | `auth gmail`          | One-time OAuth flow that prints a `gmail.readonly` refresh token   |
 | `doctor`              | Check config, credentials, sources, channels and state, with fixes |

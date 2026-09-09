@@ -29,7 +29,7 @@ Google Play는 심사 결과를 Play Console 화면과 개발자 계정 메일�
 ## 빠른 시작: GitHub Action
 
 1. [docs/gmail-oauth.ko.md](docs/gmail-oauth.ko.md)를 따라 Gmail 시크릿 세 개를 만듭니다(최초 1회, 약 10분). `SUBMITTED` 이벤트가 필요하면 [docs/play-api-setup.ko.md](docs/play-api-setup.ko.md)로 Play 서비스 계정도 추가합니다.
-2. 저장소에 `play-review-notify.yml`을 추가합니다([examples/play-review-notify.yml](examples/play-review-notify.yml)에서 시작).
+2. 저장소에 `play-review-notify.yml`을 추가합니다. `npx play-review-notify init`이 몇 가지 질문 뒤에 설정 파일과 아래 워크플로우를 만들어 주며, [examples/play-review-notify.yml](examples/play-review-notify.yml)에서 시작해도 됩니다.
 3. 워크플로우를 추가합니다.
 
 ```yaml
@@ -77,7 +77,7 @@ GitHub 스케줄 트리거는 최소 5분 간격이며 지연될 수 있습니�
 
 ```bash
 npm i -g play-review-notify                       # 또는 npx play-review-notify ...
-cp examples/play-review-notify.yml play-review-notify.yml   # 앱과 채널 편집
+play-review-notify init                            # 몇 가지 질문에 답하면 play-review-notify.yml 생성
 
 export GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... # docs/gmail-oauth.ko.md
 play-review-notify auth gmail                      # 브라우저 동의 → GMAIL_REFRESH_TOKEN 출력
@@ -93,6 +93,7 @@ play-review-notify run                             # 첫 실행은 기준점 기
 
 | 명령                  | 용도                                                          |
 | --------------------- | ------------------------------------------------------------- |
+| `init`                | 질문 몇 개로 설정 파일(과 GitHub 워크플로우) 생성               |
 | `run`                 | 활성화된 소스를 한 번 폴링하고 알림 후 상태 저장, 종료          |
 | `auth gmail`          | `gmail.readonly` Refresh Token을 발급하는 최초 1회 OAuth 흐름   |
 | `doctor`              | 설정·인증·소스·채널·상태 저장소를 점검하고 해결 방법 안내         |

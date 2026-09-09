@@ -10,6 +10,16 @@ import { createDefaultNotifiers } from '../notifiers';
 import { createSources, ManualSourceAdapter } from '../sources';
 import { authorizeGmail } from '../sources/email/oauth';
 import { formatDoctorReport, runDoctor } from './doctor';
+import {
+  CHANNEL_KINDS,
+  parseInitChoice,
+  parsePackageList,
+  runInit,
+  SOURCE_KINDS,
+  TARGETS,
+  type InitIo,
+  type InitOptions,
+} from './init';
 import { createStateStore, FileStateStore, NoneStateStore } from '../state';
 import { renderMessage } from '../templates';
 
@@ -219,15 +229,70 @@ program
     process.exit(results.some((r) => r.status === 'fail') ? EXIT.CONFIG : EXIT.OK);
   });
 
-for (const [name, phase] of [['init', 'Phase 2']] as const) {
-  program
-    .command(name)
-    .description(`(not implemented yet, planned for ${phase})`)
-    .action(() => {
-      process.stderr.write(`${name} is not implemented yet (planned for ${phase})\n`);
-      process.exit(EXIT.CONFIG);
-    });
-}
+program
+  .command('init')
+  .description('Create play-review-notify.yml (and a GitHub workflow) by answering a few questions')
+  .option('--packages <names>', 'comma-separated package names (skips the prompt)')
+  .option('--target <target>', `${TARGETS.join(' | ')} (skips the prompt)`)
+  .option('--sources <kinds>', `comma-separated: ${SOURCE_KINDS.join(', ')} (skips the prompts)`)
+  .option('--channel <kind>', `${CHANNEL_KINDS.join(' | ')} (skips the prompt)`)
+  .option(
+    '--workflow-path <path>',
+    'workflow file to create',
+    '.github/workflows/play-review-notify.yml',
+  )
+  .option('-y, --yes', 'no prompts; use flags and defaults')
+  .option('-f, --force', 'overwrite existing files')
+  .action(
+    async (cmd: {
+      packages?: string;
+      target?: string;
+      sources?: string;
+      channel?: string;
+      workflowPath: string;
+      yes?: boolean;
+      force?: boolean;
+    }) => {
+      const g = program.opts<GlobalOpts>();
+      const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY);
+      const rl = interactive
+        ? (await import('node:readline/promises')).createInterface({
+            input: process.stdin,
+            output: process.stderr,
+          })
+        : undefined;
+      const io: InitIo = {
+        ask: async (q, d) => (await rl?.question(`${q}${d ? ` [${d}]` : ''}: `)) ?? '',
+        out: (t) => process.stderr.write(t),
+      };
+      try {
+        const opts: InitOptions = {
+          configPath: g.config,
+          workflowPath: cmd.workflowPath,
+          cwd: process.cwd(),
+          force: cmd.force ?? false,
+          yes: cmd.yes ?? false,
+          interactive,
+        };
+        if (cmd.packages) opts.packages = parsePackageList(cmd.packages);
+        if (cmd.target) opts.target = parseInitChoice(cmd.target, TARGETS, 'target');
+        if (cmd.channel) opts.channel = parseInitChoice(cmd.channel, CHANNEL_KINDS, 'channel');
+        if (cmd.sources)
+          opts.sources = cmd.sources
+            .split(/[,\s]+/)
+            .filter(Boolean)
+            .map((x) => parseInitChoice(x, SOURCE_KINDS, 'source'));
+        const result = await runInit(opts, io);
+        if (g.json) process.stdout.write(JSON.stringify(result) + '\n');
+        process.exit(EXIT.OK);
+      } catch (e) {
+        process.stderr.write(`init failed: ${(e as Error).message}\n`);
+        process.exit(EXIT.CONFIG);
+      } finally {
+        rl?.close();
+      }
+    },
+  );
 
 program
   .command('auth')
