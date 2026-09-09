@@ -31,6 +31,7 @@
   "files": [
     "dist",
     "rules",
+    "schemas",
     "action.yml",
     "README.md",
     "LICENSE"
@@ -45,7 +46,8 @@
     "test:watch": "vitest",
     "cli": "tsx src/cli/index.ts",
     "prepublishOnly": "npm run build",
-    "spike:play": "tsx scripts/spike/play-tracks.ts"
+    "spike:play": "tsx scripts/spike/play-tracks.ts",
+    "schema": "tsx scripts/generate-schema.ts"
   },
   "dependencies": {
     "@actions/cache": "^4.0.3",
@@ -59,6 +61,7 @@
   "devDependencies": {
     "@eslint/js": "^9.26.0",
     "@types/node": "^20.17.32",
+    "ajv": "^8.20.0",
     "eslint": "^9.26.0",
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
@@ -66,6 +69,7 @@
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.1",
-    "vitest": "^3.1.3"
+    "vitest": "^3.1.3",
+    "zod-to-json-schema": "^3.25.2"
   }
 }

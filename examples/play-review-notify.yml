@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas/config.schema.json
 # Example configuration. Copy to your repository root as play-review-notify.yml.
 # Secrets are injected via ${ENV_VAR} references; never commit real values.
 version: 1

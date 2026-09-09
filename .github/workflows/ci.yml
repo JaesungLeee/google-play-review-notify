@@ -31,6 +31,14 @@ jobs:
           expected=$(node -p "require('./package.json').version")
           actual=$(node dist/cli.js --version)
           test "$actual" = "$expected" || { echo "::error::dist/cli.js --version is $actual, expected $expected"; exit 1; }
+      - name: Ensure the config JSON schema is up to date
+        if: matrix.node == 20
+        run: |
+          npm run schema
+          git diff --exit-code -- schemas/ || {
+            echo "::error::schemas/config.schema.json is stale. Run 'npm run schema' and commit the result."
+            exit 1
+          }
       - name: Ensure committed action bundle is up to date
         if: matrix.node == 20
         run: |
