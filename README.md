@@ -190,7 +190,9 @@ maxRetries: 3
 - **Channels**: `slack` (Incoming Webhook, Block Kit), `discord` (webhook embed), `webhook`
   (JSON payload with `X-Play-Review-Event`, `X-Play-Review-Timestamp`, and
   `X-Play-Review-Signature: sha256=HMAC(secret, timestamp + "." + body)` headers; `batch: true`
-  sends one array per run).
+  sends one array per run). The payload is described by
+  [schemas/webhook-payload.schema.json](schemas/webhook-payload.schema.json); importable n8n
+  workflows are in [examples/n8n](examples/n8n/README.md).
 - **State stores**: `file` (CLI default), `github-cache` (Action default; entries expire after 7
   days without access, which is fine for any schedule shorter than that), `none` (lookback window
   only), `custom` (a local module exporting a `StateStore`).

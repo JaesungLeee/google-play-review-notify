@@ -1,0 +1,92 @@
+{
+  "name": "Play review → Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "play-review",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "8d3f2b1a-0001-4c6e-9a01-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "play-review-notify"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify X-Play-Review-Signature and turn the body (one payload, or an array when the\n// channel has batch: true) into one n8n item per event.\n// Set PLAY_REVIEW_WEBHOOK_SECRET in n8n's environment and allow $env access\n// (N8N_BLOCK_ENV_ACCESS_IN_NODE=false), or hard-code the secret here for a quick test.\nconst crypto = require('crypto');\nconst secret = $env.PLAY_REVIEW_WEBHOOK_SECRET;\nconst req = $input.first().json;\nconst ts = req.headers['x-play-review-timestamp'];\nconst sig = req.headers['x-play-review-signature'];\nconst body = req.body;\nif (secret) {\n  // The sender signs the compact JSON body; re-serialising the parsed body reproduces it.\n  const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(`${ts}.${JSON.stringify(body)}`).digest('hex');\n  if (sig !== expected) throw new Error('invalid X-Play-Review-Signature');\n  if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) throw new Error('stale timestamp');\n}\nconst payloads = Array.isArray(body) ? body : [body];\nreturn payloads.map((p) => ({ json: p }));"
+      },
+      "id": "8d3f2b1a-0002-4c6e-9a01-000000000002",
+      "name": "Verify and split",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "8d3f2b1a-0003-4c6e-9a01-000000000003",
+              "leftValue": "={{ $json.event.type }}",
+              "rightValue": "REJECTED",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8d3f2b1a-0004-4c6e-9a01-000000000004",
+      "name": "Is rejected?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: `<!channel> :no_entry_sign: *${$json.app.name ?? $json.event.packageName}* was rejected` + ($json.event.versionName ? ` (v${$json.event.versionName})` : '') + ($json.event.reason ? `\\n> ${$json.event.reason}` : '') + ($json.event.consoleUrl ? `\\n${$json.event.consoleUrl}` : '') }) }}",
+        "options": {}
+      },
+      "id": "8d3f2b1a-0005-4c6e-9a01-000000000005",
+      "name": "Slack: rejected",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, -120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: `${({ LIVE: ':rocket:', APPROVED: ':white_check_mark:', SUBMITTED: ':outbox_tray:', POLICY_WARNING: ':warning:' })[$json.event.type] ?? ':information_source:'} *${$json.app.name ?? $json.event.packageName}*: ${$json.event.type}` + ($json.event.versionName ? ` (v${$json.event.versionName})` : '') + ($json.event.reason ? `\\n> ${$json.event.reason}` : '') }) }}",
+        "options": {}
+      },
+      "id": "8d3f2b1a-0006-4c6e-9a01-000000000006",
+      "name": "Slack: other events",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 120]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Verify and split", "type": "main", "index": 0 }]] },
+    "Verify and split": { "main": [[{ "node": "Is rejected?", "type": "main", "index": 0 }]] },
+    "Is rejected?": {
+      "main": [
+        [{ "node": "Slack: rejected", "type": "main", "index": 0 }],
+        [{ "node": "Slack: other events", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

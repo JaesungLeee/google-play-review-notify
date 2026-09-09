@@ -1,16 +1,19 @@
 /**
- * Generates schemas/config.schema.json from the zod config schema.
+ * Generates schemas/config.schema.json and schemas/webhook-payload.schema.json from the zod schemas.
  * Run `npm run schema` after changing src/core/config.ts; CI fails when the file is stale.
  */
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { format } from 'prettier';
+import { format, resolveConfig } from 'prettier';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { configSchema } from '../src/core/config';
 import { REVIEW_EVENT_TYPES } from '../src/core/types';
+import { webhookBodySchema } from '../src/notifiers/webhook';
 
-const SCHEMA_ID =
-  'https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas/config.schema.json';
+const SCHEMA_BASE =
+  'https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas';
+const SCHEMA_ID = `${SCHEMA_BASE}/config.schema.json`;
+const WEBHOOK_SCHEMA_ID = `${SCHEMA_BASE}/webhook-payload.schema.json`;
 
 /**
  * Config values may be `${ENV_VAR}` references that are resolved before validation, so editor
@@ -76,17 +79,43 @@ export function buildConfigJsonSchema(): JsonObject {
   };
 }
 
+export function buildWebhookPayloadJsonSchema(): JsonObject {
+  const generated = zodToJsonSchema(webhookBodySchema, {
+    $refStrategy: 'none',
+    errorMessages: false,
+  }) as JsonObject;
+  delete generated['$schema'];
+  return {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    $id: WEBHOOK_SCHEMA_ID,
+    title: 'play-review-notify webhook payload',
+    ...generated,
+  };
+}
+
+/** Format with the repository's Prettier settings so `format:check` agrees with the output. */
+async function renderJson(value: JsonObject): Promise<string> {
+  const options = (await resolveConfig(resolve(__dirname, '..', 'schemas', 'x.json'))) ?? {};
+  return format(JSON.stringify(value), { ...options, parser: 'json' });
+}
+
 export async function renderConfigJsonSchema(): Promise<string> {
-  return format(JSON.stringify(buildConfigJsonSchema()), { parser: 'json' });
+  return renderJson(buildConfigJsonSchema());
+}
+
+export async function renderWebhookPayloadJsonSchema(): Promise<string> {
+  return renderJson(buildWebhookPayloadJsonSchema());
 }
 
 if (require.main === module) {
-  const out = resolve(__dirname, '..', 'schemas', 'config.schema.json');
-  renderConfigJsonSchema()
-    .then((text) => {
-      writeFileSync(out, text);
-      console.log(`Wrote ${out}`);
-    })
+  const dir = resolve(__dirname, '..', 'schemas');
+  Promise.all([
+    renderConfigJsonSchema().then((t) => writeFileSync(resolve(dir, 'config.schema.json'), t)),
+    renderWebhookPayloadJsonSchema().then((t) =>
+      writeFileSync(resolve(dir, 'webhook-payload.schema.json'), t),
+    ),
+  ])
+    .then(() => console.log(`Wrote config.schema.json and webhook-payload.schema.json to ${dir}`))
     .catch((e: unknown) => {
       console.error(e);
       process.exit(1);

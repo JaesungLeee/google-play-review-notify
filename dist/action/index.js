@@ -119324,7 +119324,7 @@ function renderMessage(config, event, app) {
   if (event.track) fields.push({ label: "Track", value: event.track });
   if (ctx.versionLabel) fields.push({ label: "Version", value: ctx.versionLabel });
   fields.push({ label: "Source", value: `${event.source} (${event.confidence})` });
-  return {
+  const rendered = {
     event,
     title,
     body,
@@ -119332,6 +119332,8 @@ function renderMessage(config, event, app) {
     mentions: config.events[event.type]?.mentions ?? [],
     fields
   };
+  if (app) rendered.app = app;
+  return rendered;
 }
 
 // src/core/run.ts
@@ -119399,27 +119401,35 @@ async function runOnce(opts) {
     return summary2;
   }
   const retries = Object.entries(state.events).filter(([, r2]) => !r2.delivered && r2.attempts < config.maxRetries && r2.pendingChannels?.length).map(([id, r2]) => ({ id, record: r2 }));
+  const pending = [];
   for (const event of fresh) {
     const channels = resolveChannels(config, event);
     state.events[event.id] = toRecord(event, now, { delivered: false, pendingChannels: channels });
-    await deliver(opts, state, event, channels, summary2.deliveries, now);
+    pending.push(toPending(config, event, channels));
   }
   for (const { id, record } of retries) {
-    const event = fromRecord(id, record);
     logger2.info(`Retrying delivery of ${id} (attempt ${record.attempts + 1}/${config.maxRetries})`);
-    await deliver(opts, state, event, record.pendingChannels ?? [], summary2.deliveries, now);
+    pending.push(toPending(config, fromRecord(id, record), record.pendingChannels ?? []));
   }
+  await deliverAll(opts, state, pending, summary2.deliveries, now);
   await persist(opts, state, now);
   return summary2;
 }
-async function deliver(opts, state, event, channels, deliveries, now) {
-  const { config, logger: logger2 } = opts;
-  const record = state.events[event.id];
-  if (!record) return;
+function toPending(config, event, channels) {
   const app = config.apps.find((a) => a.packageName === event.packageName);
-  const message = renderMessage(config, event, app);
-  const stillPending = [];
-  for (const name of channels) {
+  return { event, message: renderMessage(config, event, app), channels, failed: [] };
+}
+async function deliverAll(opts, state, items, deliveries, now) {
+  const { config, logger: logger2 } = opts;
+  const byChannel = /* @__PURE__ */ new Map();
+  for (const item of items) {
+    for (const name of item.channels) {
+      const group = byChannel.get(name) ?? [];
+      group.push(item);
+      byChannel.set(name, group);
+    }
+  }
+  for (const [name, group] of byChannel) {
     const channel = config.channels[name];
     if (!channel) {
       logger2.warn(`Channel "${name}" not configured, skipping`);
@@ -119428,32 +119438,66 @@ async function deliver(opts, state, event, channels, deliveries, now) {
     const notifier = opts.notifiers.get(channel.type);
     if (!notifier) {
       logger2.warn(`No notifier registered for channel type "${channel.type}"`);
-      stillPending.push(name);
+      for (const item of group) item.failed.push(name);
       continue;
     }
     if (opts.dryRun) {
-      logger2.info(`[dry-run] ${channel.type}:${name} \u2190 ${message.title}
-${message.body}`);
-      deliveries.push({ eventId: event.id, channel: name, ok: true });
+      for (const item of group) {
+        logger2.info(
+          `[dry-run] ${channel.type}:${name} \u2190 ${item.message.title}
+${item.message.body}`
+        );
+        deliveries.push({ eventId: item.event.id, channel: name, ok: true });
+      }
       continue;
     }
-    try {
-      await notifier.send(message, { ...channel, name });
-      deliveries.push({ eventId: event.id, channel: name, ok: true });
-      logger2.info(`Delivered ${event.type} for ${event.packageName ?? "<unknown>"} to ${name}`);
-    } catch (e2) {
-      const error2 = e2.message;
-      deliveries.push({ eventId: event.id, channel: name, ok: false, error: error2 });
-      record.lastError = error2;
-      stillPending.push(name);
-      logger2.error(`Delivery to ${name} failed: ${error2}`);
+    const target = { ...channel, name };
+    const batch = "batch" in channel && channel.batch && notifier.sendBatch;
+    if (batch) {
+      try {
+        await notifier.sendBatch(
+          group.map((g) => g.message),
+          target
+        );
+        for (const item of group)
+          deliveries.push({ eventId: item.event.id, channel: name, ok: true });
+        logger2.info(`Delivered ${group.length} event(s) to ${name} in one batch`);
+      } catch (e2) {
+        const error2 = e2.message;
+        for (const item of group) markFailed(state, item, name, error2, deliveries);
+        logger2.error(`Batch delivery to ${name} failed: ${error2}`);
+      }
+      continue;
+    }
+    for (const item of group) {
+      try {
+        await notifier.send(item.message, target);
+        deliveries.push({ eventId: item.event.id, channel: name, ok: true });
+        logger2.info(
+          `Delivered ${item.event.type} for ${item.event.packageName ?? "<unknown>"} to ${name}`
+        );
+      } catch (e2) {
+        const error2 = e2.message;
+        markFailed(state, item, name, error2, deliveries);
+        logger2.error(`Delivery to ${name} failed: ${error2}`);
+      }
     }
   }
-  record.attempts += 1;
-  record.delivered = stillPending.length === 0;
-  if (record.delivered) delete record.pendingChannels;
-  else record.pendingChannels = stillPending;
-  record.at = record.at || now.toISOString();
+  for (const item of items) {
+    const record = state.events[item.event.id];
+    if (!record) continue;
+    record.attempts += 1;
+    record.delivered = item.failed.length === 0;
+    if (record.delivered) delete record.pendingChannels;
+    else record.pendingChannels = item.failed;
+    record.at = record.at || now.toISOString();
+  }
+}
+function markFailed(state, item, channel, error2, deliveries) {
+  deliveries.push({ eventId: item.event.id, channel, ok: false, error: error2 });
+  item.failed.push(channel);
+  const record = state.events[item.event.id];
+  if (record) record.lastError = error2;
 }
 async function persist(opts, state, now) {
   const pruned = pruneEvents({ ...state, updatedAt: now.toISOString() }, now);
@@ -119616,6 +119660,39 @@ ${f3.value}`
 // src/notifiers/webhook.ts
 var import_node_crypto = require("crypto");
 var WEBHOOK_PAYLOAD_VERSION = 1;
+var webhookEventSchema = external_exports.object({
+  id: external_exports.string().describe(
+    'Stable dedupe key, e.g. "email:<gmailMessageId>" or "api:<pkg>:<track>:<versionCode>:SUBMITTED". Retries reuse it.'
+  ),
+  type: external_exports.enum(REVIEW_EVENT_TYPES).describe("Event type after mergeInto is applied."),
+  packageName: external_exports.string().nullable().describe("Android application id; null when the source could not identify the app."),
+  appName: external_exports.string().optional().describe("Display name from the email or the config."),
+  track: external_exports.string().optional().describe("production, beta, alpha, internal, ..."),
+  versionCode: external_exports.string().optional(),
+  versionName: external_exports.string().optional(),
+  reason: external_exports.string().optional().describe("Rejection or warning reason, plain text, capped at reasonMaxLength."),
+  consoleUrl: external_exports.string().optional().describe("Deep link into Play Console when known."),
+  source: external_exports.enum(["email", "play-api", "store-listing", "manual"]),
+  confidence: external_exports.enum(["high", "medium", "low"]),
+  observedAt: external_exports.string().describe("ISO 8601 time the signal was observed.")
+}).describe("A normalized review event.");
+var webhookPayloadSchema = external_exports.object({
+  payloadVersion: external_exports.literal(WEBHOOK_PAYLOAD_VERSION).describe("Payload format version."),
+  sentAt: external_exports.string().describe("ISO 8601 time the request was built."),
+  event: webhookEventSchema,
+  app: external_exports.object({
+    packageName: external_exports.string().nullable(),
+    name: external_exports.string().optional().describe("From the config, or the event when not configured."),
+    tracks: external_exports.array(external_exports.string()).optional().describe("Configured tracks for the app.")
+  }).describe("The configured app the event belongs to."),
+  run: external_exports.object({
+    id: external_exports.string().describe('Run identifier, e.g. "gha:<runId>" or "local:<pid>".'),
+    dryRun: external_exports.boolean()
+  })
+}).describe("One event delivered to a webhook channel.");
+var webhookBodySchema = external_exports.union([webhookPayloadSchema, external_exports.array(webhookPayloadSchema).min(1)]).describe(
+  "Body of a play-review-notify webhook request: one payload, or an array when the channel has batch: true."
+);
 function signPayload(secret, timestamp, body) {
   return "sha256=" + (0, import_node_crypto.createHmac)("sha256", secret).update(`${timestamp}.${body}`).digest("hex");
 }
@@ -119627,13 +119704,20 @@ var WebhookNotifier = class {
   type = "webhook";
   buildPayload(m2) {
     const { raw: _raw, ...event } = m2.event;
+    const app = { packageName: event.packageName };
+    const name = m2.app?.name ?? event.appName;
+    if (name) app.name = name;
+    if (m2.app) app.tracks = m2.app.tracks;
     return {
       payloadVersion: WEBHOOK_PAYLOAD_VERSION,
-      sentAt: (this.opts.now ?? (() => /* @__PURE__ */ new Date()))().toISOString(),
+      sentAt: this.now().toISOString(),
       event,
-      app: { packageName: event.packageName, ...event.appName ? { name: event.appName } : {} },
+      app,
       run: { id: this.opts.runId ?? `local:${process.pid}`, dryRun: false }
     };
+  }
+  now() {
+    return (this.opts.now ?? (() => /* @__PURE__ */ new Date()))();
   }
   buildHeaders(channel, body, timestamp) {
     const headers = {
@@ -119649,12 +119733,20 @@ var WebhookNotifier = class {
     return headers;
   }
   async send(message, channel) {
+    await this.post(channel, JSON.stringify(this.buildPayload(message)), message.event.type);
+  }
+  /** `batch: true`: one request whose body is an array of payloads; `X-Play-Review-Event: batch`. */
+  async sendBatch(messages, channel) {
+    if (messages.length === 0) return;
+    const body = JSON.stringify(messages.map((m2) => this.buildPayload(m2)));
+    await this.post(channel, body, "batch");
+  }
+  async post(channel, body, eventHeader) {
     const url = channel["url"];
     if (typeof url !== "string") throw new Error(`Webhook channel ${channel.name} has no url`);
-    const body = JSON.stringify(this.buildPayload(message));
-    const timestamp = String(Math.floor((this.opts.now ?? (() => /* @__PURE__ */ new Date()))().getTime() / 1e3));
+    const timestamp = String(Math.floor(this.now().getTime() / 1e3));
     const headers = this.buildHeaders(channel, body, timestamp);
-    headers["x-play-review-event"] = message.event.type;
+    headers["x-play-review-event"] = eventHeader;
     await fetchWithRetry(url, { method: "POST", headers, body }, this.opts.retry ?? {});
   }
 };
