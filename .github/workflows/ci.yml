@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   verify:
+    name: verify (ubuntu, node ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,3 +47,37 @@ jobs:
             echo "::error::dist/action/index.js is stale. Run 'npm run build' and commit the result."
             exit 1
           }
+
+  # The CLI is also run from local cron jobs, so the test suite and a CLI smoke test run on the
+  # other operating systems with the minimum supported Node.js. Lint and formatting are
+  # platform-independent and stay on Linux.
+  verify-os:
+    name: verify (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: CLI smoke test (version, init, state show)
+        run: |
+          expected=$(node -p "require('./package.json').version")
+          actual=$(node dist/cli.js --version)
+          test "$actual" = "$expected" || { echo "::error::dist/cli.js --version is $actual, expected $expected"; exit 1; }
+          cli="$GITHUB_WORKSPACE/dist/cli.js"
+          cd "$RUNNER_TEMP"
+          node "$cli" init --packages com.example.app --channel slack --sources store-listing --target cli --yes
+          test -f play-review-notify.yml
+          SLACK_WEBHOOK_URL=https://hooks.slack.com/services/x node "$cli" state show
