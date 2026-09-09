@@ -24,6 +24,15 @@ updates:
       # Keep the pinned Node.js major of the Action runtime (action.yml) in sync manually.
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
+      # vitest 5 requires Node.js 22.12+; the test suite still runs on Node.js 20 in CI.
+      - dependency-name: 'vitest'
+        update-types: ['version-update:semver-major']
+      # typescript-eslint supports TypeScript < 6.1 only. Revisit when it supports 7.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      # zod 4 changes .default() and z.record() semantics; migrate deliberately, not via a bump.
+      - dependency-name: 'zod'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /

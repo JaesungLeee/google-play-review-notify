@@ -652,7 +652,7 @@ var require_errors = __commonJS({
       [kInvalidReturnValueError] = true;
     };
     var kAbortError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_ABORT");
-    var AbortError6 = class extends UndiciError {
+    var AbortError4 = class extends UndiciError {
       constructor(message) {
         super(message);
         this.name = "AbortError";
@@ -665,7 +665,7 @@ var require_errors = __commonJS({
       [kAbortError] = true;
     };
     var kRequestAbortedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_ABORTED");
-    var RequestAbortedError = class extends AbortError6 {
+    var RequestAbortedError = class extends AbortError4 {
       constructor(message) {
         super(message);
         this.name = "AbortError";
@@ -870,7 +870,7 @@ var require_errors = __commonJS({
       }
     };
     module2.exports = {
-      AbortError: AbortError6,
+      AbortError: AbortError4,
       HTTPParserError,
       UndiciError,
       HeadersTimeoutError,
@@ -9535,7 +9535,7 @@ var require_readable = __commonJS({
     "use strict";
     var assert5 = require("assert");
     var { Readable: Readable7 } = require("stream");
-    var { RequestAbortedError, NotSupportedError, InvalidArgumentError, AbortError: AbortError6 } = require_errors();
+    var { RequestAbortedError, NotSupportedError, InvalidArgumentError, AbortError: AbortError4 } = require_errors();
     var util6 = require_util();
     var { ReadableStreamFrom } = require_util();
     var kConsume = /* @__PURE__ */ Symbol("kConsume");
@@ -9663,16 +9663,16 @@ var require_readable = __commonJS({
         }
         return await new Promise((resolve5, reject) => {
           if (this[kContentLength] > limit) {
-            this.destroy(new AbortError6());
+            this.destroy(new AbortError4());
           }
           const onAbort = () => {
-            this.destroy(signal.reason ?? new AbortError6());
+            this.destroy(signal.reason ?? new AbortError4());
           };
           signal?.addEventListener("abort", onAbort);
           this.on("close", function() {
             signal?.removeEventListener("abort", onAbort);
             if (signal?.aborted) {
-              reject(signal.reason ?? new AbortError6());
+              reject(signal.reason ?? new AbortError4());
             } else {
               resolve5(null);
             }
@@ -29362,121 +29362,6 @@ var require_browser = __commonJS({
   }
 });
 
-// node_modules/has-flag/index.js
-var require_has_flag = __commonJS({
-  "node_modules/has-flag/index.js"(exports2, module2) {
-    "use strict";
-    module2.exports = (flag, argv = process.argv) => {
-      const prefix2 = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
-      const position = argv.indexOf(prefix2 + flag);
-      const terminatorPosition = argv.indexOf("--");
-      return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
-    };
-  }
-});
-
-// node_modules/supports-color/index.js
-var require_supports_color = __commonJS({
-  "node_modules/supports-color/index.js"(exports2, module2) {
-    "use strict";
-    var os9 = require("os");
-    var tty = require("tty");
-    var hasFlag = require_has_flag();
-    var { env } = process;
-    var forceColor;
-    if (hasFlag("no-color") || hasFlag("no-colors") || hasFlag("color=false") || hasFlag("color=never")) {
-      forceColor = 0;
-    } else if (hasFlag("color") || hasFlag("colors") || hasFlag("color=true") || hasFlag("color=always")) {
-      forceColor = 1;
-    }
-    if ("FORCE_COLOR" in env) {
-      if (env.FORCE_COLOR === "true") {
-        forceColor = 1;
-      } else if (env.FORCE_COLOR === "false") {
-        forceColor = 0;
-      } else {
-        forceColor = env.FORCE_COLOR.length === 0 ? 1 : Math.min(parseInt(env.FORCE_COLOR, 10), 3);
-      }
-    }
-    function translateLevel(level) {
-      if (level === 0) {
-        return false;
-      }
-      return {
-        level,
-        hasBasic: true,
-        has256: level >= 2,
-        has16m: level >= 3
-      };
-    }
-    function supportsColor(haveStream, streamIsTTY) {
-      if (forceColor === 0) {
-        return 0;
-      }
-      if (hasFlag("color=16m") || hasFlag("color=full") || hasFlag("color=truecolor")) {
-        return 3;
-      }
-      if (hasFlag("color=256")) {
-        return 2;
-      }
-      if (haveStream && !streamIsTTY && forceColor === void 0) {
-        return 0;
-      }
-      const min = forceColor || 0;
-      if (env.TERM === "dumb") {
-        return min;
-      }
-      if (process.platform === "win32") {
-        const osRelease = os9.release().split(".");
-        if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
-          return Number(osRelease[2]) >= 14931 ? 3 : 2;
-        }
-        return 1;
-      }
-      if ("CI" in env) {
-        if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE"].some((sign) => sign in env) || env.CI_NAME === "codeship") {
-          return 1;
-        }
-        return min;
-      }
-      if ("TEAMCITY_VERSION" in env) {
-        return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
-      }
-      if (env.COLORTERM === "truecolor") {
-        return 3;
-      }
-      if ("TERM_PROGRAM" in env) {
-        const version3 = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
-        switch (env.TERM_PROGRAM) {
-          case "iTerm.app":
-            return version3 >= 3 ? 3 : 2;
-          case "Apple_Terminal":
-            return 2;
-        }
-      }
-      if (/-256(color)?$/i.test(env.TERM)) {
-        return 2;
-      }
-      if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
-        return 1;
-      }
-      if ("COLORTERM" in env) {
-        return 1;
-      }
-      return min;
-    }
-    function getSupportLevel(stream2) {
-      const level = supportsColor(stream2, stream2 && stream2.isTTY);
-      return translateLevel(level);
-    }
-    module2.exports = {
-      supportsColor: getSupportLevel,
-      stdout: translateLevel(supportsColor(true, tty.isatty(1))),
-      stderr: translateLevel(supportsColor(true, tty.isatty(2)))
-    };
-  }
-});
-
 // node_modules/debug/src/node.js
 var require_node = __commonJS({
   "node_modules/debug/src/node.js"(exports2, module2) {
@@ -29496,7 +29381,7 @@ var require_node = __commonJS({
     );
     exports2.colors = [6, 2, 3, 4, 5, 1];
     try {
-      const supportsColor = require_supports_color();
+      const supportsColor = require("supports-color");
       if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
         exports2.colors = [
           20,
@@ -34852,10 +34737,10 @@ var init_esm_min = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/errors/base.js
+// node_modules/node-fetch/src/errors/base.js
 var FetchBaseError;
 var init_base = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/errors/base.js"() {
+  "node_modules/node-fetch/src/errors/base.js"() {
     "use strict";
     FetchBaseError = class extends Error {
       constructor(message, type) {
@@ -34873,10 +34758,10 @@ var init_base = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/errors/fetch-error.js
+// node_modules/node-fetch/src/errors/fetch-error.js
 var FetchError;
 var init_fetch_error = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/errors/fetch-error.js"() {
+  "node_modules/node-fetch/src/errors/fetch-error.js"() {
     "use strict";
     init_base();
     FetchError = class extends FetchBaseError {
@@ -34896,10 +34781,10 @@ var init_fetch_error = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/utils/is.js
+// node_modules/node-fetch/src/utils/is.js
 var NAME, isURLSearchParameters, isBlob, isAbortSignal, isDomainOrSubdomain, isSameProtocol;
 var init_is = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/utils/is.js"() {
+  "node_modules/node-fetch/src/utils/is.js"() {
     "use strict";
     NAME = Symbol.toStringTag;
     isURLSearchParameters = (object) => {
@@ -35005,7 +34890,7 @@ var init_from = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/utils/multipart-parser.js
+// node_modules/node-fetch/src/utils/multipart-parser.js
 var multipart_parser_exports = {};
 __export(multipart_parser_exports, {
   toFormData: () => toFormData
@@ -35099,7 +34984,7 @@ async function toFormData(Body2, ct) {
 }
 var s, S, f2, F, LF, CR, SPACE, HYPHEN, COLON, A, Z, lower, noop, MultipartParser;
 var init_multipart_parser = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/utils/multipart-parser.js"() {
+  "node_modules/node-fetch/src/utils/multipart-parser.js"() {
     "use strict";
     init_from();
     init_esm_min();
@@ -35368,7 +35253,7 @@ var init_multipart_parser = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/body.js
+// node_modules/node-fetch/src/body.js
 async function consumeBody(data) {
   if (data[INTERNALS].disturbed) {
     throw new TypeError(`body used already for: ${data.url}`);
@@ -35415,7 +35300,7 @@ async function consumeBody(data) {
 }
 var import_node_stream, import_node_util, import_node_buffer, pipeline, INTERNALS, Body, clone, getNonSpecFormDataBoundary, extractContentType, getTotalBytes, writeToStream;
 var init_body = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/body.js"() {
+  "node_modules/node-fetch/src/body.js"() {
     "use strict";
     import_node_stream = __toESM(require("stream"), 1);
     import_node_util = require("util");
@@ -35627,7 +35512,7 @@ var init_body = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/headers.js
+// node_modules/node-fetch/src/headers.js
 function fromRawHeaders(headers = []) {
   return new Headers3(
     headers.reduce((result, value, index, array) => {
@@ -35648,7 +35533,7 @@ function fromRawHeaders(headers = []) {
 }
 var import_node_util2, import_node_http, validateHeaderName, validateHeaderValue, Headers3;
 var init_headers = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/headers.js"() {
+  "node_modules/node-fetch/src/headers.js"() {
     "use strict";
     import_node_util2 = require("util");
     import_node_http = __toESM(require("http"), 1);
@@ -35819,10 +35704,10 @@ var init_headers = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/utils/is-redirect.js
+// node_modules/node-fetch/src/utils/is-redirect.js
 var redirectStatus, isRedirect;
 var init_is_redirect = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/utils/is-redirect.js"() {
+  "node_modules/node-fetch/src/utils/is-redirect.js"() {
     "use strict";
     redirectStatus = /* @__PURE__ */ new Set([301, 302, 303, 307, 308]);
     isRedirect = (code) => {
@@ -35831,10 +35716,10 @@ var init_is_redirect = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/response.js
+// node_modules/node-fetch/src/response.js
 var INTERNALS2, Response2;
 var init_response = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/response.js"() {
+  "node_modules/node-fetch/src/response.js"() {
     "use strict";
     init_headers();
     init_body();
@@ -35958,10 +35843,10 @@ var init_response = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/utils/get-search.js
+// node_modules/node-fetch/src/utils/get-search.js
 var getSearch;
 var init_get_search = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/utils/get-search.js"() {
+  "node_modules/node-fetch/src/utils/get-search.js"() {
     "use strict";
     getSearch = (parsedURL) => {
       if (parsedURL.search) {
@@ -35974,7 +35859,7 @@ var init_get_search = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/utils/referrer.js
+// node_modules/node-fetch/src/utils/referrer.js
 function stripURLForUseAsAReferrer(url2, originOnly = false) {
   if (url2 == null) {
     return "no-referrer";
@@ -36102,7 +35987,7 @@ function parseReferrerPolicyFromHeader(headers) {
 }
 var import_node_net, ReferrerPolicy, DEFAULT_REFERRER_POLICY;
 var init_referrer = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/utils/referrer.js"() {
+  "node_modules/node-fetch/src/utils/referrer.js"() {
     "use strict";
     import_node_net = require("net");
     ReferrerPolicy = /* @__PURE__ */ new Set([
@@ -36120,10 +36005,10 @@ var init_referrer = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/request.js
+// node_modules/node-fetch/src/request.js
 var import_node_url, import_node_util3, INTERNALS3, isRequest, doBadDataWarn, Request, getNodeRequestOptions;
 var init_request = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/request.js"() {
+  "node_modules/node-fetch/src/request.js"() {
     "use strict";
     import_node_url = require("url");
     import_node_util3 = require("util");
@@ -36326,10 +36211,10 @@ var init_request = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/errors/abort-error.js
+// node_modules/node-fetch/src/errors/abort-error.js
 var AbortError;
 var init_abort_error = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/errors/abort-error.js"() {
+  "node_modules/node-fetch/src/errors/abort-error.js"() {
     "use strict";
     init_base();
     AbortError = class extends FetchBaseError {
@@ -36340,7 +36225,7 @@ var init_abort_error = __esm({
   }
 });
 
-// node_modules/gaxios/node_modules/node-fetch/src/index.js
+// node_modules/node-fetch/src/index.js
 var src_exports = {};
 __export(src_exports, {
   AbortError: () => AbortError,
@@ -36621,7 +36506,7 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 }
 var import_node_http2, import_node_https, import_node_zlib, import_node_stream2, import_node_buffer2, supportedSchemas;
 var init_src = __esm({
-  "node_modules/gaxios/node_modules/node-fetch/src/index.js"() {
+  "node_modules/node-fetch/src/index.js"() {
     "use strict";
     import_node_http2 = __toESM(require("http"), 1);
     import_node_https = __toESM(require("https"), 1);
@@ -38921,9 +38806,9 @@ var require_json_bigint = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/gcp-metadata/build/src/gcp-residency.js
+// node_modules/gcp-metadata/build/src/gcp-residency.js
 var require_gcp_residency = __commonJS({
-  "node_modules/googleapis-common/node_modules/gcp-metadata/build/src/gcp-residency.js"(exports2) {
+  "node_modules/gcp-metadata/build/src/gcp-residency.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GCE_LINUX_BIOS_PATHS = void 0;
@@ -39351,9 +39236,9 @@ var require_src3 = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/gcp-metadata/build/src/index.js
+// node_modules/gcp-metadata/build/src/index.js
 var require_src4 = __commonJS({
-  "node_modules/googleapis-common/node_modules/gcp-metadata/build/src/index.js"(exports2) {
+  "node_modules/gcp-metadata/build/src/index.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m2, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -39712,9 +39597,9 @@ var require_base64_js = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/shared.js
+// node_modules/google-auth-library/build/src/crypto/shared.js
 var require_shared = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/shared.js"(exports2) {
+  "node_modules/google-auth-library/build/src/crypto/shared.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.fromArrayBufferToHex = fromArrayBufferToHex;
@@ -39727,9 +39612,9 @@ var require_shared = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/browser/crypto.js
+// node_modules/google-auth-library/build/src/crypto/browser/crypto.js
 var require_crypto = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/browser/crypto.js"(exports2) {
+  "node_modules/google-auth-library/build/src/crypto/browser/crypto.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.BrowserCrypto = void 0;
@@ -39823,9 +39708,9 @@ var require_crypto = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/node/crypto.js
+// node_modules/google-auth-library/build/src/crypto/node/crypto.js
 var require_crypto2 = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/node/crypto.js"(exports2) {
+  "node_modules/google-auth-library/build/src/crypto/node/crypto.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.NodeCrypto = void 0;
@@ -39887,9 +39772,9 @@ var require_crypto2 = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/crypto.js
+// node_modules/google-auth-library/build/src/crypto/crypto.js
 var require_crypto3 = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/crypto/crypto.js"(exports2) {
+  "node_modules/google-auth-library/build/src/crypto/crypto.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m2, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -40148,9 +40033,9 @@ var require_ecdsa_sig_formatter = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/util.js
+// node_modules/google-auth-library/build/src/util.js
 var require_util10 = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/util.js"(exports2) {
+  "node_modules/google-auth-library/build/src/util.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.LRUCache = void 0;
@@ -40263,9 +40148,9 @@ var require_util10 = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/package.json
+// node_modules/google-auth-library/package.json
 var require_package2 = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/package.json"(exports2, module2) {
+  "node_modules/google-auth-library/package.json"(exports2, module2) {
     module2.exports = {
       name: "google-auth-library",
       version: "10.5.0",
@@ -40357,9 +40242,9 @@ var require_package2 = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/shared.cjs
+// node_modules/google-auth-library/build/src/shared.cjs
 var require_shared2 = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/shared.cjs"(exports2) {
+  "node_modules/google-auth-library/build/src/shared.cjs"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.USER_AGENT = exports2.PRODUCT_NAME = exports2.pkg = void 0;
@@ -40372,9 +40257,9 @@ var require_shared2 = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/authclient.js
+// node_modules/google-auth-library/build/src/auth/authclient.js
 var require_authclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/authclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/authclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AuthClient = exports2.DEFAULT_EAGER_REFRESH_THRESHOLD_MILLIS = exports2.DEFAULT_UNIVERSE = void 0;
@@ -40607,9 +40492,9 @@ var require_authclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/loginticket.js
+// node_modules/google-auth-library/build/src/auth/loginticket.js
 var require_loginticket = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/loginticket.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/loginticket.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.LoginTicket = void 0;
@@ -40659,9 +40544,9 @@ var require_loginticket = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2client.js
+// node_modules/google-auth-library/build/src/auth/oauth2client.js
 var require_oauth2client = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2client.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/oauth2client.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.OAuth2Client = exports2.ClientAuthentication = exports2.CertificateFormat = exports2.CodeChallengeMethod = void 0;
@@ -41340,9 +41225,9 @@ var require_oauth2client = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/computeclient.js
+// node_modules/google-auth-library/build/src/auth/computeclient.js
 var require_computeclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/computeclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/computeclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Compute = void 0;
@@ -41432,9 +41317,9 @@ var require_computeclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/idtokenclient.js
+// node_modules/google-auth-library/build/src/auth/idtokenclient.js
 var require_idtokenclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/idtokenclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/idtokenclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.IdTokenClient = void 0;
@@ -41478,9 +41363,9 @@ var require_idtokenclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/envDetect.js
+// node_modules/google-auth-library/build/src/auth/envDetect.js
 var require_envDetect = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/envDetect.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/envDetect.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GCPEnv = void 0;
@@ -42743,9 +42628,9 @@ var require_src5 = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtaccess.js
+// node_modules/google-auth-library/build/src/auth/jwtaccess.js
 var require_jwtaccess = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtaccess.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/jwtaccess.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.JWTAccess = void 0;
@@ -42913,9 +42798,9 @@ var require_jwtaccess = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtclient.js
+// node_modules/google-auth-library/build/src/auth/jwtclient.js
 var require_jwtclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/jwtclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/jwtclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.JWT = void 0;
@@ -43184,9 +43069,9 @@ var require_jwtclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/refreshclient.js
+// node_modules/google-auth-library/build/src/auth/refreshclient.js
 var require_refreshclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/refreshclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/refreshclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.UserRefreshClient = exports2.USER_REFRESH_ACCOUNT_TYPE = void 0;
@@ -43311,9 +43196,9 @@ var require_refreshclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/impersonated.js
+// node_modules/google-auth-library/build/src/auth/impersonated.js
 var require_impersonated = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/impersonated.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/impersonated.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Impersonated = exports2.IMPERSONATED_ACCOUNT_TYPE = void 0;
@@ -43490,9 +43375,9 @@ var require_impersonated = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2common.js
+// node_modules/google-auth-library/build/src/auth/oauth2common.js
 var require_oauth2common = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/oauth2common.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/oauth2common.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.OAuthClientAuthHandler = void 0;
@@ -43638,9 +43523,9 @@ var require_oauth2common = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/stscredentials.js
+// node_modules/google-auth-library/build/src/auth/stscredentials.js
 var require_stscredentials = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/stscredentials.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/stscredentials.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.StsCredentials = void 0;
@@ -43725,9 +43610,9 @@ var require_stscredentials = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/baseexternalclient.js
+// node_modules/google-auth-library/build/src/auth/baseexternalclient.js
 var require_baseexternalclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/baseexternalclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/baseexternalclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.BaseExternalAccountClient = exports2.CLOUD_RESOURCE_MANAGER = exports2.EXTERNAL_ACCOUNT_TYPE = exports2.EXPIRATION_TIME_OFFSET = void 0;
@@ -44102,9 +43987,9 @@ var require_baseexternalclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js
+// node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js
 var require_filesubjecttokensupplier = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/filesubjecttokensupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.FileSubjectTokenSupplier = void 0;
@@ -44167,9 +44052,9 @@ var require_filesubjecttokensupplier = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js
+// node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js
 var require_urlsubjecttokensupplier = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/urlsubjecttokensupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.UrlSubjectTokenSupplier = void 0;
@@ -44224,9 +44109,9 @@ var require_urlsubjecttokensupplier = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js
+// node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js
 var require_certificatesubjecttokensupplier = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/certificatesubjecttokensupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.CertificateSubjectTokenSupplier = exports2.InvalidConfigurationError = exports2.CertificateSourceUnavailableError = exports2.CERTIFICATE_CONFIGURATION_ENV_VARIABLE = void 0;
@@ -44408,9 +44293,9 @@ var require_certificatesubjecttokensupplier = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/identitypoolclient.js
+// node_modules/google-auth-library/build/src/auth/identitypoolclient.js
 var require_identitypoolclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/identitypoolclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/identitypoolclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.IdentityPoolClient = void 0;
@@ -44520,9 +44405,9 @@ var require_identitypoolclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsrequestsigner.js
+// node_modules/google-auth-library/build/src/auth/awsrequestsigner.js
 var require_awsrequestsigner = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsrequestsigner.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/awsrequestsigner.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AwsRequestSigner = void 0;
@@ -44670,9 +44555,9 @@ ${credentialScope}
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js
+// node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js
 var require_defaultawssecuritycredentialssupplier = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/defaultawssecuritycredentialssupplier.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DefaultAwsSecurityCredentialsSupplier = void 0;
@@ -44821,9 +44706,9 @@ var require_defaultawssecuritycredentialssupplier = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsclient.js
+// node_modules/google-auth-library/build/src/auth/awsclient.js
 var require_awsclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/awsclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/awsclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AwsClient = void 0;
@@ -44935,9 +44820,9 @@ var require_awsclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/executable-response.js
+// node_modules/google-auth-library/build/src/auth/executable-response.js
 var require_executable_response = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/executable-response.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/executable-response.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.InvalidSubjectTokenError = exports2.InvalidMessageFieldError = exports2.InvalidCodeFieldError = exports2.InvalidTokenTypeFieldError = exports2.InvalidExpirationTimeFieldError = exports2.InvalidSuccessFieldError = exports2.InvalidVersionFieldError = exports2.ExecutableResponseError = exports2.ExecutableResponse = void 0;
@@ -45066,9 +44951,9 @@ var require_executable_response = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js
+// node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js
 var require_pluggable_auth_handler = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/pluggable-auth-handler.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PluggableAuthHandler = exports2.ExecutableError = void 0;
@@ -45207,9 +45092,9 @@ var require_pluggable_auth_handler = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js
+// node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js
 var require_pluggable_auth_client = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/pluggable-auth-client.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PluggableAuthClient = exports2.ExecutableError = void 0;
@@ -45334,9 +45219,9 @@ var require_pluggable_auth_client = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalclient.js
+// node_modules/google-auth-library/build/src/auth/externalclient.js
 var require_externalclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/externalclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ExternalAccountClient = void 0;
@@ -45383,9 +45268,9 @@ var require_externalclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js
+// node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js
 var require_externalAccountAuthorizedUserClient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/externalAccountAuthorizedUserClient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ExternalAccountAuthorizedUserClient = exports2.EXTERNAL_ACCOUNT_AUTHORIZED_USER_TYPE = void 0;
@@ -45569,9 +45454,9 @@ var require_externalAccountAuthorizedUserClient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/googleauth.js
+// node_modules/google-auth-library/build/src/auth/googleauth.js
 var require_googleauth = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/googleauth.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/googleauth.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GoogleAuth = exports2.GoogleAuthExceptionMessages = void 0;
@@ -46359,9 +46244,9 @@ var require_googleauth = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/iam.js
+// node_modules/google-auth-library/build/src/auth/iam.js
 var require_iam = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/iam.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/iam.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.IAMAuth = void 0;
@@ -46395,9 +46280,9 @@ var require_iam = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/downscopedclient.js
+// node_modules/google-auth-library/build/src/auth/downscopedclient.js
 var require_downscopedclient = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/downscopedclient.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/downscopedclient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DownscopedClient = exports2.EXPIRATION_TIME_OFFSET = exports2.MAX_ACCESS_BOUNDARY_RULES_COUNT = void 0;
@@ -46580,9 +46465,9 @@ var require_downscopedclient = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/passthrough.js
+// node_modules/google-auth-library/build/src/auth/passthrough.js
 var require_passthrough = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/auth/passthrough.js"(exports2) {
+  "node_modules/google-auth-library/build/src/auth/passthrough.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PassThroughClient = void 0;
@@ -46625,9 +46510,9 @@ var require_passthrough = __commonJS({
   }
 });
 
-// node_modules/googleapis-common/node_modules/google-auth-library/build/src/index.js
+// node_modules/google-auth-library/build/src/index.js
 var require_src6 = __commonJS({
-  "node_modules/googleapis-common/node_modules/google-auth-library/build/src/index.js"(exports2) {
+  "node_modules/google-auth-library/build/src/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GoogleAuth = exports2.auth = exports2.PassThroughClient = exports2.ExternalAccountAuthorizedUserClient = exports2.EXTERNAL_ACCOUNT_AUTHORIZED_USER_TYPE = exports2.ExecutableError = exports2.PluggableAuthClient = exports2.DownscopedClient = exports2.BaseExternalAccountClient = exports2.ExternalAccountClient = exports2.IdentityPoolClient = exports2.AwsRequestSigner = exports2.AwsClient = exports2.UserRefreshClient = exports2.LoginTicket = exports2.ClientAuthentication = exports2.OAuth2Client = exports2.CodeChallengeMethod = exports2.Impersonated = exports2.JWT = exports2.JWTAccess = exports2.IdTokenClient = exports2.IAMAuth = exports2.GCPEnv = exports2.Compute = exports2.DEFAULT_UNIVERSE = exports2.AuthClient = exports2.gaxios = exports2.gcpMetadata = void 0;
@@ -64869,10 +64754,10 @@ var init_aborterUtils = __esm({
   }
 });
 
-// node_modules/@azure/core-util/node_modules/@azure/abort-controller/dist/esm/AbortError.js
+// node_modules/@azure/abort-controller/dist/esm/AbortError.js
 var AbortError3;
 var init_AbortError2 = __esm({
-  "node_modules/@azure/core-util/node_modules/@azure/abort-controller/dist/esm/AbortError.js"() {
+  "node_modules/@azure/abort-controller/dist/esm/AbortError.js"() {
     "use strict";
     AbortError3 = class extends Error {
       constructor(message) {
@@ -64883,9 +64768,9 @@ var init_AbortError2 = __esm({
   }
 });
 
-// node_modules/@azure/core-util/node_modules/@azure/abort-controller/dist/esm/index.js
+// node_modules/@azure/abort-controller/dist/esm/index.js
 var init_esm3 = __esm({
-  "node_modules/@azure/core-util/node_modules/@azure/abort-controller/dist/esm/index.js"() {
+  "node_modules/@azure/abort-controller/dist/esm/index.js"() {
     "use strict";
     init_AbortError2();
   }
@@ -73943,28 +73828,6 @@ var init_bufferHelpers_common = __esm({
   }
 });
 
-// node_modules/@azure/storage-common/node_modules/@azure/abort-controller/dist/esm/AbortError.js
-var AbortError4;
-var init_AbortError3 = __esm({
-  "node_modules/@azure/storage-common/node_modules/@azure/abort-controller/dist/esm/AbortError.js"() {
-    "use strict";
-    AbortError4 = class extends Error {
-      constructor(message) {
-        super(message);
-        this.name = "AbortError";
-      }
-    };
-  }
-});
-
-// node_modules/@azure/storage-common/node_modules/@azure/abort-controller/dist/esm/index.js
-var init_esm11 = __esm({
-  "node_modules/@azure/storage-common/node_modules/@azure/abort-controller/dist/esm/index.js"() {
-    "use strict";
-    init_AbortError3();
-  }
-});
-
 // node_modules/@azure/storage-common/dist/esm/crc64.js
 var NativeCRC64, crc64_default;
 var init_crc64 = __esm({
@@ -76441,7 +76304,7 @@ var import_node_stream5, StructuredMessageEncodingStream;
 var init_StructuredMessageEncodingStream = __esm({
   "node_modules/@azure/storage-common/dist/esm/StructuredMessageEncodingStream.js"() {
     "use strict";
-    init_esm11();
+    init_esm3();
     import_node_stream5 = __toESM(require("stream"), 1);
     init_StructuredMessageEncoding();
     StructuredMessageEncodingStream = class extends import_node_stream5.Readable {
@@ -76476,7 +76339,7 @@ var init_StructuredMessageEncodingStream = __esm({
         this.encodingMethods.sourceDataHandler(data);
       };
       sourceAbortedHandler = () => {
-        const abortError = new AbortError4("The operation was aborted.");
+        const abortError = new AbortError3("The operation was aborted.");
         this.destroy(abortError);
       };
       sourceErrorOrEndHandler = (err) => {
@@ -76695,7 +76558,7 @@ var import_node_stream6, StructuredMessageDecodingStream;
 var init_StructuredMessageDecodingStream = __esm({
   "node_modules/@azure/storage-common/dist/esm/StructuredMessageDecodingStream.js"() {
     "use strict";
-    init_esm11();
+    init_esm3();
     import_node_stream6 = require("stream");
     init_StructuredMessageDecoding();
     StructuredMessageDecodingStream = class extends import_node_stream6.Readable {
@@ -76734,7 +76597,7 @@ var init_StructuredMessageDecodingStream = __esm({
         }
       };
       sourceAbortedHandler = () => {
-        const abortError = new AbortError4("The operation was aborted.");
+        const abortError = new AbortError3("The operation was aborted.");
         this.destroy(abortError);
       };
       sourceErrorOrEndHandler = (err) => {
@@ -77718,7 +77581,7 @@ var DEFAULT_RETRY_OPTIONS, RETRY_ABORT_ERROR, StorageRetryPolicy;
 var init_StorageRetryPolicy = __esm({
   "node_modules/@azure/storage-common/dist/esm/policies/StorageRetryPolicy.js"() {
     "use strict";
-    init_esm11();
+    init_esm3();
     init_RequestPolicy();
     init_constants4();
     init_utils_common();
@@ -77733,7 +77596,7 @@ var init_StorageRetryPolicy = __esm({
       tryTimeoutInMs: void 0
       // Use server side default timeout strategy
     };
-    RETRY_ABORT_ERROR = new AbortError4("The operation was aborted.");
+    RETRY_ABORT_ERROR = new AbortError3("The operation was aborted.");
     StorageRetryPolicy = class extends BaseRequestPolicy {
       /**
        * RetryOptions.
@@ -78078,7 +77941,7 @@ var storageRetryPolicyName, DEFAULT_RETRY_OPTIONS2, retriableErrors, RETRY_ABORT
 var init_StorageRetryPolicyV2 = __esm({
   "node_modules/@azure/storage-common/dist/esm/policies/StorageRetryPolicyV2.js"() {
     "use strict";
-    init_esm11();
+    init_esm3();
     init_esm6();
     init_esm4();
     init_StorageRetryPolicyFactory();
@@ -78106,7 +77969,7 @@ var init_StorageRetryPolicyV2 = __esm({
       "EPIPE",
       "REQUEST_SEND_ERROR"
     ];
-    RETRY_ABORT_ERROR2 = new AbortError4("The operation was aborted.");
+    RETRY_ABORT_ERROR2 = new AbortError3("The operation was aborted.");
   }
 });
 
@@ -78320,7 +78183,7 @@ var init_indexPlatform = __esm({
 });
 
 // node_modules/@azure/storage-common/dist/esm/index.js
-var init_esm12 = __esm({
+var init_esm11 = __esm({
   "node_modules/@azure/storage-common/dist/esm/index.js"() {
     "use strict";
     init_indexPlatform();
@@ -78720,7 +78583,7 @@ var init_Pipeline = __esm({
     init_esm10();
     init_esm7();
     init_log6();
-    init_esm12();
+    init_esm11();
     init_constants5();
     Pipeline = class {
       /**
@@ -92955,7 +92818,7 @@ var init_utils_common2 = __esm({
     init_esm6();
     init_esm4();
     init_constants5();
-    init_esm12();
+    init_esm11();
     accountNameSuffixes = [
       "-secondary-ipv6",
       "-secondary-dualstack",
@@ -94498,12 +94361,12 @@ var init_BlobSASSignatureValues = __esm({
     "use strict";
     init_BlobSASPermissions();
     init_ContainerSASPermissions();
-    init_esm12();
+    init_esm11();
     init_SasIPRange();
     init_SASQueryParameters();
     init_constants5();
     init_utils_common2();
-    init_esm12();
+    init_esm11();
   }
 });
 
@@ -94694,34 +94557,12 @@ var init_BlobLeaseClient = __esm({
   }
 });
 
-// node_modules/@azure/storage-blob/node_modules/@azure/abort-controller/dist/esm/AbortError.js
-var AbortError5;
-var init_AbortError4 = __esm({
-  "node_modules/@azure/storage-blob/node_modules/@azure/abort-controller/dist/esm/AbortError.js"() {
-    "use strict";
-    AbortError5 = class extends Error {
-      constructor(message) {
-        super(message);
-        this.name = "AbortError";
-      }
-    };
-  }
-});
-
-// node_modules/@azure/storage-blob/node_modules/@azure/abort-controller/dist/esm/index.js
-var init_esm13 = __esm({
-  "node_modules/@azure/storage-blob/node_modules/@azure/abort-controller/dist/esm/index.js"() {
-    "use strict";
-    init_AbortError4();
-  }
-});
-
 // node_modules/@azure/storage-blob/dist/esm/utils/RetriableReadableStream.js
 var import_node_stream7, RetriableReadableStream;
 var init_RetriableReadableStream = __esm({
   "node_modules/@azure/storage-blob/dist/esm/utils/RetriableReadableStream.js"() {
     "use strict";
-    init_esm13();
+    init_esm3();
     import_node_stream7 = require("stream");
     RetriableReadableStream = class extends import_node_stream7.Readable {
       start;
@@ -94787,7 +94628,7 @@ var init_RetriableReadableStream = __esm({
         }
       };
       sourceAbortedHandler = () => {
-        const abortError = new AbortError5("The operation was aborted.");
+        const abortError = new AbortError3("The operation was aborted.");
         this.destroy(abortError);
       };
       sourceErrorOrEndHandler = (err) => {
@@ -94830,7 +94671,7 @@ var init_BlobDownloadResponse = __esm({
   "node_modules/@azure/storage-blob/dist/esm/BlobDownloadResponse.js"() {
     "use strict";
     init_esm4();
-    init_esm12();
+    init_esm11();
     init_RetriableReadableStream();
     BlobDownloadResponse = class {
       /**
@@ -95762,9 +95603,9 @@ var init_AvroReadableFromStream = __esm({
   "node_modules/@azure/storage-blob/dist/esm/internal-avro/AvroReadableFromStream.js"() {
     "use strict";
     init_AvroReadable();
-    init_esm13();
+    init_esm3();
     import_buffer = require("buffer");
-    ABORT_ERROR = new AbortError5("Reading from the avro stream was aborted.");
+    ABORT_ERROR = new AbortError3("Reading from the avro stream was aborted.");
     AvroReadableFromStream = class extends AvroReadable {
       _position;
       _readable;
@@ -96818,7 +96659,7 @@ var init_pollOperation = __esm({
 });
 
 // node_modules/@azure/core-lro/dist/esm/index.js
-var init_esm14 = __esm({
+var init_esm12 = __esm({
   "node_modules/@azure/core-lro/dist/esm/index.js"() {
     "use strict";
     init_poller2();
@@ -96842,7 +96683,7 @@ var init_BlobStartCopyFromUrlPoller = __esm({
   "node_modules/@azure/storage-blob/dist/esm/pollers/BlobStartCopyFromUrlPoller.js"() {
     "use strict";
     init_esm4();
-    init_esm14();
+    init_esm12();
     BlobBeginCopyFromUrlPoller = class extends Poller {
       intervalInMs;
       constructor(options) {
@@ -97143,7 +96984,7 @@ var init_Clients = __esm({
     init_esm4();
     init_BlobDownloadResponse();
     init_BlobQueryResponse();
-    init_esm12();
+    init_esm11();
     init_models2();
     init_PageBlobRangeResponse();
     init_Pipeline();
@@ -97151,7 +96992,7 @@ var init_Clients = __esm({
     init_Range();
     init_StorageClient();
     init_Batch();
-    init_esm12();
+    init_esm11();
     init_constants5();
     init_tracing();
     init_utils_common2();
@@ -99899,7 +99740,7 @@ var init_BlobBatch = __esm({
     init_esm7();
     init_esm6();
     init_esm4();
-    init_esm12();
+    init_esm11();
     init_Clients();
     init_Mutex();
     init_Pipeline();
@@ -99919,7 +99760,7 @@ var init_BlobBatchClient = __esm({
     init_BatchUtils();
     init_BlobBatch();
     init_tracing();
-    init_esm12();
+    init_esm11();
     init_StorageContextClient();
     init_Pipeline();
     init_utils_common2();
@@ -99933,7 +99774,7 @@ var init_ContainerClient = __esm({
     init_esm6();
     init_esm4();
     init_esm7();
-    init_esm12();
+    init_esm11();
     init_Pipeline();
     init_StorageClient();
     init_tracing();
@@ -99990,7 +99831,7 @@ var init_BlobServiceClient = __esm({
     init_Pipeline();
     init_ContainerClient();
     init_utils_common2();
-    init_esm12();
+    init_esm11();
     init_utils_common2();
     init_tracing();
     init_BlobBatchClient();
@@ -100013,7 +99854,7 @@ var init_generatedModels = __esm({
 });
 
 // node_modules/@azure/storage-blob/dist/esm/index.js
-var init_esm15 = __esm({
+var init_esm13 = __esm({
   "node_modules/@azure/storage-blob/dist/esm/index.js"() {
     "use strict";
     init_esm6();
@@ -100032,7 +99873,7 @@ var init_esm15 = __esm({
     init_ContainerSASPermissions();
     init_models2();
     init_Pipeline();
-    init_esm12();
+    init_esm11();
     init_SASQueryParameters();
     init_generatedModels();
     init_log6();
@@ -100128,7 +99969,7 @@ var init_uploadUtils = __esm({
   "node_modules/@actions/cache/lib/internal/uploadUtils.js"() {
     "use strict";
     init_core();
-    init_esm15();
+    init_esm13();
     init_errors();
     __awaiter11 = function(thisArg, _arguments, P, generator) {
       function adopt(value) {
@@ -100557,7 +100398,7 @@ var init_downloadUtils = __esm({
     "use strict";
     init_core();
     init_lib();
-    init_esm15();
+    init_esm13();
     buffer2 = __toESM(require("buffer"), 1);
     fs7 = __toESM(require("fs"), 1);
     stream = __toESM(require("stream"), 1);
