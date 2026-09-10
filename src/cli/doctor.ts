@@ -1,6 +1,7 @@
 /**
  * `doctor`: checks everything a run depends on and explains what to fix, without sending any
- * notification. Each probe is independent and read-only.
+ * notification. Each probe is independent and read-only. Check ids are stable and language
+ * independent; messages and hints follow `opts.lang`.
  */
 import { existsSync, mkdirSync, accessSync, constants } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -9,6 +10,7 @@ import { fetchWithRetry, HttpError } from '../core/http';
 import { buildQuery, createGmailClient, type GmailClient } from '../sources/email/gmail';
 import { createPlayApiClient, type PlayApiClient } from '../sources/play-api/client';
 import { parseStoreListing, storeListingUrl } from '../sources/store-listing';
+import { messages, type Lang, type Messages } from './i18n';
 
 export type CheckStatus = 'ok' | 'warn' | 'fail' | 'skip';
 
@@ -30,7 +32,12 @@ export interface DoctorOptions {
   playClient?: (serviceAccount: string) => PlayApiClient;
   now?: Date;
   env?: NodeJS.ProcessEnv;
+  /** Language of messages and hints. Default: English. */
+  lang?: Lang;
 }
+
+/** Message table plus the doc file names for the chosen language. */
+type Texts = { m: Messages['doctor']; docs: Messages['docs'] };
 
 const LOOKBACK_DAYS = 7;
 
@@ -38,36 +45,38 @@ export async function runDoctor(config: Config, opts: DoctorOptions = {}): Promi
   const out: CheckResult[] = [];
   const env = opts.env ?? process.env;
   const now = opts.now ?? new Date();
+  const { doctor: m, docs } = messages(opts.lang ?? 'en');
+  const t: Texts = { m, docs };
 
-  out.push(checkNode());
-  out.push(...checkConfig(config));
-  out.push(...(await checkGmail(config, opts, now)));
-  out.push(...(await checkPlayApi(config, opts)));
-  out.push(...(await checkStoreListing(config, opts)));
-  out.push(...checkChannels(config));
-  out.push(...(await checkStateStore(config, env)));
+  out.push(checkNode(t));
+  out.push(...checkConfig(config, t));
+  out.push(...(await checkGmail(config, opts, now, t)));
+  out.push(...(await checkPlayApi(config, opts, t)));
+  out.push(...(await checkStoreListing(config, opts, t)));
+  out.push(...checkChannels(config, t));
+  out.push(...(await checkStateStore(config, env, t)));
   return out;
 }
 
-function checkNode(): CheckResult {
+function checkNode({ m }: Texts): CheckResult {
   const major = Number(process.versions.node.split('.')[0]);
   return major >= 20
-    ? { id: 'node', status: 'ok', message: `Node.js ${process.versions.node}` }
+    ? { id: 'node', status: 'ok', message: m.nodeOk(process.versions.node) }
     : {
         id: 'node',
         status: 'fail',
-        message: `Node.js ${process.versions.node} is too old`,
-        hint: 'Node.js 20 or newer is required.',
+        message: m.nodeTooOld(process.versions.node),
+        hint: m.nodeHint,
       };
 }
 
-function checkConfig(config: Config): CheckResult[] {
+function checkConfig(config: Config, { m, docs }: Texts): CheckResult[] {
   const results: CheckResult[] = [];
   const apps = config.apps.map((a) => a.packageName).join(', ');
   results.push({
     id: 'config.apps',
     status: 'ok',
-    message: `${config.apps.length} app(s): ${apps}`,
+    message: m.apps(config.apps.length, apps),
   });
 
   const enabled = (['email', 'playApi', 'storeListing'] as const).filter(
@@ -75,28 +84,23 @@ function checkConfig(config: Config): CheckResult[] {
   );
   results.push(
     enabled.length
-      ? { id: 'config.sources', status: 'ok', message: `Sources enabled: ${enabled.join(', ')}` }
-      : {
-          id: 'config.sources',
-          status: 'fail',
-          message: 'No source is enabled',
-          hint: 'Enable sources.email (rejections), sources.storeListing (live), or sources.playApi (submitted).',
-        },
+      ? { id: 'config.sources', status: 'ok', message: m.sourcesEnabled(enabled.join(', ')) }
+      : { id: 'config.sources', status: 'fail', message: m.noSource, hint: m.noSourceHint },
   );
   if (!config.sources.email.enabled) {
     results.push({
       id: 'config.rejections',
       status: 'warn',
-      message: 'Email source is off, so rejections will not be detected',
-      hint: 'Rejections are only announced by email. See docs/gmail-oauth.md.',
+      message: m.emailOff,
+      hint: m.emailOffHint(docs.gmailOauth),
     });
   }
   if (!config.sources.storeListing.enabled) {
     results.push({
       id: 'config.live',
       status: 'warn',
-      message: 'Store listing source is off, so LIVE will not be detected',
-      hint: 'Google sends no approval email and the Play API cannot tell; the public store page is the signal.',
+      message: m.storeOff,
+      hint: m.storeOffHint,
     });
   }
 
@@ -106,7 +110,7 @@ function checkConfig(config: Config): CheckResult[] {
   results.push({
     id: 'config.events',
     status: 'ok',
-    message: `Events on: ${enabledEvents.join(', ')}`,
+    message: m.eventsOn(enabledEvents.join(', ')),
   });
 
   const unrouted = config.apps.filter(
@@ -116,24 +120,30 @@ function checkConfig(config: Config): CheckResult[] {
     results.push({
       id: 'config.routing',
       status: 'warn',
-      message: `No channel for: ${unrouted.map((a) => a.packageName).join(', ')}`,
-      hint: 'Set apps[].channels or defaultChannels; events for these apps are detected but go nowhere.',
+      message: m.noChannelFor(unrouted.map((a) => a.packageName).join(', ')),
+      hint: m.noChannelForHint,
     });
   }
   // Unknown channel names are rejected by the config loader before doctor runs.
   return results;
 }
 
-async function checkGmail(config: Config, opts: DoctorOptions, now: Date): Promise<CheckResult[]> {
+async function checkGmail(
+  config: Config,
+  opts: DoctorOptions,
+  now: Date,
+  t: Texts,
+): Promise<CheckResult[]> {
+  const { m } = t;
   const cfg = config.sources.email;
-  if (!cfg.enabled) return [{ id: 'gmail', status: 'skip', message: 'Email source disabled' }];
+  if (!cfg.enabled) return [{ id: 'gmail', status: 'skip', message: m.emailDisabled }];
   if (!cfg.auth) {
     return [
       {
         id: 'gmail.auth',
         status: 'fail',
-        message: 'sources.email.auth is missing',
-        hint: 'Set clientId, clientSecret and refreshToken (run `auth gmail`).',
+        message: m.emailAuthMissing,
+        hint: m.emailAuthMissingHint,
       },
     ];
   }
@@ -144,71 +154,66 @@ async function checkGmail(config: Config, opts: DoctorOptions, now: Date): Promi
     results.push({
       id: 'gmail.auth',
       status: 'ok',
-      message: profile?.emailAddress
-        ? `Authorized as ${profile.emailAddress}`
-        : 'Gmail credentials accepted',
+      message: profile?.emailAddress ? m.authorizedAs(profile.emailAddress) : m.gmailAccepted,
     });
   } catch (e) {
     return [
       {
         id: 'gmail.auth',
         status: 'fail',
-        message: `Gmail auth failed: ${msg(e)}`,
-        hint: gmailHint(msg(e)),
+        message: m.gmailAuthFailed(msg(e)),
+        hint: gmailHint(msg(e), t),
       },
     ];
   }
   try {
     const since = new Date(now.getTime() - LOOKBACK_DAYS * 86_400_000);
-    const messages = await client.search(buildQuery(cfg.senderAllowlist, since), 50);
+    const messagesFound = await client.search(buildQuery(cfg.senderAllowlist, since), 50);
     results.push(
-      messages.length
+      messagesFound.length
         ? {
             id: 'gmail.inbox',
             status: 'ok',
-            message: `${messages.length} Google Play email(s) in the last ${LOOKBACK_DAYS} days`,
+            message: m.gmailEmails(messagesFound.length, LOOKBACK_DAYS),
           }
         : {
             id: 'gmail.inbox',
             status: 'warn',
-            message: `No Google Play emails in the last ${LOOKBACK_DAYS} days`,
-            hint: 'Normal for a quiet account. If Play emails do arrive, check that this is the mailbox that receives them and that Play Console email notifications are on.',
+            message: m.gmailNoEmails(LOOKBACK_DAYS),
+            hint: m.gmailNoEmailsHint,
           },
     );
   } catch (e) {
     results.push({
       id: 'gmail.inbox',
       status: 'fail',
-      message: `Gmail search failed: ${msg(e)}`,
-      hint: gmailHint(msg(e)),
+      message: m.gmailSearchFailed(msg(e)),
+      hint: gmailHint(msg(e), t),
     });
   }
   return results;
 }
 
-function gmailHint(m: string): string {
-  if (/invalid_grant|token has been expired or revoked/i.test(m))
-    return 'The refresh token is expired or revoked. If the OAuth consent screen is in "Testing", tokens expire after 7 days: publish it, then run `auth gmail` again.';
-  if (/invalid_client|unauthorized_client/i.test(m))
-    return 'Client id or secret is wrong. Copy them again from Google Cloud → Credentials.';
-  if (/insufficient|scope|ACCESS_TOKEN_SCOPE_INSUFFICIENT/i.test(m))
-    return 'The token lacks gmail.readonly. Run `auth gmail` again and accept the permission.';
-  if (/accessNotConfigured|Gmail API has not been used/i.test(m))
-    return 'Enable the Gmail API in the Cloud project (docs/gmail-oauth.md, step 1).';
-  return 'See docs/gmail-oauth.md, "Troubleshooting".';
+function gmailHint(text: string, { m, docs }: Texts): string {
+  if (/invalid_grant|token has been expired or revoked/i.test(text)) return m.gmailHintExpired;
+  if (/invalid_client|unauthorized_client/i.test(text)) return m.gmailHintClient;
+  if (/insufficient|scope|ACCESS_TOKEN_SCOPE_INSUFFICIENT/i.test(text)) return m.gmailHintScope;
+  if (/accessNotConfigured|Gmail API has not been used/i.test(text))
+    return m.gmailHintApi(docs.gmailOauth);
+  return m.gmailHintDefault(docs.gmailOauth);
 }
 
-async function checkPlayApi(config: Config, opts: DoctorOptions): Promise<CheckResult[]> {
+async function checkPlayApi(config: Config, opts: DoctorOptions, t: Texts): Promise<CheckResult[]> {
+  const { m, docs } = t;
   const cfg = config.sources.playApi;
-  if (!cfg.enabled)
-    return [{ id: 'play-api', status: 'skip', message: 'Play API source disabled' }];
+  if (!cfg.enabled) return [{ id: 'play-api', status: 'skip', message: m.playDisabled }];
   if (!cfg.serviceAccountJson) {
     return [
       {
         id: 'play-api.auth',
         status: 'fail',
-        message: 'sources.playApi.serviceAccountJson is missing',
-        hint: 'Provide the service account key JSON (docs/play-api-setup.md).',
+        message: m.playKeyMissing,
+        hint: m.playKeyMissingHint(docs.playApiSetup),
       },
     ];
   }
@@ -220,8 +225,8 @@ async function checkPlayApi(config: Config, opts: DoctorOptions): Promise<CheckR
       {
         id: 'play-api.auth',
         status: 'fail',
-        message: `Service account key could not be read: ${msg(e)}`,
-        hint: 'serviceAccountJson must be the key JSON content or a path to the key file.',
+        message: m.playKeyUnreadable(msg(e)),
+        hint: m.playKeyUnreadableHint,
       },
     ];
   }
@@ -229,49 +234,45 @@ async function checkPlayApi(config: Config, opts: DoctorOptions): Promise<CheckR
   for (const app of config.apps) {
     try {
       const tracks = await client.listTracks(app.packageName);
-      const wanted = tracks.filter((t) => app.tracks.includes(t.track));
+      const wanted = tracks.filter((x) => app.tracks.includes(x.track));
       const summary = wanted
-        .map((t) => `${t.track}=[${t.releases.flatMap((r) => r.versionCodes).join(',') || '-'}]`)
+        .map((x) => `${x.track}=[${x.releases.flatMap((r) => r.versionCodes).join(',') || '-'}]`)
         .join(' ');
-      const missingTracks = app.tracks.filter((t) => !tracks.some((x) => x.track === t));
+      const missingTracks = app.tracks.filter((x) => !tracks.some((y) => y.track === x));
       results.push({
         id: `play-api.${app.packageName}`,
         status: missingTracks.length ? 'warn' : 'ok',
-        message: `${app.packageName}: ${summary || 'no configured track found'}`,
-        ...(missingTracks.length
-          ? {
-              hint: `Track(s) not returned by the API: ${missingTracks.join(', ')}. Check apps[].tracks.`,
-            }
-          : {}),
+        message: m.playTracks(app.packageName, summary || m.playNoTrack),
+        ...(missingTracks.length ? { hint: m.playMissingTracks(missingTracks.join(', ')) } : {}),
       });
     } catch (e) {
       results.push({
         id: `play-api.${app.packageName}`,
         status: 'fail',
         message: `${app.packageName}: ${msg(e)}`,
-        hint: playHint(msg(e)),
+        hint: playHint(msg(e), t),
       });
     }
   }
   return results;
 }
 
-function playHint(m: string): string {
-  if (/accessNotConfigured|has not been used|is disabled/i.test(m))
-    return 'Enable the Google Play Android Developer API in the Cloud project (docs/play-api-setup.md, step 1).';
-  if (/403|insufficient|permission|not have access/i.test(m))
-    return 'Invite the service account in Play Console → Users and permissions with "View app information (read-only)" for this app. Propagation can take several minutes.';
-  if (/404|not found/i.test(m))
-    return 'The developer account that the service account was invited to does not own this package.';
-  if (/invalid_grant|JWT|signature/i.test(m))
-    return 'The key JSON is corrupted or the system clock is off. Re-download the key.';
-  return 'See docs/play-api-setup.md, "Troubleshooting".';
+function playHint(text: string, { m, docs }: Texts): string {
+  if (/accessNotConfigured|has not been used|is disabled/i.test(text))
+    return m.playHintApi(docs.playApiSetup);
+  if (/403|insufficient|permission|not have access/i.test(text)) return m.playHintPermission;
+  if (/404|not found/i.test(text)) return m.playHintNotFound;
+  if (/invalid_grant|JWT|signature/i.test(text)) return m.playHintKey;
+  return m.playHintDefault(docs.playApiSetup);
 }
 
-async function checkStoreListing(config: Config, opts: DoctorOptions): Promise<CheckResult[]> {
+async function checkStoreListing(
+  config: Config,
+  opts: DoctorOptions,
+  { m }: Texts,
+): Promise<CheckResult[]> {
   const cfg = config.sources.storeListing;
-  if (!cfg.enabled)
-    return [{ id: 'store-listing', status: 'skip', message: 'Store listing source disabled' }];
+  if (!cfg.enabled) return [{ id: 'store-listing', status: 'skip', message: m.storeDisabled }];
   const results: CheckResult[] = [];
   const apps = config.apps.filter((a) => a.tracks.includes('production'));
   if (!apps.length) {
@@ -279,8 +280,8 @@ async function checkStoreListing(config: Config, opts: DoctorOptions): Promise<C
       {
         id: 'store-listing',
         status: 'warn',
-        message: 'No app has the production track; the store listing source has nothing to watch',
-        hint: 'Only production releases are visible on the public store page.',
+        message: m.storeNoProduction,
+        hint: m.storeNoProductionHint,
       },
     ];
   }
@@ -302,13 +303,13 @@ async function checkStoreListing(config: Config, opts: DoctorOptions): Promise<C
           ? {
               id: `store-listing.${app.packageName}`,
               status: 'ok',
-              message: `${app.packageName}: listed, updated ${info.updatedText ?? info.updatedAt}`,
+              message: m.storeListed(app.packageName, info.updatedText ?? info.updatedAt),
             }
           : {
               id: `store-listing.${app.packageName}`,
               status: 'fail',
-              message: `${app.packageName}: page fetched but the "Updated on" date was not found`,
-              hint: 'Google may have changed the page format. Please open an issue with the package name.',
+              message: m.storeNoDate(app.packageName),
+              hint: m.storeNoDateHint,
             },
       );
     } catch (e) {
@@ -316,14 +317,14 @@ async function checkStoreListing(config: Config, opts: DoctorOptions): Promise<C
         results.push({
           id: `store-listing.${app.packageName}`,
           status: 'ok',
-          message: `${app.packageName}: not published yet (404); LIVE fires when it appears`,
+          message: m.storeNotPublished(app.packageName),
         });
       } else {
         results.push({
           id: `store-listing.${app.packageName}`,
           status: 'fail',
-          message: `${app.packageName}: ${msg(e)}`,
-          hint: 'Check network access to play.google.com from this machine.',
+          message: m.storeFetchFailed(app.packageName, msg(e)),
+          hint: m.storeFetchFailedHint,
         });
       }
     }
@@ -331,40 +332,37 @@ async function checkStoreListing(config: Config, opts: DoctorOptions): Promise<C
   return results;
 }
 
-function checkChannels(config: Config): CheckResult[] {
+function checkChannels(config: Config, { m }: Texts): CheckResult[] {
   const names = Object.keys(config.channels);
   if (!names.length) {
-    return [
-      {
-        id: 'channels',
-        status: 'warn',
-        message: 'No channels configured; events will be detected but not delivered',
-        hint: 'Add channels (slack, discord, webhook) and defaultChannels.',
-      },
-    ];
+    return [{ id: 'channels', status: 'warn', message: m.noChannels, hint: m.noChannelsHint }];
   }
   return names.map((name) => {
     const ch = config.channels[name]!;
     const url = ch.type === 'webhook' ? ch.url : ch.webhookUrl;
     let hint: string | undefined;
     if (ch.type === 'slack' && !/^https:\/\/hooks\.slack\.com\/services\//.test(url))
-      hint = 'Slack Incoming Webhook URLs start with https://hooks.slack.com/services/.';
+      hint = m.slackUrlHint;
     if (
       ch.type === 'discord' &&
       !/^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\//.test(url)
     )
-      hint = 'Discord webhook URLs start with https://discord.com/api/webhooks/.';
-    if (!/^https:\/\//.test(url)) hint = 'Use an https:// URL.';
+      hint = m.discordUrlHint;
+    if (!/^https:\/\//.test(url)) hint = m.httpsHint;
     return {
       id: `channels.${name}`,
       status: hint ? 'warn' : 'ok',
-      message: `${name}: ${ch.type}${hint ? ' (unusual URL)' : ''}`,
-      ...(hint ? { hint: `${hint} Run \`test-notify\` to send a real test message.` } : {}),
+      message: m.channel(name, ch.type, Boolean(hint)),
+      ...(hint ? { hint: `${hint} ${m.channelHintSuffix}` } : {}),
     };
   });
 }
 
-async function checkStateStore(config: Config, env: NodeJS.ProcessEnv): Promise<CheckResult[]> {
+async function checkStateStore(
+  config: Config,
+  env: NodeJS.ProcessEnv,
+  { m }: Texts,
+): Promise<CheckResult[]> {
   const cfg = config.stateStore;
   switch (cfg.type) {
     case 'file': {
@@ -372,20 +370,14 @@ async function checkStateStore(config: Config, env: NodeJS.ProcessEnv): Promise<
       try {
         mkdirSync(dirname(path), { recursive: true });
         accessSync(dirname(path), constants.W_OK);
-        return [
-          {
-            id: 'state',
-            status: 'ok',
-            message: `file store at ${path}${existsSync(path) ? '' : ' (no state yet: the first run records a baseline)'}`,
-          },
-        ];
+        return [{ id: 'state', status: 'ok', message: m.fileStore(path, existsSync(path)) }];
       } catch (e) {
         return [
           {
             id: 'state',
             status: 'fail',
-            message: `file store: ${msg(e)}`,
-            hint: 'The directory must be writable.',
+            message: m.fileStoreFailed(msg(e)),
+            hint: m.fileStoreFailedHint,
           },
         ];
       }
@@ -393,34 +385,28 @@ async function checkStateStore(config: Config, env: NodeJS.ProcessEnv): Promise<
     case 'github-cache':
       return [
         env['GITHUB_ACTIONS']
-          ? { id: 'state', status: 'ok', message: 'github-cache store (Actions cache)' }
+          ? { id: 'state', status: 'ok', message: m.cacheStore }
           : {
               id: 'state',
               status: 'warn',
-              message: 'github-cache store selected outside GitHub Actions',
-              hint: 'Use stateStore.type: file for local or cron runs.',
+              message: m.cacheStoreOutside,
+              hint: m.cacheStoreOutsideHint,
             },
       ];
     case 'none':
-      return [
-        {
-          id: 'state',
-          status: 'warn',
-          message: 'no state store: every run is a baseline and nothing is ever notified',
-          hint: 'Use file or github-cache for real runs.',
-        },
-      ];
+      return [{ id: 'state', status: 'warn', message: m.noneStore, hint: m.noneStoreHint }];
     case 'custom':
       try {
         await import(resolve(cfg.module));
-        return [{ id: 'state', status: 'ok', message: `custom store module ${cfg.module} loads` }];
+        return [{ id: 'state', status: 'ok', message: m.customStoreLoads(cfg.module) }];
       } catch (e) {
-        return [{ id: 'state', status: 'fail', message: `custom store: ${msg(e)}` }];
+        return [{ id: 'state', status: 'fail', message: m.customStoreFailed(msg(e)) }];
       }
   }
 }
 
-export function formatDoctorReport(results: CheckResult[]): string {
+export function formatDoctorReport(results: CheckResult[], lang: Lang = 'en'): string {
+  const m = messages(lang).doctor;
   const icon: Record<CheckStatus, string> = { ok: '✔', warn: '⚠', fail: '✖', skip: '–' };
   const lines = results.map((r) => {
     const head = `${icon[r.status]} ${r.id}: ${r.message}`;
@@ -428,10 +414,7 @@ export function formatDoctorReport(results: CheckResult[]): string {
   });
   const fails = results.filter((r) => r.status === 'fail').length;
   const warns = results.filter((r) => r.status === 'warn').length;
-  lines.push(
-    '',
-    fails ? `${fails} problem(s), ${warns} warning(s)` : `All good, ${warns} warning(s)`,
-  );
+  lines.push('', fails ? m.summaryProblems(fails, warns) : m.summaryAllGood(warns));
   return lines.join('\n');
 }
 

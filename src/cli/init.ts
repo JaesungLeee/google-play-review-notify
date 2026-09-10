@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { parseConfig } from '../core/config';
+import { messages, type Lang, type Messages } from './i18n';
 
 export const SCHEMA_URL =
   'https://raw.githubusercontent.com/JaesungLeee/google-play-review-notify/main/schemas/config.schema.json';
@@ -42,6 +43,8 @@ export interface InitOptions {
   sources?: SourceKind[];
   target?: Target;
   interactive: boolean;
+  /** Language of prompts and messages (not of the generated files). Default: English. */
+  lang?: Lang;
 }
 
 export interface InitIo {
@@ -62,43 +65,49 @@ export class InitError extends Error {
 
 const PACKAGE_NAME = /^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+$/;
 
-export function parsePackageList(raw: string): string[] {
+export function parsePackageList(raw: string, lang: Lang = 'en'): string[] {
   const names = raw
     .split(/[,\s]+/)
     .map((s) => s.trim())
     .filter(Boolean);
   for (const n of names) {
     if (!PACKAGE_NAME.test(n)) {
-      throw new InitError(`"${n}" is not a valid Android package name (e.g. com.example.app)`);
+      throw new InitError(messages(lang).init.invalidPackage(n));
     }
   }
   return [...new Set(names)];
 }
 
+export type InitChoiceKind = 'target' | 'channel' | 'source';
+
 export function parseInitChoice<T extends string>(
   raw: string,
   allowed: readonly T[],
-  what: string,
+  what: InitChoiceKind,
+  lang: Lang = 'en',
 ): T {
   const v = raw.trim().toLowerCase() as T;
   if (!allowed.includes(v)) {
-    throw new InitError(`Unknown ${what} "${raw}". Choose one of: ${allowed.join(', ')}`);
+    const m = messages(lang).init;
+    throw new InitError(m.unknownChoice(m.choiceKinds[what], raw, allowed.join(', ')));
   }
   return v;
 }
 
-function yesNo(raw: string, fallback: boolean): boolean {
+function yesNo(raw: string, fallback: boolean, m: Messages['init']): boolean {
   const v = raw.trim().toLowerCase();
   if (v === '') return fallback;
   if (['y', 'yes', 'true', '1'].includes(v)) return true;
   if (['n', 'no', 'false', '0'].includes(v)) return false;
-  throw new InitError(`Please answer y or n (got "${raw}")`);
+  throw new InitError(m.answerYesNo(raw));
 }
 
 const yamlString = (s: string): string => JSON.stringify(s);
 
 /** Collect answers from flags, then prompts (when interactive and not --yes), then defaults. */
 export async function collectAnswers(opts: InitOptions, io: InitIo): Promise<InitAnswers> {
+  const lang = opts.lang ?? 'en';
+  const m = messages(lang).init;
   const prompt = opts.interactive && !opts.yes;
   const ask = async (q: string, d: string): Promise<string> => {
     const v = prompt ? (await io.ask(q, d)).trim() : '';
@@ -108,12 +117,10 @@ export async function collectAnswers(opts: InitOptions, io: InitIo): Promise<Ini
   let packages = opts.packages;
   while (!packages || packages.length === 0) {
     if (!prompt) {
-      throw new InitError(
-        'No package name given. Pass --packages com.example.app (comma-separated for several).',
-      );
+      throw new InitError(m.noPackages);
     }
     try {
-      packages = parsePackageList(await ask('Package name(s), comma-separated', ''));
+      packages = parsePackageList(await ask(m.askPackages, ''), lang);
     } catch (e) {
       io.out(`${(e as InitError).message}\n`);
     }
@@ -121,53 +128,29 @@ export async function collectAnswers(opts: InitOptions, io: InitIo): Promise<Ini
 
   const apps: InitAnswers['apps'] = [];
   for (const packageName of packages) {
-    const name = (await ask(`Display name for ${packageName} as shown in Play Console`, '')).trim();
+    const name = (await ask(m.askDisplayName(packageName), '')).trim();
     apps.push(name ? { packageName, name } : { packageName });
   }
 
   const target =
     opts.target ??
-    parseInitChoice(
-      await ask('Where will this run? (github-actions | cli)', 'github-actions'),
-      TARGETS,
-      'target',
-    );
+    parseInitChoice(await ask(m.askTarget, 'github-actions'), TARGETS, 'target', lang);
 
   let enabled: SourceKind[];
   if (opts.sources) enabled = opts.sources;
   else {
     enabled = [];
-    if (yesNo(await ask('Watch the Play Console inbox for rejections via Gmail? (y/n)', 'y'), true))
-      enabled.push('email');
-    if (
-      yesNo(
-        await ask('Watch the public store listing to detect releases going live? (y/n)', 'y'),
-        true,
-      )
-    )
-      enabled.push('store-listing');
-    if (
-      yesNo(
-        await ask(
-          'Use the Play Developer API to detect new submissions? (needs a service account) (y/n)',
-          'n',
-        ),
-        false,
-      )
-    )
-      enabled.push('play-api');
+    if (yesNo(await ask(m.askEmail, 'y'), true, m)) enabled.push('email');
+    if (yesNo(await ask(m.askStoreListing, 'y'), true, m)) enabled.push('store-listing');
+    if (yesNo(await ask(m.askPlayApi, 'n'), false, m)) enabled.push('play-api');
   }
   if (enabled.length === 0) {
-    throw new InitError('At least one source must be enabled (email, store-listing, play-api).');
+    throw new InitError(m.noSources);
   }
 
   const channel =
     opts.channel ??
-    parseInitChoice(
-      await ask('Notification channel (slack | discord | webhook)', 'slack'),
-      CHANNEL_KINDS,
-      'channel',
-    );
+    parseInitChoice(await ask(m.askChannel, 'slack'), CHANNEL_KINDS, 'channel', lang);
 
   return {
     apps,
@@ -315,7 +298,9 @@ export function renderWorkflow(a: InitAnswers, configPath: string): string {
 export function renderNextSteps(
   a: InitAnswers,
   paths: { config: string; workflow?: string },
+  lang: Lang = 'en',
 ): string {
+  const { init: m, docs } = messages(lang);
   const secrets = requiredSecrets(a);
   const steps: string[] = [];
   let n = 1;
@@ -325,47 +310,35 @@ export function renderNextSteps(
   };
 
   if (a.sources.email) {
-    step('Create a Gmail OAuth client and refresh token (one-time, about 10 minutes):', [
-      `${DOCS}/gmail-oauth.md`,
+    step(m.stepGmail, [
+      `${DOCS}/${docs.gmailOauth}`,
       'export GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=...',
-      'play-review-notify auth gmail          # prints GMAIL_REFRESH_TOKEN',
+      `play-review-notify auth gmail          # ${m.stepGmailAuthComment}`,
     ]);
   }
   if (a.sources['play-api']) {
-    step('Create a Play service account with read-only access and download its key:', [
-      `${DOCS}/play-api-setup.md`,
-    ]);
+    step(m.stepPlayApi, [`${DOCS}/${docs.playApiSetup}`]);
   }
-  const channelHint: Record<ChannelKind, string> = {
-    slack: 'Create a Slack Incoming Webhook: https://api.slack.com/messaging/webhooks',
-    discord: 'Create a Discord webhook: Server settings → Integrations → Webhooks',
-    webhook: 'Point WEBHOOK_URL at your receiver (n8n, Make, Zapier, your server)',
-  };
-  step(channelHint[a.channel]);
+  step(m.stepChannel[a.channel]);
 
   if (a.target === 'github-actions') {
-    step('Add the secrets to your repository (Settings → Secrets and variables → Actions):', [
-      ...secrets.map((s) => `gh secret set ${s}`),
-    ]);
-    step('Verify locally before the first scheduled run:', [
+    step(m.stepSecrets, [...secrets.map((s) => `gh secret set ${s}`)]);
+    step(m.stepVerifyBeforeSchedule, [
       `export ${secrets.join('=... ')}=...`,
       `play-review-notify -c ${paths.config} doctor`,
       `play-review-notify -c ${paths.config} test-notify`,
     ]);
-    step(`Commit ${paths.config}${paths.workflow ? ` and ${paths.workflow}` : ''} and push.`, [
-      'The first run only records a baseline; later runs notify.',
-      'Trigger one manually from the Actions tab to check it is green.',
-    ]);
+    step(m.stepCommit(paths.config, paths.workflow), [m.stepCommitBaseline, m.stepCommitTrigger]);
   } else {
-    step('Export the variables and verify:', [
+    step(m.stepExportVerify, [
       `export ${secrets.join('=... ')}=...`,
       `play-review-notify -c ${paths.config} doctor`,
       `play-review-notify -c ${paths.config} test-notify`,
       `play-review-notify -c ${paths.config} run --dry-run --verbose`,
     ]);
-    step('Schedule `run` (the first run only records a baseline):', [
+    step(m.stepSchedule, [
       `*/10 * * * * cd ${'$'}(pwd) && play-review-notify -c ${paths.config} run >> play-review-notify.log 2>&1`,
-      'Add .play-review-notify/ to .gitignore if this directory is a repository.',
+      m.stepGitignore,
     ]);
   }
   return steps.join('\n');
@@ -380,6 +353,8 @@ export function validateGeneratedConfig(yamlText: string, a: InitAnswers): void 
 }
 
 export async function runInit(opts: InitOptions, io: InitIo): Promise<InitResult> {
+  const lang = opts.lang ?? 'en';
+  const m = messages(lang).init;
   const answers = await collectAnswers(opts, io);
   const configText = renderConfig(answers);
   validateGeneratedConfig(configText, answers);
@@ -390,7 +365,7 @@ export async function runInit(opts: InitOptions, io: InitIo): Promise<InitResult
     const abs = resolve(opts.cwd, rel);
     if (existsSync(abs) && !opts.force) {
       if (rel === opts.configPath) {
-        throw new InitError(`${rel} already exists. Use --force to overwrite it.`);
+        throw new InitError(m.alreadyExists(rel));
       }
       skipped.push(rel);
       return;
@@ -407,13 +382,14 @@ export async function runInit(opts: InitOptions, io: InitIo): Promise<InitResult
     workflow = opts.workflowPath;
   }
 
-  io.out(`\nWrote ${written.join(', ')}\n`);
-  for (const s of skipped) io.out(`Kept existing ${s} (use --force to overwrite)\n`);
-  io.out('\nNext steps:\n');
+  io.out(m.wrote(written.join(', ')));
+  for (const s of skipped) io.out(m.keptExisting(s));
+  io.out(m.nextSteps);
   io.out(
     renderNextSteps(
       answers,
       workflow ? { config: opts.configPath, workflow } : { config: opts.configPath },
+      lang,
     ) + '\n',
   );
   return { answers, written, skipped };
