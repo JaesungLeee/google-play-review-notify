@@ -195,6 +195,11 @@ per event. Importable n8n workflows are in [examples/n8n](../examples/n8n/README
   failed (notifications still sent), `3` at least one notification failed. `doctor` exits `1`
   when any check fails and `0` otherwise, and never sends anything. `--json` prints
   `{ "events": ReviewEvent[], "summary": {...} }`.
+- CLI language (`src/cli/i18n.ts`): `--lang` > `$PLAY_REVIEW_NOTIFY_LANG` > a one-question gate
+  when stdin and stdout are TTYs (default from the system locale) > English. The gate is skipped
+  for `--json` and `--version`, so scripts never block on it. Only CLI text is translated: help,
+  prompts, `doctor` messages and hints, and command output. Check ids, generated files, JSON
+  output, and core log lines stay English. An unknown language exits `1`.
 
 ## Extending
 

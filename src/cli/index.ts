@@ -1,6 +1,11 @@
 #!/usr/bin/env node
-/** CLI entry. Exit codes are documented in docs/design.md, "CLI contract". */
-import { Command } from 'commander';
+/**
+ * CLI entry. Exit codes are documented in docs/design.md, "CLI contract".
+ *
+ * The output language is decided before the program is built (see ./i18n): `--lang`, then
+ * $PLAY_REVIEW_NOTIFY_LANG, then a language gate in an interactive terminal, then English.
+ */
+import { Command, Help } from 'commander';
 import { collectSecrets, loadConfigFile, ConfigError, type Config } from '../core/config';
 import { createConsoleLogger, type LogLevel } from '../core/logger';
 import { PACKAGE_VERSION } from '../core/version';
@@ -10,6 +15,8 @@ import { createDefaultNotifiers } from '../notifiers';
 import { createSources, ManualSourceAdapter } from '../sources';
 import { authorizeGmail } from '../sources/email/oauth';
 import { formatDoctorReport, runDoctor } from './doctor';
+import type { Interface as ReadlineInterface } from 'node:readline/promises';
+import { LangError, messages, promptLang, resolveLang, type Lang } from './i18n';
 import {
   CHANNEL_KINDS,
   parseInitChoice,
@@ -31,6 +38,7 @@ interface GlobalOpts {
   config: string;
   json?: boolean;
   verbose?: boolean;
+  lang?: string;
 }
 
 function logger(opts: GlobalOpts, config?: Config) {
@@ -57,305 +65,360 @@ function exitCodeFor(summary: RunSummary): number {
   return EXIT.OK;
 }
 
-const program = new Command()
-  .name('play-review-notify')
-  .description('Detect Google Play review outcomes and notify Slack, Discord, or any webhook.')
-  .version(VERSION)
-  .option('-c, --config <path>', 'config file (YAML or JSON)', 'play-review-notify.yml')
-  .option('--json', 'structured JSON logs and output')
-  .option('-v, --verbose', 'debug logging');
-
-program
-  .command('run')
-  .description('Poll all enabled sources once, notify, and exit')
-  .option('--dry-run', 'render messages but do not send or save state')
-  .option('--state-store <type>', 'override state store: file | none')
-  .action(async (cmd: { dryRun?: boolean; stateStore?: string }) => {
-    const g = program.opts<GlobalOpts>();
-    const config = loadOrExit(g);
-    const log = logger(g, config);
-    const stateStore =
-      cmd.stateStore === 'none'
-        ? new NoneStateStore()
-        : cmd.stateStore === 'file'
-          ? new FileStateStore()
-          : await createStateStore(config, log);
-    const summary = await runOnce({
-      config,
-      sources: createSources(config, log, { version: VERSION }),
-      notifiers: createDefaultNotifiers({ version: VERSION }),
-      stateStore,
-      logger: log,
-      dryRun: cmd.dryRun ?? false,
-    });
-    if (g.json) process.stdout.write(JSON.stringify({ events: summary.events, summary }) + '\n');
-    else
-      log.info(
-        `Done: ${summary.events.length} new event(s), ${summary.deliveries.filter((d) => d.ok).length} delivered` +
-          (summary.baseline ? ' (baseline run, notifications suppressed)' : ''),
-      );
-    process.exit(exitCodeFor(summary));
+/** Questions go to stderr so stdout stays clean for `--json` and redirection. */
+async function withReadline<T>(fn: (rl: ReadlineInterface) => Promise<T>): Promise<T> {
+  const rl = (await import('node:readline/promises')).createInterface({
+    input: process.stdin,
+    output: process.stderr,
   });
-
-program
-  .command('test-notify')
-  .description('Send a sample event to configured channels')
-  .option('-t, --type <type>', 'event type', 'REJECTED')
-  .option('-p, --package <packageName>', 'package name (defaults to first app in config)')
-  .action(async (cmd: { type: ReviewEvent['type']; package?: string }) => {
-    const g = program.opts<GlobalOpts>();
-    const config = loadOrExit(g);
-    const log = logger(g, config);
-    const app = config.apps.find((a) => a.packageName === cmd.package) ?? config.apps[0];
-    if (!app) return process.exit(EXIT.CONFIG);
-    const event: ReviewEvent = {
-      id: `manual:test:${Date.now()}`,
-      type: cmd.type,
-      packageName: app.packageName,
-      track: app.tracks[0] ?? 'production',
-      versionCode: '1',
-      versionName: '0.0.1-test',
-      reason: 'This is a test notification from google-play-review-notify.',
-      source: 'manual',
-      confidence: 'high',
-      observedAt: new Date().toISOString(),
-    };
-    if (app.name) event.appName = app.name;
-    const message = renderMessage(config, event, app);
-    const notifiers = createDefaultNotifiers({ version: VERSION });
-    const targets = app.channels ?? config.defaultChannels;
-    let failed = false;
-    for (const name of targets) {
-      const channel = config.channels[name];
-      const notifier = channel && notifiers.get(channel.type);
-      if (!channel || !notifier) {
-        log.warn(`Channel ${name} is missing or has no notifier`);
-        continue;
-      }
-      try {
-        await notifier.send(message, { ...channel, name });
-        log.info(`Sent test ${event.type} to ${name}`);
-      } catch (e) {
-        failed = true;
-        log.error(`Failed to send to ${name}: ${(e as Error).message}`);
-      }
-    }
-    process.exit(failed ? EXIT.NOTIFY_FAILED : EXIT.OK);
+  rl.on('SIGINT', () => {
+    rl.close();
+    process.stderr.write('\n');
+    process.exit(130);
   });
+  try {
+    return await fn(rl);
+  } finally {
+    rl.close();
+  }
+}
 
-program
-  .command('emit')
-  .description('Emit an event from an external pipeline (e.g. SUBMITTED right after upload)')
-  .requiredOption('-t, --type <type>', 'event type')
-  .requiredOption('-p, --package <packageName>', 'package name')
-  .option('--track <track>', 'track', 'production')
-  .option('--version-code <code>', 'version code')
-  .option('--version-name <name>', 'version name')
-  .option('--dry-run', 'do not send or save state')
-  .action(
-    async (cmd: {
-      type: ReviewEvent['type'];
-      package: string;
-      track: string;
-      versionCode?: string;
-      versionName?: string;
-      dryRun?: boolean;
-    }) => {
+/** The language gate: asked once, before anything else, only in an interactive terminal. */
+function askLangInTerminal(defaultLang: Lang): Promise<Lang> {
+  return withReadline(
+    (rl) =>
+      promptLang(
+        { ask: (q) => rl.question(q), out: (t) => process.stderr.write(t) },
+        defaultLang,
+      ).catch(() => defaultLang), // stdin closed mid-question: fall back to the default
+  );
+}
+
+export function buildProgram(lang: Lang, interactive: boolean): Command {
+  const { cli: m, help, docs } = messages(lang);
+
+  const program = new Command()
+    .name('play-review-notify')
+    .description(m.description)
+    .version(VERSION, '-V, --version', help.versionOption)
+    .helpOption('-h, --help', help.helpOption)
+    .helpCommand('help [command]', help.helpCommand)
+    .configureHelp({
+      styleTitle: (title) => help.titles[title] ?? title,
+      optionDescription(option) {
+        return Help.prototype.optionDescription
+          .call(this, option)
+          .replace('(default: ', `(${help.defaultLabel}`);
+      },
+    })
+    .option('-c, --config <path>', m.optConfig, 'play-review-notify.yml')
+    .option('--json', m.optJson)
+    .option('-v, --verbose', m.optVerbose)
+    .option('--lang <lang>', m.optLang);
+
+  program
+    .command('run')
+    .description(m.run)
+    .option('--dry-run', m.runDryRun)
+    .option('--state-store <type>', m.runStateStore)
+    .action(async (cmd: { dryRun?: boolean; stateStore?: string }) => {
       const g = program.opts<GlobalOpts>();
       const config = loadOrExit(g);
       const log = logger(g, config);
-      const { manualEventId } = await import('../sources/manual');
+      const stateStore =
+        cmd.stateStore === 'none'
+          ? new NoneStateStore()
+          : cmd.stateStore === 'file'
+            ? new FileStateStore()
+            : await createStateStore(config, log);
+      const summary = await runOnce({
+        config,
+        sources: createSources(config, log, { version: VERSION }),
+        notifiers: createDefaultNotifiers({ version: VERSION }),
+        stateStore,
+        logger: log,
+        dryRun: cmd.dryRun ?? false,
+      });
+      if (g.json) process.stdout.write(JSON.stringify({ events: summary.events, summary }) + '\n');
+      else
+        log.info(
+          m.runDone(
+            summary.events.length,
+            summary.deliveries.filter((d) => d.ok).length,
+            Boolean(summary.baseline),
+          ),
+        );
+      process.exit(exitCodeFor(summary));
+    });
+
+  program
+    .command('test-notify')
+    .description(m.testNotify)
+    .option('-t, --type <type>', m.optEventType, 'REJECTED')
+    .option('-p, --package <packageName>', m.optPackageDefault)
+    .action(async (cmd: { type: ReviewEvent['type']; package?: string }) => {
+      const g = program.opts<GlobalOpts>();
+      const config = loadOrExit(g);
+      const log = logger(g, config);
+      const app = config.apps.find((a) => a.packageName === cmd.package) ?? config.apps[0];
+      if (!app) return process.exit(EXIT.CONFIG);
       const event: ReviewEvent = {
-        id: manualEventId({
-          type: cmd.type,
-          packageName: cmd.package,
-          track: cmd.track,
-          ...(cmd.versionCode ? { versionCode: cmd.versionCode } : {}),
-        }),
+        id: `manual:test:${Date.now()}`,
         type: cmd.type,
-        packageName: cmd.package,
-        track: cmd.track,
+        packageName: app.packageName,
+        track: app.tracks[0] ?? 'production',
+        versionCode: '1',
+        versionName: '0.0.1-test',
+        reason: m.testReason,
         source: 'manual',
         confidence: 'high',
         observedAt: new Date().toISOString(),
       };
-      if (cmd.versionCode) event.versionCode = cmd.versionCode;
-      if (cmd.versionName) event.versionName = cmd.versionName;
-      const summary = await runOnce({
-        config,
-        sources: [new ManualSourceAdapter([event])],
-        notifiers: createDefaultNotifiers({ version: VERSION }),
-        stateStore: await createStateStore(config, log),
-        logger: log,
-        dryRun: cmd.dryRun ?? false,
-      });
-      process.exit(exitCodeFor(summary));
-    },
-  );
-
-const state = program.command('state').description('Inspect or reset persisted state');
-state.command('show').action(async () => {
-  const g = program.opts<GlobalOpts>();
-  const config = loadOrExit(g);
-  const store = await createStateStore(config, logger(g, config));
-  const s = await store.load();
-  process.stdout.write(JSON.stringify(s, null, 2) + '\n');
-});
-state
-  .command('reset')
-  .description('Forget all state; the next run records a fresh baseline')
-  .action(async () => {
-    const g = program.opts<GlobalOpts>();
-    const config = loadOrExit(g);
-    const log = logger(g, config);
-    if (config.stateStore.type !== 'file') {
-      log.error('state reset is only supported for the file state store in this version');
-      process.exit(EXIT.CONFIG);
-    }
-    const { rmSync } = await import('node:fs');
-    rmSync(new FileStateStore(config.stateStore.path).path, { force: true });
-    log.info('State removed');
-  });
-
-program
-  .command('doctor')
-  .description('Check config, credentials, sources, channels, and state store without sending')
-  .action(async () => {
-    const g = program.opts<GlobalOpts>();
-    const config = loadOrExit(g);
-    const results = await runDoctor(config, { version: VERSION });
-    if (g.json) process.stdout.write(JSON.stringify(results, null, 2) + '\n');
-    else process.stdout.write(formatDoctorReport(results) + '\n');
-    process.exit(results.some((r) => r.status === 'fail') ? EXIT.CONFIG : EXIT.OK);
-  });
-
-program
-  .command('init')
-  .description('Create play-review-notify.yml (and a GitHub workflow) by answering a few questions')
-  .option('--packages <names>', 'comma-separated package names (skips the prompt)')
-  .option('--target <target>', `${TARGETS.join(' | ')} (skips the prompt)`)
-  .option('--sources <kinds>', `comma-separated: ${SOURCE_KINDS.join(', ')} (skips the prompts)`)
-  .option('--channel <kind>', `${CHANNEL_KINDS.join(' | ')} (skips the prompt)`)
-  .option(
-    '--workflow-path <path>',
-    'workflow file to create',
-    '.github/workflows/play-review-notify.yml',
-  )
-  .option('-y, --yes', 'no prompts; use flags and defaults')
-  .option('-f, --force', 'overwrite existing files')
-  .action(
-    async (cmd: {
-      packages?: string;
-      target?: string;
-      sources?: string;
-      channel?: string;
-      workflowPath: string;
-      yes?: boolean;
-      force?: boolean;
-    }) => {
-      const g = program.opts<GlobalOpts>();
-      const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY);
-      const rl = interactive
-        ? (await import('node:readline/promises')).createInterface({
-            input: process.stdin,
-            output: process.stderr,
-          })
-        : undefined;
-      const io: InitIo = {
-        ask: async (q, d) => (await rl?.question(`${q}${d ? ` [${d}]` : ''}: `)) ?? '',
-        out: (t) => process.stderr.write(t),
-      };
-      try {
-        const opts: InitOptions = {
-          configPath: g.config,
-          workflowPath: cmd.workflowPath,
-          cwd: process.cwd(),
-          force: cmd.force ?? false,
-          yes: cmd.yes ?? false,
-          interactive,
-        };
-        if (cmd.packages) opts.packages = parsePackageList(cmd.packages);
-        if (cmd.target) opts.target = parseInitChoice(cmd.target, TARGETS, 'target');
-        if (cmd.channel) opts.channel = parseInitChoice(cmd.channel, CHANNEL_KINDS, 'channel');
-        if (cmd.sources)
-          opts.sources = cmd.sources
-            .split(/[,\s]+/)
-            .filter(Boolean)
-            .map((x) => parseInitChoice(x, SOURCE_KINDS, 'source'));
-        const result = await runInit(opts, io);
-        if (g.json) process.stdout.write(JSON.stringify(result) + '\n');
-        process.exit(EXIT.OK);
-      } catch (e) {
-        process.stderr.write(`init failed: ${(e as Error).message}\n`);
-        process.exit(EXIT.CONFIG);
-      } finally {
-        rl?.close();
-      }
-    },
-  );
-
-program
-  .command('auth')
-  .argument('<provider>', 'gmail')
-  .description('Obtain an OAuth refresh token (one-time setup). See docs/gmail-oauth.md')
-  .option('--client-id <id>', 'OAuth client id (default: $GMAIL_CLIENT_ID)')
-  .option('--client-secret <secret>', 'OAuth client secret (default: $GMAIL_CLIENT_SECRET)')
-  .option('--port <port>', 'local callback port (default: a free port)', (v) => Number(v))
-  .option('--no-open', 'print the consent URL instead of opening a browser')
-  .action(
-    async (
-      provider: string,
-      cmd: { clientId?: string; clientSecret?: string; port?: number; open: boolean },
-    ) => {
-      const g = program.opts<GlobalOpts>();
-      if (provider !== 'gmail') {
-        process.stderr.write(`Unknown provider "${provider}". Supported: gmail\n`);
-        process.exit(EXIT.CONFIG);
-      }
-      const clientId = cmd.clientId ?? process.env['GMAIL_CLIENT_ID'];
-      const clientSecret = cmd.clientSecret ?? process.env['GMAIL_CLIENT_SECRET'];
-      if (!clientId || !clientSecret) {
-        process.stderr.write(
-          'Missing OAuth client. Pass --client-id/--client-secret or set GMAIL_CLIENT_ID and ' +
-            'GMAIL_CLIENT_SECRET (create a "Desktop app" OAuth client; see docs/gmail-oauth.md).\n',
-        );
-        process.exit(EXIT.CONFIG);
-      }
-      const err = (m: string) => process.stderr.write(m + '\n');
-      try {
-        const result = await authorizeGmail({
-          clientId,
-          clientSecret,
-          port: cmd.port ?? 0,
-          openBrowser: cmd.open,
-          onAuthUrl: (url) =>
-            err(
-              (cmd.open ? 'Opening your browser. If it does not open, visit:' : 'Visit:') +
-                `\n\n  ${url}\n\nWaiting for Google to redirect back to this machine...`,
-            ),
-        });
-        if (g.json) {
-          process.stdout.write(JSON.stringify(result) + '\n');
-        } else {
-          err(
-            `\nAuthorized${result.emailAddress ? ` as ${result.emailAddress}` : ''}. ` +
-              'Add this to your environment or CI secrets:\n',
-          );
-          process.stdout.write(`GMAIL_REFRESH_TOKEN=${result.refreshToken}\n`);
-          err(
-            '\nKeep it secret. If the OAuth consent screen is still in "Testing", the token ' +
-              'expires after 7 days; publish the app to production to make it permanent.',
-          );
+      if (app.name) event.appName = app.name;
+      const message = renderMessage(config, event, app);
+      const notifiers = createDefaultNotifiers({ version: VERSION });
+      const targets = app.channels ?? config.defaultChannels;
+      let failed = false;
+      for (const name of targets) {
+        const channel = config.channels[name];
+        const notifier = channel && notifiers.get(channel.type);
+        if (!channel || !notifier) {
+          log.warn(m.channelMissing(name));
+          continue;
         }
-        process.exit(EXIT.OK);
-      } catch (e) {
-        err(`auth gmail failed: ${(e as Error).message}`);
+        try {
+          await notifier.send(message, { ...channel, name });
+          log.info(m.sentTest(event.type, name));
+        } catch (e) {
+          failed = true;
+          log.error(m.sendFailed(name, (e as Error).message));
+        }
+      }
+      process.exit(failed ? EXIT.NOTIFY_FAILED : EXIT.OK);
+    });
+
+  program
+    .command('emit')
+    .description(m.emit)
+    .requiredOption('-t, --type <type>', m.optEventType)
+    .requiredOption('-p, --package <packageName>', m.optPackage)
+    .option('--track <track>', m.optTrack, 'production')
+    .option('--version-code <code>', m.optVersionCode)
+    .option('--version-name <name>', m.optVersionName)
+    .option('--dry-run', m.emitDryRun)
+    .action(
+      async (cmd: {
+        type: ReviewEvent['type'];
+        package: string;
+        track: string;
+        versionCode?: string;
+        versionName?: string;
+        dryRun?: boolean;
+      }) => {
+        const g = program.opts<GlobalOpts>();
+        const config = loadOrExit(g);
+        const log = logger(g, config);
+        const { manualEventId } = await import('../sources/manual');
+        const event: ReviewEvent = {
+          id: manualEventId({
+            type: cmd.type,
+            packageName: cmd.package,
+            track: cmd.track,
+            ...(cmd.versionCode ? { versionCode: cmd.versionCode } : {}),
+          }),
+          type: cmd.type,
+          packageName: cmd.package,
+          track: cmd.track,
+          source: 'manual',
+          confidence: 'high',
+          observedAt: new Date().toISOString(),
+        };
+        if (cmd.versionCode) event.versionCode = cmd.versionCode;
+        if (cmd.versionName) event.versionName = cmd.versionName;
+        const summary = await runOnce({
+          config,
+          sources: [new ManualSourceAdapter([event])],
+          notifiers: createDefaultNotifiers({ version: VERSION }),
+          stateStore: await createStateStore(config, log),
+          logger: log,
+          dryRun: cmd.dryRun ?? false,
+        });
+        process.exit(exitCodeFor(summary));
+      },
+    );
+
+  const state = program.command('state').description(m.state);
+  state
+    .command('show')
+    .description(m.stateShow)
+    .action(async () => {
+      const g = program.opts<GlobalOpts>();
+      const config = loadOrExit(g);
+      const store = await createStateStore(config, logger(g, config));
+      const s = await store.load();
+      process.stdout.write(JSON.stringify(s, null, 2) + '\n');
+    });
+  state
+    .command('reset')
+    .description(m.stateReset)
+    .action(async () => {
+      const g = program.opts<GlobalOpts>();
+      const config = loadOrExit(g);
+      const log = logger(g, config);
+      if (config.stateStore.type !== 'file') {
+        log.error(m.stateResetUnsupported);
         process.exit(EXIT.CONFIG);
       }
-    },
-  );
+      const { rmSync } = await import('node:fs');
+      rmSync(new FileStateStore(config.stateStore.path).path, { force: true });
+      log.info(m.stateRemoved);
+    });
 
-program.parseAsync(process.argv).catch((e: unknown) => {
+  program
+    .command('doctor')
+    .description(m.doctor)
+    .action(async () => {
+      const g = program.opts<GlobalOpts>();
+      const config = loadOrExit(g);
+      const results = await runDoctor(config, { version: VERSION, lang });
+      if (g.json) process.stdout.write(JSON.stringify(results, null, 2) + '\n');
+      else process.stdout.write(formatDoctorReport(results, lang) + '\n');
+      process.exit(results.some((r) => r.status === 'fail') ? EXIT.CONFIG : EXIT.OK);
+    });
+
+  program
+    .command('init')
+    .description(m.init)
+    .option('--packages <names>', m.initPackages)
+    .option('--target <target>', m.initTarget(TARGETS.join(' | ')))
+    .option('--sources <kinds>', m.initSources(SOURCE_KINDS.join(', ')))
+    .option('--channel <kind>', m.initChannel(CHANNEL_KINDS.join(' | ')))
+    .option(
+      '--workflow-path <path>',
+      m.initWorkflowPath,
+      '.github/workflows/play-review-notify.yml',
+    )
+    .option('-y, --yes', m.initYes)
+    .option('-f, --force', m.initForce)
+    .action(
+      async (cmd: {
+        packages?: string;
+        target?: string;
+        sources?: string;
+        channel?: string;
+        workflowPath: string;
+        yes?: boolean;
+        force?: boolean;
+      }) => {
+        const g = program.opts<GlobalOpts>();
+        const run = async (io: InitIo) => {
+          const opts: InitOptions = {
+            configPath: g.config,
+            workflowPath: cmd.workflowPath,
+            cwd: process.cwd(),
+            force: cmd.force ?? false,
+            yes: cmd.yes ?? false,
+            interactive,
+            lang,
+          };
+          if (cmd.packages) opts.packages = parsePackageList(cmd.packages, lang);
+          if (cmd.target) opts.target = parseInitChoice(cmd.target, TARGETS, 'target', lang);
+          if (cmd.channel)
+            opts.channel = parseInitChoice(cmd.channel, CHANNEL_KINDS, 'channel', lang);
+          if (cmd.sources)
+            opts.sources = cmd.sources
+              .split(/[,\s]+/)
+              .filter(Boolean)
+              .map((x) => parseInitChoice(x, SOURCE_KINDS, 'source', lang));
+          return runInit(opts, io);
+        };
+        const out = (t: string) => process.stderr.write(t);
+        try {
+          const result = interactive
+            ? await withReadline((rl) =>
+                run({ ask: (q, d) => rl.question(`${q}${d ? ` [${d}]` : ''}: `), out }),
+              )
+            : await run({ ask: async () => '', out });
+          if (g.json) process.stdout.write(JSON.stringify(result) + '\n');
+          process.exit(EXIT.OK);
+        } catch (e) {
+          process.stderr.write(m.initFailed((e as Error).message) + '\n');
+          process.exit(EXIT.CONFIG);
+        }
+      },
+    );
+
+  program
+    .command('auth')
+    .argument('<provider>', m.authProvider)
+    .description(m.auth(docs.gmailOauth))
+    .option('--client-id <id>', m.authClientId)
+    .option('--client-secret <secret>', m.authClientSecret)
+    .option('--port <port>', m.authPort, (v) => Number(v))
+    .option('--no-open', m.authNoOpen)
+    .action(
+      async (
+        provider: string,
+        cmd: { clientId?: string; clientSecret?: string; port?: number; open: boolean },
+      ) => {
+        const g = program.opts<GlobalOpts>();
+        if (provider !== 'gmail') {
+          process.stderr.write(m.unknownProvider(provider) + '\n');
+          process.exit(EXIT.CONFIG);
+        }
+        const clientId = cmd.clientId ?? process.env['GMAIL_CLIENT_ID'];
+        const clientSecret = cmd.clientSecret ?? process.env['GMAIL_CLIENT_SECRET'];
+        if (!clientId || !clientSecret) {
+          process.stderr.write(m.missingOauthClient(docs.gmailOauth) + '\n');
+          process.exit(EXIT.CONFIG);
+        }
+        const err = (t: string) => process.stderr.write(t + '\n');
+        try {
+          const result = await authorizeGmail({
+            clientId,
+            clientSecret,
+            port: cmd.port ?? 0,
+            openBrowser: cmd.open,
+            onAuthUrl: (url) =>
+              err(`${cmd.open ? m.openingBrowser : m.visit}\n\n  ${url}\n\n${m.waitingRedirect}`),
+          });
+          if (g.json) {
+            process.stdout.write(JSON.stringify(result) + '\n');
+          } else {
+            err(m.authorized(result.emailAddress));
+            process.stdout.write(`GMAIL_REFRESH_TOKEN=${result.refreshToken}\n`);
+            err(m.keepSecret);
+          }
+          process.exit(EXIT.OK);
+        } catch (e) {
+          err(m.authFailed((e as Error).message));
+          process.exit(EXIT.CONFIG);
+        }
+      },
+    );
+
+  return program;
+}
+
+async function main(argv: string[]): Promise<void> {
+  const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY);
+  let lang: Lang;
+  try {
+    lang = await resolveLang({
+      argv: argv.slice(2),
+      env: process.env,
+      interactive,
+      gate: askLangInTerminal,
+    });
+  } catch (e) {
+    if (!(e instanceof LangError)) throw e;
+    process.stderr.write(`${e.message}\n`);
+    process.exit(EXIT.CONFIG);
+  }
+  await buildProgram(lang, interactive).parseAsync(argv);
+}
+
+main(process.argv).catch((e: unknown) => {
   const msg = e instanceof ConfigError ? e.message : ((e as Error).stack ?? String(e));
   process.stderr.write(msg + '\n');
   process.exit(e instanceof ConfigError ? EXIT.CONFIG : EXIT.NOTIFY_FAILED);

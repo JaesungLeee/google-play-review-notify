@@ -124,6 +124,12 @@ Schedule Trigger; state lives in `.play-review-notify/state.json` by default.
 Exit codes: `0` ok, `1` configuration or auth error, `2` a source failed (notifications still
 sent), `3` a notification failed. `--json` switches to structured output.
 
+**Language.** In a terminal the CLI first asks whether to continue in English or Korean (Enter
+picks the system locale's language). Skip the question with `--lang en|ko` or
+`PLAY_REVIEW_NOTIFY_LANG=ko`; outside a terminal, with `--json`, or with `--version` there is no
+question and the output is English. Generated files, JSON output, and core log lines stay English
+in every language.
+
 ## Configuration
 
 Secrets are never written to the file; use `${ENV_VAR}` references.
