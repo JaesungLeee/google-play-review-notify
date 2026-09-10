@@ -1,10 +1,20 @@
-# Example consumer workflow (reference only; copy into your app repository).
-# Uses the reusable workflow, which bundles schedule-friendly permissions, checkout and the Action.
-# Disabled here via a workflow_dispatch-only trigger; enable the schedule in your copy.
+# Example consumer workflow (copy into your app repository and enable the schedule).
+# In this repository it doubles as a smoke test of the published `v1` Action through the reusable
+# workflow: run it from the Actions tab. Without a config file the `packages` input builds one, no
+# source is enabled, and the run only records a baseline in the Actions cache.
 name: Play review notify (example)
 
 on:
   workflow_dispatch:
+    inputs:
+      packages:
+        description: Comma-separated package names (used because this repo has no config file)
+        type: string
+        default: com.example.app
+      dry-run:
+        description: Render without sending or saving state
+        type: boolean
+        default: true
   # schedule:
   #   - cron: '*/10 * * * *'
 
@@ -13,7 +23,8 @@ jobs:
     uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
     with:
       config-path: play-review-notify.yml
-      dry-run: true
+      packages: ${{ inputs.packages }}
+      dry-run: ${{ inputs.dry-run }}
     secrets:
       GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
       GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
