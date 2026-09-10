@@ -20,6 +20,11 @@ on:
 
 jobs:
   notify:
+    # Required: a called workflow cannot request more than the caller grants, and the default
+    # GITHUB_TOKEN permissions of a repository are usually read-only.
+    permissions:
+      contents: read
+      actions: write # state lives in the Actions cache
     uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
     with:
       config-path: play-review-notify.yml
