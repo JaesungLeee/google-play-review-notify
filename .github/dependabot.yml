@@ -33,6 +33,9 @@ updates:
       # zod 4 changes .default() and z.record() semantics; migrate deliberately, not via a bump.
       - dependency-name: 'zod'
         update-types: ['version-update:semver-major']
+      # commander 14+ requires Node.js 22.12+; the CLI supports Node.js 20 (package.json engines).
+      - dependency-name: 'commander'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /
