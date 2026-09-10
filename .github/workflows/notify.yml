@@ -2,6 +2,7 @@
 #
 #   jobs:
 #     notify:
+#       permissions: { contents: read, actions: write }   # required: callers must grant them
 #       uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
 #       with:
 #         config-path: play-review-notify.yml

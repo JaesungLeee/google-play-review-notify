@@ -75,6 +75,9 @@ Or call the reusable workflow, which bundles the permissions, checkout and the A
 ```yaml
 jobs:
   notify:
+    permissions:
+      contents: read
+      actions: write # a called workflow cannot request more than the caller grants
     uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
     with:
       config-path: play-review-notify.yml
