@@ -64,6 +64,9 @@ jobs:
 ```yaml
 jobs:
   notify:
+    permissions:
+      contents: read
+      actions: write # 호출되는 워크플로우는 호출 측이 준 권한 이상을 요구할 수 없음
     uses: JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1
     with:
       config-path: play-review-notify.yml

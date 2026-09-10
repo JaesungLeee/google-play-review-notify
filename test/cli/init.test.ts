@@ -160,9 +160,15 @@ describe('renderWorkflow', () => {
     };
     const wf = parseYaml(renderWorkflow(a, 'cfg.yml')) as {
       jobs: {
-        notify: { uses: string; with: Record<string, string>; secrets: Record<string, string> };
+        notify: {
+          uses: string;
+          permissions: Record<string, string>;
+          with: Record<string, string>;
+          secrets: Record<string, string>;
+        };
       };
     };
+    expect(wf.jobs.notify.permissions).toEqual({ contents: 'read', actions: 'write' });
     expect(wf.jobs.notify.uses).toBe(
       'JaesungLeee/google-play-review-notify/.github/workflows/notify.yml@v1',
     );
