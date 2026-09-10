@@ -21,7 +21,7 @@ updates:
         dependency-type: development
         update-types: [minor, patch]
     ignore:
-      # Keep the pinned Node.js major of the Action runtime (action.yml) in sync manually.
+      # @types/node tracks the minimum supported Node.js (engines), not the Action runtime.
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
       # vitest 5 requires Node.js 22.12+; the test suite still runs on Node.js 20 in CI.
