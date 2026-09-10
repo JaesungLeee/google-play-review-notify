@@ -57,5 +57,5 @@ outputs:
     description: '"true" when at least one REJECTED event was detected.'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/action/index.js'
