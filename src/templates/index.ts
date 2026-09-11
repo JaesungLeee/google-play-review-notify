@@ -4,37 +4,34 @@ import { renderTemplate } from '../core/template';
 import type { RenderedMessage, ReviewEvent, ReviewEventType } from '../core/types';
 
 export const EVENT_COLORS: Record<ReviewEventType, string> = {
+  PENDING_SUBMISSION: '6a737d',
   SUBMITTED: '6a737d',
   APPROVED: '28a745',
   LIVE: '28a745',
   REJECTED: 'd73a49',
   POLICY_WARNING: 'f66a0a',
-  REMOVED: '9e1c23',
-  SUSPENDED: '9e1c23',
-  UNKNOWN_NOTICE: '6a737d',
 };
 
 export const EVENT_EMOJI: Record<ReviewEventType, string> = {
+  PENDING_SUBMISSION: '📝',
   SUBMITTED: '📤',
   APPROVED: '✅',
   LIVE: '🚀',
   REJECTED: '🚫',
   POLICY_WARNING: '⚠️',
-  REMOVED: '🗑️',
-  SUSPENDED: '⛔',
-  UNKNOWN_NOTICE: 'ℹ️',
 };
 
 export const DEFAULT_TITLES: Record<ReviewEventType, string> = {
+  PENDING_SUBMISSION: '{{emoji}} Ready to send for review — {{displayName}}',
   SUBMITTED: '{{emoji}} Submitted for review — {{displayName}}',
   APPROVED: '{{emoji}} Approved — {{displayName}}',
   LIVE: '{{emoji}} Live on Google Play — {{displayName}}',
   REJECTED: '{{emoji}} Rejected — {{displayName}}',
   POLICY_WARNING: '{{emoji}} Policy warning — {{displayName}}',
-  REMOVED: '{{emoji}} Removed from Google Play — {{displayName}}',
-  SUSPENDED: '{{emoji}} Suspended — {{displayName}}',
-  UNKNOWN_NOTICE: '{{emoji}} Google Play notice — {{displayName}}',
 };
+
+/** Appended to the title of a follow-up (see `ReviewEvent.followUp`). */
+export const FOLLOW_UP_SUFFIX = ' (reason added)';
 
 export const DEFAULT_BODY =
   '{{#track}}Track: {{track}}{{/track}}{{#versionLabel}} · Version: {{versionLabel}}{{/versionLabel}}\n' +
@@ -76,7 +73,8 @@ export function renderMessage(
 ): RenderedMessage {
   const ctx = buildContext(config, event, app);
   const override = config.templates[event.type];
-  const title = renderTemplate(DEFAULT_TITLES[event.type], ctx);
+  const title =
+    renderTemplate(DEFAULT_TITLES[event.type], ctx) + (event.followUp ? FOLLOW_UP_SUFFIX : '');
   const body = renderTemplate(override ?? DEFAULT_BODY, ctx).trim();
   const fields: RenderedMessage['fields'] = [];
   if (event.packageName) fields.push({ label: 'Package', value: event.packageName });

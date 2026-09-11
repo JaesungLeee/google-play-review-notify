@@ -51,12 +51,9 @@ body:
       label: How did this tool classify it?
       options:
         [
-          UNKNOWN_NOTICE (not classified),
+          Not classified (logged as "matched no rule"),
           REJECTED,
           POLICY_WARNING,
-          REMOVED,
-          SUSPENDED,
-          APPROVED,
           Not sure,
         ]
   - type: textarea

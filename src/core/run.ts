@@ -70,28 +70,51 @@ export async function runOnce(opts: RunOptions): Promise<RunSummary> {
   }
 
   // 2. Dedupe against state, apply merges and per-event enablement.
-  const seenLogical = new Set(
-    Object.entries(state.events)
-      .map(([, r]) =>
-        r.packageName && r.versionCode ? `${r.packageName}:${r.versionCode}:${r.type}` : null,
-      )
-      .filter((k): k is string => k !== null),
-  );
+  //    Two sources may report the same fact under different ids (the API and the rejection
+  //    email); the logical key `pkg:versionCode:type` catches that across sources and for
+  //    merged types. A repeat that adds a reason the first notification lacked becomes a
+  //    follow-up; anything else is suppressed. Repeats from the same source (two emails about
+  //    one version) are delivered as before: the id is the dedupe key there.
+  const recorded = new Map<string, { id: string; record: EventRecord }>();
+  for (const [id, record] of Object.entries(state.events)) {
+    const lk = logicalKeyOf(record);
+    if (lk) recorded.set(lk, { id, record });
+  }
+  const inRun = new Map<string, ReviewEvent>();
   const fresh: ReviewEvent[] = [];
   for (const raw of collected) {
     if (state.events[raw.id]) continue;
     const event = applyMerge(config, raw);
-    if (!config.events[raw.type]?.enabled) {
+    const eventConfig = config.events[raw.type];
+    if (!eventConfig?.enabled) {
       logger.debug(`Event ${raw.id} (${raw.type}) disabled by config`);
       continue;
     }
     const lk = logicalKey(event);
-    if (lk && seenLogical.has(lk) && event.type !== raw.type) {
-      logger.debug(`Event ${raw.id} merged into already-recorded ${lk}, suppressed`);
+    const merged = event.type !== raw.type;
+    const sibling = lk ? inRun.get(lk) : undefined;
+    if (sibling && (merged || sourceOf(sibling.id) !== sourceOf(raw.id))) {
+      // Same fact twice in one run: keep one notification, with the details of both.
+      if (event.reason && !sibling.reason) sibling.reason = event.reason;
+      if (event.versionName && !sibling.versionName) sibling.versionName = event.versionName;
+      logger.debug(`Event ${raw.id} merged into ${sibling.id} (same ${lk})`);
       state.events[raw.id] = toRecord(event, now, { delivered: true, suppressed: true });
       continue;
     }
-    if (lk) seenLogical.add(lk);
+    const prior = lk ? recorded.get(lk) : undefined;
+    if (prior && (merged || sourceOf(prior.id) !== sourceOf(raw.id))) {
+      const followUp =
+        Boolean(event.reason) && !prior.record.hasReason && eventConfig.reasonFollowUp;
+      if (!followUp) {
+        logger.debug(`Event ${raw.id} repeats already-recorded ${lk}, suppressed`);
+        state.events[raw.id] = toRecord(event, now, { delivered: true, suppressed: true });
+        continue;
+      }
+      prior.record.hasReason = true;
+      logger.debug(`Event ${raw.id} adds a reason to already-recorded ${lk}, sent as follow-up`);
+      event.followUp = true;
+    }
+    if (lk) inRun.set(lk, event);
     fresh.push(event);
   }
   summary.events = fresh;
@@ -256,20 +279,24 @@ function toRecord(e: ReviewEvent, now: Date, extra: Partial<EventRecord>): Event
     ...extra,
   };
   if (e.versionCode !== undefined) rec.versionCode = e.versionCode;
+  if (e.reason) rec.hasReason = true;
   return rec;
+}
+
+function logicalKeyOf(r: EventRecord): string | null {
+  return r.packageName && r.versionCode ? `${r.packageName}:${r.versionCode}:${r.type}` : null;
+}
+
+/** Source family from the id prefix; `emit` deliberately shares the Play API's `api:` ids. */
+function sourceOf(id: string): string {
+  return id.split(':')[0] ?? '';
 }
 
 /** Reconstruct the minimum needed to re-render a message for retry. */
 function fromRecord(id: string, r: EventRecord): ReviewEvent {
   const prefix = id.split(':')[0] ?? 'manual';
   const source: ReviewEvent['source'] =
-    prefix === 'email'
-      ? 'email'
-      : prefix === 'api'
-        ? 'play-api'
-        : prefix === 'store'
-          ? 'store-listing'
-          : 'manual';
+    prefix === 'email' ? 'email' : prefix === 'api' ? 'play-api' : 'manual';
   const ev: ReviewEvent = {
     id,
     type: r.type,

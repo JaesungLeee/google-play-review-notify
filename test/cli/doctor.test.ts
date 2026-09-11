@@ -1,6 +1,6 @@
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { formatDoctorReport, runDoctor } from '../../src/cli/doctor';
 import type { GmailClient } from '../../src/sources/email/gmail';
 import type { PlayApiClient } from '../../src/sources/play-api/client';
@@ -16,16 +16,9 @@ const gmailOk: GmailClient = {
   ],
 };
 const playOk: PlayApiClient = {
-  listTracks: async () => [
-    {
-      track: 'production',
-      releases: [{ name: '1.0.0', status: 'completed', versionCodes: ['3'] }],
-    },
-    { track: 'internal', releases: [] },
-  ],
+  listReleases: async (_pkg, track) =>
+    track === 'production' ? [{ name: '1.0.0', state: 'IN_REVIEW', versionCodes: ['3'] }] : [],
 };
-const storeFetch = (status: number, body = '') =>
-  vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { status }));
 
 describe('runDoctor', () => {
   it('reports ok for a healthy configuration', async () => {
@@ -33,7 +26,6 @@ describe('runDoctor', () => {
       sources: {
         email: { enabled: true, auth: { clientId: 'a', clientSecret: 'b', refreshToken: 'c' } },
         playApi: { enabled: true, serviceAccountJson: '{}' },
-        storeListing: { enabled: true },
       },
       stateStore: {
         type: 'file',
@@ -44,7 +36,6 @@ describe('runDoctor', () => {
       await runDoctor(config, {
         gmailClient: () => gmailOk,
         playClient: () => playOk,
-        fetchImpl: storeFetch(200, '["Sep 4, 2026",[1788519013,61000000]]'),
         env: {},
       }),
     );
@@ -54,8 +45,7 @@ describe('runDoctor', () => {
     });
     expect(r['gmail.inbox']?.status).toBe('ok');
     expect(r['play-api.com.example.app']).toMatchObject({ status: 'ok' });
-    expect(r['play-api.com.example.app']?.message).toContain('production=[3]');
-    expect(r['store-listing.com.example.app']).toMatchObject({ status: 'ok' });
+    expect(r['play-api.com.example.app']?.message).toContain('production=[1.0.0:IN_REVIEW(3)]');
     expect(r['channels.slack']?.status).toBe('ok');
     expect(r['state']?.status).toBe('ok');
     expect(Object.values(r).some((x) => x.status === 'fail')).toBe(false);
@@ -77,7 +67,7 @@ describe('runDoctor', () => {
           search: async () => [],
         }),
         playClient: () => ({
-          listTracks: async () => {
+          listReleases: async () => {
             throw new Error('403: The caller does not have permission');
           },
         }),
@@ -90,11 +80,12 @@ describe('runDoctor', () => {
     expect(r['play-api.com.example.app']?.hint).toContain('Users and permissions');
   });
 
-  it('treats an unpublished listing as ok and warns about quiet inboxes and odd URLs', async () => {
+  it('warns per track that cannot be listed, and about quiet inboxes and odd URLs', async () => {
     const config = makeConfig({
+      apps: [{ packageName: 'com.example.app', tracks: ['production', 'internal'] }],
       sources: {
         email: { enabled: true, auth: { clientId: 'a', clientSecret: 'b', refreshToken: 'c' } },
-        storeListing: { enabled: true },
+        playApi: { enabled: true, serviceAccountJson: '{}' },
       },
       channels: { slack: { type: 'slack', webhookUrl: 'https://example.com/not-slack' } },
       stateStore: { type: 'github-cache' },
@@ -102,17 +93,23 @@ describe('runDoctor', () => {
     const r = byId(
       await runDoctor(config, {
         gmailClient: () => ({ ...gmailOk, search: async () => [] }),
-        fetchImpl: storeFetch(404, 'Not Found'),
+        playClient: () => ({
+          listReleases: async (_pkg, track) => {
+            if (track === 'internal') throw new Error('404: track not found');
+            return [{ name: '1.0.0', state: 'PUBLISHED', versionCodes: ['3'] }];
+          },
+        }),
         env: {},
       }),
     );
     expect(r['gmail.inbox']?.status).toBe('warn');
-    expect(r['store-listing.com.example.app']).toMatchObject({ status: 'ok' });
-    expect(r['store-listing.com.example.app']?.message).toContain('not published');
+    expect(r['play-api.com.example.app']).toMatchObject({ status: 'warn' });
+    expect(r['play-api.com.example.app']?.message).toContain('production=[1.0.0:PUBLISHED(3)]');
+    expect(r['play-api.com.example.app']?.hint).toContain('internal');
     expect(r['channels.slack']?.status).toBe('warn');
     expect(r['state']).toMatchObject({ status: 'warn' }); // github-cache outside Actions
     expect(r['config.rejections']).toBeUndefined();
-    expect(r['play-api']?.status).toBe('skip');
+    expect(r['config.releases']).toBeUndefined();
   });
 
   it('fails when no source is enabled and warns about undetectable events', async () => {
@@ -123,7 +120,7 @@ describe('runDoctor', () => {
     });
     const r = byId(await runDoctor(config, { env: {} }));
     expect(r['config.sources']?.status).toBe('fail');
-    expect(r['config.live']?.status).toBe('warn');
+    expect(r['config.releases']?.status).toBe('warn');
     expect(r['config.routing']?.status).toBe('warn');
     expect(r['config.rejections']?.status).toBe('warn');
     expect(r['gmail']?.status).toBe('skip');

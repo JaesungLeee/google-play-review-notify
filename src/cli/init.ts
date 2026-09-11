@@ -16,11 +16,11 @@ const DOCS = 'https://github.com/JaesungLeee/google-play-review-notify/blob/main
 
 export type ChannelKind = 'slack' | 'discord' | 'webhook';
 export type Target = 'github-actions' | 'cli';
-export type SourceKind = 'email' | 'play-api' | 'store-listing';
+export type SourceKind = 'email' | 'play-api';
 
 export const CHANNEL_KINDS: readonly ChannelKind[] = ['slack', 'discord', 'webhook'];
 export const TARGETS: readonly Target[] = ['github-actions', 'cli'];
-export const SOURCE_KINDS: readonly SourceKind[] = ['email', 'play-api', 'store-listing'];
+export const SOURCE_KINDS: readonly SourceKind[] = ['email', 'play-api'];
 
 export interface InitAnswers {
   apps: Array<{ packageName: string; name?: string }>;
@@ -140,9 +140,8 @@ export async function collectAnswers(opts: InitOptions, io: InitIo): Promise<Ini
   if (opts.sources) enabled = opts.sources;
   else {
     enabled = [];
+    if (yesNo(await ask(m.askPlayApi, 'y'), true, m)) enabled.push('play-api');
     if (yesNo(await ask(m.askEmail, 'y'), true, m)) enabled.push('email');
-    if (yesNo(await ask(m.askStoreListing, 'y'), true, m)) enabled.push('store-listing');
-    if (yesNo(await ask(m.askPlayApi, 'n'), false, m)) enabled.push('play-api');
   }
   if (enabled.length === 0) {
     throw new InitError(m.noSources);
@@ -157,7 +156,6 @@ export async function collectAnswers(opts: InitOptions, io: InitIo): Promise<Ini
     sources: {
       email: enabled.includes('email'),
       'play-api': enabled.includes('play-api'),
-      'store-listing': enabled.includes('store-listing'),
     },
     channel,
     target,
@@ -192,9 +190,19 @@ export function renderConfig(a: InitAnswers): string {
     if (app.name) lines.push(`    name: ${yamlString(app.name)}`);
     lines.push('    tracks: [production]');
   }
-  lines.push('', 'sources:', '  email:');
+  lines.push('', 'sources:', '  playApi:');
   lines.push(
-    `    # REJECTED and POLICY_WARNING from Play Console emails. Setup: ${DOCS}/gmail-oauth.md`,
+    '    # PENDING_SUBMISSION, SUBMITTED, APPROVED, REJECTED and LIVE from the release lifecycle',
+    `    # of each configured track. Setup: ${DOCS}/play-api-setup.md`,
+  );
+  if (a.sources['play-api']) {
+    lines.push('    enabled: true', '    serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}');
+  } else {
+    lines.push('    enabled: false', '    # serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}');
+  }
+  lines.push('  email:');
+  lines.push(
+    `    # POLICY_WARNING and the reason text of rejections from Play Console emails. Setup: ${DOCS}/gmail-oauth.md`,
   );
   if (a.sources.email) {
     lines.push(
@@ -214,31 +222,15 @@ export function renderConfig(a: InitAnswers): string {
       '    #   refreshToken: ${GMAIL_REFRESH_TOKEN}',
     );
   }
-  lines.push('  playApi:');
-  lines.push(
-    `    # SUBMITTED when a new versionCode appears on a track. Setup: ${DOCS}/play-api-setup.md`,
-  );
-  if (a.sources['play-api']) {
-    lines.push('    enabled: true', '    serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}');
-  } else {
-    lines.push('    enabled: false', '    # serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}');
-  }
-  lines.push('  storeListing:');
-  lines.push(
-    '    # LIVE (production track) when the public store page appears or its "Updated on" date changes.',
-    `    enabled: ${a.sources['store-listing']}`,
-    '    locale: en',
-    '    country: US',
-  );
 
   const mention = a.channel === 'slack' ? "'<!channel>'" : a.channel === 'discord' ? "'@here'" : '';
   lines.push(
     '',
     'events:',
     `  REJECTED: { enabled: true, mentions: [${mention}] }`,
-    '  LIVE: { enabled: true, mergeInto: APPROVED }',
-    '  # SUBMITTED: { enabled: true }        # off by default; needs the playApi source or `emit`',
-    '  # UNKNOWN_NOTICE: { enabled: true }   # turn on to see Play emails the rules could not classify',
+    '  # LIVE: { enabled: true, mergeInto: APPROVED }   # one message per release instead of approved + live',
+    '  # SUBMITTED: { enabled: true }             # off by default: submitted for review',
+    '  # PENDING_SUBMISSION: { enabled: true }    # off by default: release created but not sent for review',
   );
 
   const env = CHANNEL_ENV[a.channel];

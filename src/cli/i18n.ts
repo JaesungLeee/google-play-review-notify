@@ -198,11 +198,11 @@ const en = {
       'No package name given. Pass --packages com.example.app (comma-separated for several).',
     askDisplayName: (pkg: string) => `Display name for ${pkg} as shown in Play Console`,
     askTarget: 'Where will this run? (github-actions | cli)',
-    askEmail: 'Watch the Play Console inbox for rejections via Gmail? (y/n)',
-    askStoreListing: 'Watch the public store listing to detect releases going live? (y/n)',
+    askEmail:
+      'Watch the Play Console inbox via Gmail for policy warnings and rejection reasons? (y/n)',
     askPlayApi:
-      'Use the Play Developer API to detect new submissions? (needs a service account) (y/n)',
-    noSources: 'At least one source must be enabled (email, store-listing, play-api).',
+      'Use the Play Developer API to track releases (submitted, approved, rejected, live)? (needs a service account) (y/n)',
+    noSources: 'At least one source must be enabled (email, play-api).',
     askChannel: 'Notification channel (slack | discord | webhook)',
     stepGmail: 'Create a Gmail OAuth client and refresh token (one-time, about 10 minutes):',
     stepGmailAuthComment: 'prints GMAIL_REFRESH_TOKEN',
@@ -234,12 +234,14 @@ const en = {
     sourcesEnabled: (list: string) => `Sources enabled: ${list}`,
     noSource: 'No source is enabled',
     noSourceHint:
-      'Enable sources.email (rejections), sources.storeListing (live), or sources.playApi (submitted).',
-    emailOff: 'Email source is off, so rejections will not be detected',
-    emailOffHint: (doc: string) => `Rejections are only announced by email. See docs/${doc}.`,
-    storeOff: 'Store listing source is off, so LIVE will not be detected',
-    storeOffHint:
-      'Google sends no approval email and the Play API cannot tell; the public store page is the signal.',
+      'Enable sources.playApi (release states) and/or sources.email (policy warnings, rejection reasons).',
+    emailOff: 'Email source is off, so POLICY_WARNING and rejection reasons will not be detected',
+    emailOffHint: (doc: string) =>
+      `Policy warnings and the reason for a rejection only arrive by email. See docs/${doc}.`,
+    playOff:
+      'Play API source is off, so SUBMITTED, APPROVED, REJECTED and LIVE will not be detected',
+    playOffHint: (doc: string) =>
+      `Release states come from the Play Developer API release lifecycle. See docs/${doc}.`,
     eventsOn: (list: string) => `Events on: ${list}`,
     noChannelFor: (list: string) => `No channel for: ${list}`,
     noChannelForHint:
@@ -271,9 +273,8 @@ const en = {
     playKeyUnreadableHint:
       'serviceAccountJson must be the key JSON content or a path to the key file.',
     playTracks: (pkg: string, summary: string) => `${pkg}: ${summary}`,
-    playNoTrack: 'no configured track found',
-    playMissingTracks: (list: string) =>
-      `Track(s) not returned by the API: ${list}. Check apps[].tracks.`,
+    playTracksFailed: (list: string) =>
+      `Track(s) that could not be listed: ${list}. Check apps[].tracks and the app permissions.`,
     playHintApi: (doc: string) =>
       `Enable the Google Play Android Developer API in the Cloud project (docs/${doc}, step 1).`,
     playHintPermission:
@@ -282,18 +283,6 @@ const en = {
       'The developer account that the service account was invited to does not own this package.',
     playHintKey: 'The key JSON is corrupted or the system clock is off. Re-download the key.',
     playHintDefault: (doc: string) => `See docs/${doc}, "Troubleshooting".`,
-    storeDisabled: 'Store listing source disabled',
-    storeNoProduction:
-      'No app has the production track; the store listing source has nothing to watch',
-    storeNoProductionHint: 'Only production releases are visible on the public store page.',
-    storeListed: (pkg: string, updated: string | number) => `${pkg}: listed, updated ${updated}`,
-    storeNoDate: (pkg: string) => `${pkg}: page fetched but the "Updated on" date was not found`,
-    storeNoDateHint:
-      'Google may have changed the page format. Please open an issue with the package name.',
-    storeNotPublished: (pkg: string) =>
-      `${pkg}: not published yet (404); LIVE fires when it appears`,
-    storeFetchFailed: (pkg: string, err: string) => `${pkg}: ${err}`,
-    storeFetchFailedHint: 'Check network access to play.google.com from this machine.',
     noChannels: 'No channels configured; events will be detected but not delivered',
     noChannelsHint: 'Add channels (slack, discord, webhook) and defaultChannels.',
     slackUrlHint: 'Slack Incoming Webhook URLs start with https://hooks.slack.com/services/.',
@@ -408,10 +397,10 @@ const ko: Messages = {
       '패키지 이름이 없습니다. --packages com.example.app 형태로 넘기세요 (여러 개면 쉼표로 구분).',
     askDisplayName: (pkg) => `Play Console에 표시되는 ${pkg}의 앱 이름`,
     askTarget: '어디에서 실행하나요? (github-actions | cli)',
-    askEmail: 'Gmail로 Play Console 메일함을 감시해 거부를 감지할까요? (y/n)',
-    askStoreListing: '공개 스토어 페이지를 감시해 출시(LIVE)를 감지할까요? (y/n)',
-    askPlayApi: 'Play Developer API로 새 제출을 감지할까요? (서비스 계정 필요) (y/n)',
-    noSources: '소스를 하나 이상 활성화해야 합니다 (email, store-listing, play-api).',
+    askEmail: 'Gmail로 Play Console 메일함을 감시해 정책 경고와 거부 사유를 감지할까요? (y/n)',
+    askPlayApi:
+      'Play Developer API로 릴리스 상태(제출·승인·거부·출시)를 추적할까요? (서비스 계정 필요) (y/n)',
+    noSources: '소스를 하나 이상 활성화해야 합니다 (email, play-api).',
     askChannel: '알림 채널 (slack | discord | webhook)',
     stepGmail: 'Gmail OAuth 클라이언트와 리프레시 토큰을 만듭니다 (최초 1회, 약 10분):',
     stepGmailAuthComment: 'GMAIL_REFRESH_TOKEN을 출력',
@@ -443,12 +432,12 @@ const ko: Messages = {
     sourcesEnabled: (list) => `활성 소스: ${list}`,
     noSource: '활성화된 소스가 없습니다',
     noSourceHint:
-      'sources.email(거부), sources.storeListing(출시), sources.playApi(제출) 중 하나를 활성화하세요.',
-    emailOff: '이메일 소스가 꺼져 있어 거부를 감지하지 못합니다',
-    emailOffHint: (doc) => `거부는 이메일로만 통보됩니다. docs/${doc}를 참고하세요.`,
-    storeOff: '스토어 페이지 소스가 꺼져 있어 LIVE를 감지하지 못합니다',
-    storeOffHint:
-      'Google은 승인 메일을 보내지 않고 Play API도 알려주지 않습니다. 공개 스토어 페이지가 유일한 신호입니다.',
+      'sources.playApi(릴리스 상태) 또는 sources.email(정책 경고, 거부 사유)을 활성화하세요.',
+    emailOff: '이메일 소스가 꺼져 있어 POLICY_WARNING과 거부 사유를 감지하지 못합니다',
+    emailOffHint: (doc) =>
+      `정책 경고와 거부 사유는 이메일로만 통보됩니다. docs/${doc}를 참고하세요.`,
+    playOff: 'Play API 소스가 꺼져 있어 SUBMITTED, APPROVED, REJECTED, LIVE를 감지하지 못합니다',
+    playOffHint: (doc) => `릴리스 상태는 Play Developer API에서 옵니다. docs/${doc}를 참고하세요.`,
     eventsOn: (list) => `활성 이벤트: ${list}`,
     noChannelFor: (list) => `채널이 없는 앱: ${list}`,
     noChannelForHint:
@@ -478,8 +467,8 @@ const ko: Messages = {
     playKeyUnreadable: (err) => `서비스 계정 키를 읽을 수 없습니다: ${err}`,
     playKeyUnreadableHint: 'serviceAccountJson은 키 JSON 내용이거나 키 파일 경로여야 합니다.',
     playTracks: (pkg, summary) => `${pkg}: ${summary}`,
-    playNoTrack: '설정된 트랙을 찾지 못함',
-    playMissingTracks: (list) => `API가 돌려주지 않은 트랙: ${list}. apps[].tracks를 확인하세요.`,
+    playTracksFailed: (list) =>
+      `조회하지 못한 트랙: ${list}. apps[].tracks와 앱 권한을 확인하세요.`,
     playHintApi: (doc) =>
       `Cloud 프로젝트에서 Google Play Android Developer API를 사용 설정하세요 (docs/${doc}, 1단계).`,
     playHintPermission:
@@ -487,16 +476,6 @@ const ko: Messages = {
     playHintNotFound: '서비스 계정을 초대한 개발자 계정이 이 패키지를 소유하고 있지 않습니다.',
     playHintKey: '키 JSON이 손상되었거나 시스템 시계가 맞지 않습니다. 키를 다시 내려받으세요.',
     playHintDefault: (doc) => `docs/${doc}의 "문제 해결"을 참고하세요.`,
-    storeDisabled: '스토어 페이지 소스 비활성화됨',
-    storeNoProduction: 'production 트랙인 앱이 없어 스토어 페이지 소스가 감시할 대상이 없습니다',
-    storeNoProductionHint: '공개 스토어 페이지에는 production 출시만 보입니다.',
-    storeListed: (pkg, updated) => `${pkg}: 게시됨, 업데이트 ${updated}`,
-    storeNoDate: (pkg) => `${pkg}: 페이지는 받았지만 "업데이트 날짜"를 찾지 못했습니다`,
-    storeNoDateHint:
-      'Google이 페이지 형식을 바꿨을 수 있습니다. 패키지 이름과 함께 이슈를 남겨 주세요.',
-    storeNotPublished: (pkg) => `${pkg}: 아직 게시되지 않음 (404); 게시되면 LIVE가 발생합니다`,
-    storeFetchFailed: (pkg, err) => `${pkg}: ${err}`,
-    storeFetchFailedHint: '이 컴퓨터에서 play.google.com에 접근할 수 있는지 확인하세요.',
     noChannels: '설정된 채널이 없습니다. 이벤트는 감지되지만 전달되지 않습니다',
     noChannelsHint: 'channels(slack, discord, webhook)와 defaultChannels를 추가하세요.',
     slackUrlHint: 'Slack Incoming Webhook URL은 https://hooks.slack.com/services/로 시작합니다.',

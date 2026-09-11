@@ -11,6 +11,7 @@ apps:
 
 sources:
   email:
+    # POLICY_WARNING, and the reason text for REJECTED, from Play Console emails. See docs/gmail-oauth.md.
     enabled: true
     auth:
       clientId: ${GMAIL_CLIENT_ID}
@@ -18,19 +19,16 @@ sources:
       refreshToken: ${GMAIL_REFRESH_TOKEN}
     lookbackHours: 24
   playApi:
-    # Detects SUBMITTED when a new versionCode appears on a configured track. See docs/play-api-setup.md.
-    enabled: false
-    serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}
-  storeListing:
-    # Detects LIVE (production only) by watching the public store page's "Updated on" date.
-    # Google sends no approval email, so this is how you learn that a release actually shipped.
+    # PENDING_SUBMISSION, SUBMITTED, APPROVED, REJECTED and LIVE from the release lifecycle of
+    # each configured track. See docs/play-api-setup.md.
     enabled: true
-    locale: en
-    country: US
+    serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}
 
 events:
   REJECTED: { enabled: true, mentions: ['<!channel>'] }
-  LIVE: { enabled: true, mergeInto: APPROVED }
+  # LIVE: { enabled: true, mergeInto: APPROVED }   # one message per release instead of approved + live
+  # SUBMITTED: { enabled: true }                    # off by default
+  # PENDING_SUBMISSION: { enabled: true }           # off by default
 
 channels:
   release-slack:

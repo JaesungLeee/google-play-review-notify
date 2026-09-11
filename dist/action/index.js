@@ -109316,15 +109316,14 @@ var NEVER = INVALID;
 
 // src/core/types.ts
 var REVIEW_EVENT_TYPES = [
+  "PENDING_SUBMISSION",
   "SUBMITTED",
   "APPROVED",
   "REJECTED",
   "LIVE",
-  "POLICY_WARNING",
-  "REMOVED",
-  "SUSPENDED",
-  "UNKNOWN_NOTICE"
+  "POLICY_WARNING"
 ];
+var LEGACY_EVENT_TYPES = ["REMOVED", "SUSPENDED", "UNKNOWN_NOTICE"];
 var STATE_SCHEMA_VERSION = 1;
 
 // src/core/config.ts
@@ -109356,26 +109355,24 @@ var emailSourceSchema = external_exports.object({
     "'builtin' for the bundled English and Korean rule sets, or paths to rule JSON files."
   ),
   reasonMaxLength: external_exports.number().int().positive().default(1e3).describe("Maximum length of the extracted rejection reason.")
-}).describe("Gmail source: REJECTED and POLICY_WARNING from Play Console emails.");
+}).describe(
+  "Gmail source: POLICY_WARNING, plus the reason text for REJECTED, from Play Console emails."
+);
 var playApiSourceSchema = external_exports.object({
   enabled: external_exports.boolean().default(false),
   serviceAccountJson: external_exports.string().optional().describe(
     "Service account key: the JSON content (${PLAY_SERVICE_ACCOUNT_JSON}) or a file path."
-  ),
-  emitLiveWithoutConfirmation: external_exports.boolean().default(false).describe(
-    "Emit a low-confidence LIVE when a release is completed. Only for apps without a public listing."
   )
-}).describe("Play Developer API source: SUBMITTED when a new versionCode appears on a track.");
-var storeListingSourceSchema = external_exports.object({
-  enabled: external_exports.boolean().default(false),
-  locale: external_exports.string().default("en").describe("hl query parameter of the store page."),
-  country: external_exports.string().default("US").describe("gl query parameter of the store page."),
-  failureThreshold: external_exports.number().int().positive().default(5).describe("Consecutive fetch failures before the source reports an error.")
-}).describe("Public store listing source: LIVE for the production track.");
+}).describe(
+  "Play Developer API source: PENDING_SUBMISSION, SUBMITTED, APPROVED, REJECTED and LIVE from the release lifecycle of each configured track."
+);
 var eventConfigSchema = external_exports.object({
   enabled: external_exports.boolean().describe("Whether this event type is notified."),
   mentions: external_exports.array(external_exports.string()).default([]).describe("Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."),
-  mergeInto: eventTypeSchema.optional().describe("Report this event under another type, e.g. LIVE as APPROVED.")
+  mergeInto: eventTypeSchema.optional().describe("Report this event under another type, e.g. LIVE as APPROVED."),
+  reasonFollowUp: external_exports.boolean().default(true).describe(
+    "Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED)."
+  )
 }).describe("Per-event-type settings.");
 var channelBase = { name: external_exports.string().optional().describe("Human-readable label for logs.") };
 var channelSchema = external_exports.discriminatedUnion("type", [
@@ -109414,25 +109411,62 @@ var stateStoreSchema = external_exports.discriminatedUnion("type", [
   }).describe("Custom store loaded from a local module.")
 ]).describe("Where the event ledger and per-source cursors are kept between runs.");
 var DEFAULT_EVENTS = {
+  PENDING_SUBMISSION: { enabled: false },
   SUBMITTED: { enabled: false },
   APPROVED: { enabled: true },
   REJECTED: { enabled: true },
   LIVE: { enabled: true },
-  POLICY_WARNING: { enabled: true },
-  REMOVED: { enabled: true },
-  SUSPENDED: { enabled: true },
-  UNKNOWN_NOTICE: { enabled: false }
+  POLICY_WARNING: { enabled: true }
 };
+var LEGACY_SOURCE_KEYS = ["storeListing"];
+var LEGACY_PLAY_API_KEYS = ["emitLiveWithoutConfirmation"];
+function stripLegacy(raw, warn) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
+  const obj = { ...raw };
+  const events2 = obj["events"];
+  if (events2 && typeof events2 === "object" && !Array.isArray(events2)) {
+    const copy = { ...events2 };
+    for (const t2 of LEGACY_EVENT_TYPES) {
+      if (t2 in copy) {
+        warn(`events.${t2} is no longer supported and was ignored (removed in 0.4)`);
+        delete copy[t2];
+      }
+    }
+    obj["events"] = copy;
+  }
+  const sources = obj["sources"];
+  if (sources && typeof sources === "object" && !Array.isArray(sources)) {
+    const copy = { ...sources };
+    for (const k of LEGACY_SOURCE_KEYS) {
+      if (k in copy) {
+        warn(`sources.${k} is no longer supported and was ignored (removed in 0.4)`);
+        delete copy[k];
+      }
+    }
+    const playApi = copy["playApi"];
+    if (playApi && typeof playApi === "object" && !Array.isArray(playApi)) {
+      const p = { ...playApi };
+      for (const k of LEGACY_PLAY_API_KEYS) {
+        if (k in p) {
+          warn(`sources.playApi.${k} is no longer supported and was ignored (removed in 0.4)`);
+          delete p[k];
+        }
+      }
+      copy["playApi"] = p;
+    }
+    obj["sources"] = copy;
+  }
+  return obj;
+}
 var configSchema = external_exports.object({
   version: external_exports.literal(1).default(1).describe("Config format version."),
   apps: external_exports.array(appConfigSchema).min(1).describe("Apps to watch."),
   sources: external_exports.object({
     email: emailSourceSchema.default({}),
-    playApi: playApiSourceSchema.default({}),
-    storeListing: storeListingSourceSchema.default({})
+    playApi: playApiSourceSchema.default({})
   }).default({}).describe("Signal sources. Enable at least one."),
   events: external_exports.record(eventTypeSchema, eventConfigSchema).default({}).describe(
-    "Per-event-type overrides. Defaults: everything on except SUBMITTED and UNKNOWN_NOTICE."
+    "Per-event-type overrides. Defaults: everything on except PENDING_SUBMISSION and SUBMITTED."
   ).transform((given) => {
     const merged = {};
     for (const t2 of REVIEW_EVENT_TYPES) {
@@ -109467,8 +109501,8 @@ function interpolateEnv(value, env = process.env) {
   }
   return value;
 }
-function parseConfig(raw, env = process.env) {
-  const interpolated = interpolateEnv(raw, env);
+function parseConfig(raw, env = process.env, opts = {}) {
+  const interpolated = interpolateEnv(stripLegacy(raw, opts.onWarning ?? (() => void 0)), env);
   const result = configSchema.safeParse(interpolated);
   if (!result.success) {
     const issues = result.error.issues.map((i2) => `  - ${i2.path.join(".") || "<root>"}: ${i2.message}`).join("\n");
@@ -109579,35 +109613,30 @@ function renderTemplate(template, ctx) {
 
 // src/templates/index.ts
 var EVENT_COLORS = {
+  PENDING_SUBMISSION: "6a737d",
   SUBMITTED: "6a737d",
   APPROVED: "28a745",
   LIVE: "28a745",
   REJECTED: "d73a49",
-  POLICY_WARNING: "f66a0a",
-  REMOVED: "9e1c23",
-  SUSPENDED: "9e1c23",
-  UNKNOWN_NOTICE: "6a737d"
+  POLICY_WARNING: "f66a0a"
 };
 var EVENT_EMOJI = {
+  PENDING_SUBMISSION: "\u{1F4DD}",
   SUBMITTED: "\u{1F4E4}",
   APPROVED: "\u2705",
   LIVE: "\u{1F680}",
   REJECTED: "\u{1F6AB}",
-  POLICY_WARNING: "\u26A0\uFE0F",
-  REMOVED: "\u{1F5D1}\uFE0F",
-  SUSPENDED: "\u26D4",
-  UNKNOWN_NOTICE: "\u2139\uFE0F"
+  POLICY_WARNING: "\u26A0\uFE0F"
 };
 var DEFAULT_TITLES = {
+  PENDING_SUBMISSION: "{{emoji}} Ready to send for review \u2014 {{displayName}}",
   SUBMITTED: "{{emoji}} Submitted for review \u2014 {{displayName}}",
   APPROVED: "{{emoji}} Approved \u2014 {{displayName}}",
   LIVE: "{{emoji}} Live on Google Play \u2014 {{displayName}}",
   REJECTED: "{{emoji}} Rejected \u2014 {{displayName}}",
-  POLICY_WARNING: "{{emoji}} Policy warning \u2014 {{displayName}}",
-  REMOVED: "{{emoji}} Removed from Google Play \u2014 {{displayName}}",
-  SUSPENDED: "{{emoji}} Suspended \u2014 {{displayName}}",
-  UNKNOWN_NOTICE: "{{emoji}} Google Play notice \u2014 {{displayName}}"
+  POLICY_WARNING: "{{emoji}} Policy warning \u2014 {{displayName}}"
 };
+var FOLLOW_UP_SUFFIX = " (reason added)";
 var DEFAULT_BODY = "{{#track}}Track: {{track}}{{/track}}{{#versionLabel}} \xB7 Version: {{versionLabel}}{{/versionLabel}}\n{{#reason}}Reason: {{reason}}\n{{/reason}}{{#consoleUrl}}Open in Play Console \u2192 {{consoleUrl}}\n{{/consoleUrl}}Source: {{source}} \xB7 {{observedAt}}";
 function buildContext(config, event, app) {
   const appName = event.appName ?? app?.name;
@@ -109628,7 +109657,7 @@ function buildContext(config, event, app) {
 function renderMessage(config, event, app) {
   const ctx = buildContext(config, event, app);
   const override = config.templates[event.type];
-  const title = renderTemplate(DEFAULT_TITLES[event.type], ctx);
+  const title = renderTemplate(DEFAULT_TITLES[event.type], ctx) + (event.followUp ? FOLLOW_UP_SUFFIX : "");
   const body2 = renderTemplate(override ?? DEFAULT_BODY, ctx).trim();
   const fields = [];
   if (event.packageName) fields.push({ label: "Package", value: event.packageName });
@@ -109681,26 +109710,44 @@ async function runOnce(opts) {
       logger7.error(`Source ${source.name} failed: ${error2}`);
     }
   }
-  const seenLogical = new Set(
-    Object.entries(state3.events).map(
-      ([, r2]) => r2.packageName && r2.versionCode ? `${r2.packageName}:${r2.versionCode}:${r2.type}` : null
-    ).filter((k) => k !== null)
-  );
+  const recorded = /* @__PURE__ */ new Map();
+  for (const [id, record] of Object.entries(state3.events)) {
+    const lk = logicalKeyOf(record);
+    if (lk) recorded.set(lk, { id, record });
+  }
+  const inRun = /* @__PURE__ */ new Map();
   const fresh = [];
   for (const raw of collected) {
     if (state3.events[raw.id]) continue;
     const event = applyMerge(config, raw);
-    if (!config.events[raw.type]?.enabled) {
+    const eventConfig = config.events[raw.type];
+    if (!eventConfig?.enabled) {
       logger7.debug(`Event ${raw.id} (${raw.type}) disabled by config`);
       continue;
     }
     const lk = logicalKey(event);
-    if (lk && seenLogical.has(lk) && event.type !== raw.type) {
-      logger7.debug(`Event ${raw.id} merged into already-recorded ${lk}, suppressed`);
+    const merged = event.type !== raw.type;
+    const sibling = lk ? inRun.get(lk) : void 0;
+    if (sibling && (merged || sourceOf(sibling.id) !== sourceOf(raw.id))) {
+      if (event.reason && !sibling.reason) sibling.reason = event.reason;
+      if (event.versionName && !sibling.versionName) sibling.versionName = event.versionName;
+      logger7.debug(`Event ${raw.id} merged into ${sibling.id} (same ${lk})`);
       state3.events[raw.id] = toRecord(event, now, { delivered: true, suppressed: true });
       continue;
     }
-    if (lk) seenLogical.add(lk);
+    const prior = lk ? recorded.get(lk) : void 0;
+    if (prior && (merged || sourceOf(prior.id) !== sourceOf(raw.id))) {
+      const followUp = Boolean(event.reason) && !prior.record.hasReason && eventConfig.reasonFollowUp;
+      if (!followUp) {
+        logger7.debug(`Event ${raw.id} repeats already-recorded ${lk}, suppressed`);
+        state3.events[raw.id] = toRecord(event, now, { delivered: true, suppressed: true });
+        continue;
+      }
+      prior.record.hasReason = true;
+      logger7.debug(`Event ${raw.id} adds a reason to already-recorded ${lk}, sent as follow-up`);
+      event.followUp = true;
+    }
+    if (lk) inRun.set(lk, event);
     fresh.push(event);
   }
   summary2.events = fresh;
@@ -109828,11 +109875,18 @@ function toRecord(e2, now, extra) {
     ...extra
   };
   if (e2.versionCode !== void 0) rec.versionCode = e2.versionCode;
+  if (e2.reason) rec.hasReason = true;
   return rec;
+}
+function logicalKeyOf(r2) {
+  return r2.packageName && r2.versionCode ? `${r2.packageName}:${r2.versionCode}:${r2.type}` : null;
+}
+function sourceOf(id) {
+  return id.split(":")[0] ?? "";
 }
 function fromRecord(id, r2) {
   const prefix2 = id.split(":")[0] ?? "manual";
-  const source = prefix2 === "email" ? "email" : prefix2 === "api" ? "play-api" : prefix2 === "store" ? "store-listing" : "manual";
+  const source = prefix2 === "email" ? "email" : prefix2 === "api" ? "play-api" : "manual";
   const ev = {
     id,
     type: r2.type,
@@ -109983,9 +110037,12 @@ var webhookEventSchema = external_exports.object({
   versionName: external_exports.string().optional(),
   reason: external_exports.string().optional().describe("Rejection or warning reason, plain text, capped at reasonMaxLength."),
   consoleUrl: external_exports.string().optional().describe("Deep link into Play Console when known."),
-  source: external_exports.enum(["email", "play-api", "store-listing", "manual"]),
+  source: external_exports.enum(["email", "play-api", "manual"]),
   confidence: external_exports.enum(["high", "medium", "low"]),
-  observedAt: external_exports.string().describe("ISO 8601 time the signal was observed.")
+  observedAt: external_exports.string().describe("ISO 8601 time the signal was observed."),
+  followUp: external_exports.boolean().optional().describe(
+    "True when this repeats an already-delivered event because a later source added details (typically the rejection reason)."
+  )
 }).describe("A normalized review event.");
 var webhookPayloadSchema = external_exports.object({
   payloadVersion: external_exports.literal(WEBHOOK_PAYLOAD_VERSION).describe("Payload format version."),
@@ -110080,23 +110137,9 @@ var import_node_fs4 = require("fs");
 
 // rules/email/en.json
 var en_default2 = {
-  $comment: "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (see docs/design.md, 'Email rule sets'): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
+  $comment: "English rule set. REJECTED and POLICY_WARNING are validated against real Play Console policy emails (see docs/design.md, 'Email rule sets'): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Rejections themselves are reported by the Play API adapter; the email adds the reason text.",
   locale: "en",
   rules: [
-    {
-      type: "SUSPENDED",
-      subject: [
-        "has been suspended",
-        "account has been terminated",
-        "developer account has been suspended"
-      ],
-      body: ["App Status: Suspended"]
-    },
-    {
-      type: "REMOVED",
-      subject: ["has been removed from Google Play", "Removal of your app"],
-      body: ["App Status: Removed"]
-    },
     {
       type: "REJECTED",
       subject: ["has been rejected", "Update rejected", "wasn't published", "was not published"],
@@ -110110,17 +110153,6 @@ var en_default2 = {
         "target API level requirement"
       ],
       body: ["Status: Further action required", "Status: Additional action required"]
-    },
-    {
-      type: "APPROVED",
-      $comment: "Unverified draft: no approval email has been observed yet.",
-      subject: [
-        "has been approved",
-        "is now available on Google Play",
-        "is now live",
-        "has been published",
-        "update is live"
-      ]
     }
   ],
   extract: {
@@ -110142,19 +110174,9 @@ var en_default2 = {
 
 // rules/email/ko.json
 var ko_default = {
-  $comment: "Korean rule set, validated against real Play Console emails (see docs/design.md, 'Email rule sets'). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '\uC571 \uC0C1\uD0DC: \uAC70\uBD80\uB428'. APPROVED patterns are still unobserved.",
+  $comment: "Korean rule set, validated against real Play Console emails (see docs/design.md, 'Email rule sets'). Policy emails share one subject for rejections and warnings, so REJECTED is decided by the body line '\uC571 \uC0C1\uD0DC: \uAC70\uBD80\uB428'. Rejections themselves are reported by the Play API adapter; the email adds the reason text.",
   locale: "ko",
   rules: [
-    {
-      type: "SUSPENDED",
-      subject: ["\uACC4\uC815\uC774 \uC815\uC9C0\uB418\uC5C8\uC2B5\uB2C8\uB2E4", "\uAC1C\uBC1C\uC790 \uACC4\uC815\uC774 \uD574\uC9C0\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
-      body: ["\uC571 \uC0C1\uD0DC: \uC815\uC9C0\uB428", "\uACC4\uC815 \uC0C1\uD0DC: \uC815\uC9C0\uB428"]
-    },
-    {
-      type: "REMOVED",
-      subject: ["Google Play\uC5D0\uC11C \uC0AD\uC81C\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
-      body: ["\uC571 \uC0C1\uD0DC: \uC0AD\uC81C\uB428"]
-    },
     {
       type: "REJECTED",
       subject: ["\uC571\uC774 \uAC70\uBD80\uB418\uC5C8\uC2B5\uB2C8\uB2E4", "\uC5C5\uB370\uC774\uD2B8\uAC00 \uAC70\uBD80\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
@@ -110164,12 +110186,6 @@ var ko_default = {
       type: "POLICY_WARNING",
       subject: ["\uC815\uCC45\uC744 \uC900\uC218\uD558\uC9C0 \uC54A\uC74C", "\uB300\uC0C1 API \uC218\uC900 \uC694\uAD6C\uC0AC\uD56D", "[\uC870\uCE58 \uD544\uC694]"],
       body: ["\uC0C1\uD0DC: \uCD94\uAC00 \uC870\uCE58 \uD544\uC694"]
-    },
-    {
-      type: "APPROVED",
-      $comment: "Unverified draft: no approval email has been observed yet.",
-      subject: ["\uC571\uC774 \uC2B9\uC778\uB418\uC5C8\uC2B5\uB2C8\uB2E4", "\uC5C5\uB370\uC774\uD2B8\uAC00 \uAC8C\uC2DC\uB418\uC5C8\uC2B5\uB2C8\uB2E4"],
-      body: ["\uC571 \uC0C1\uD0DC: \uAC8C\uC2DC\uB428"]
     }
   ],
   extract: {
@@ -110232,7 +110248,7 @@ function runExtractor(pattern, text) {
   return void 0;
 }
 function classifyEmail(email, ruleSets, opts = {}) {
-  let type = "UNKNOWN_NOTICE";
+  let type;
   let matched;
   outer: for (const set of ruleSets) {
     for (const rule of set.rules) {
@@ -110243,6 +110259,7 @@ function classifyEmail(email, ruleSets, opts = {}) {
       }
     }
   }
+  if (!type) return null;
   const result = { type };
   const text = `${email.subject}
 ${email.body}`;
@@ -110364,13 +110381,17 @@ var EmailSourceAdapter = class _EmailSourceAdapter {
       processed.add(msg.id);
       if (!senderAllowed(msg.from, this.cfg.senderAllowlist)) continue;
       const c = classifyEmail(msg, this.ruleSets, { reasonMaxLength: this.cfg.reasonMaxLength });
+      if (!c) {
+        ctx.logger.debug(`Email ${msg.id} matched no rule, ignored: ${msg.subject}`);
+        continue;
+      }
       const packageName = c.packageName ?? this.matchByAppName(ctx, c.appName) ?? null;
       const ev = {
         id: `email:${msg.id}`,
         type: c.type,
         packageName,
         source: "email",
-        confidence: c.type === "UNKNOWN_NOTICE" ? "low" : "high",
+        confidence: "high",
         observedAt: msg.receivedAt
       };
       if (c.appName) ev.appName = c.appName;
@@ -110415,42 +110436,60 @@ function manualEventId(e2) {
 var import_androidpublisher = __toESM(require_build2());
 var import_node_fs5 = require("fs");
 var SCOPE = "https://www.googleapis.com/auth/androidpublisher";
+var STATE_PREFIX = "RELEASE_LIFECYCLE_STATE_";
+function normalizeReleaseState(raw) {
+  const v = raw ?? "UNSPECIFIED";
+  return v.startsWith(STATE_PREFIX) ? v.slice(STATE_PREFIX.length) : v;
+}
 function createPlayApiClient(serviceAccount) {
   const raw = serviceAccount.trim().startsWith("{") ? serviceAccount : (0, import_node_fs5.readFileSync)(serviceAccount, "utf8");
   const credentials = JSON.parse(raw);
   const auth = new import_androidpublisher.auth.GoogleAuth({ credentials, scopes: [SCOPE] });
   const api = (0, import_androidpublisher.androidpublisher)({ version: "v3", auth });
   return {
-    async listTracks(packageName) {
-      const edit = await api.edits.insert({ packageName });
-      const editId = edit.data.id;
-      if (!editId) throw new Error(`edits.insert returned no edit id for ${packageName}`);
-      try {
-        const res = await api.edits.tracks.list({ packageName, editId });
-        return (res.data.tracks ?? []).filter((t2) => !!t2.track).map((t2) => ({
-          track: t2.track,
-          releases: (t2.releases ?? []).map((r2) => {
-            const rel = { versionCodes: [...r2.versionCodes ?? []] };
-            if (r2.name) rel.name = r2.name;
-            if (r2.status) rel.status = r2.status;
-            if (typeof r2.userFraction === "number") rel.userFraction = r2.userFraction;
-            return rel;
-          })
-        }));
-      } finally {
-        await api.edits.delete({ packageName, editId }).catch(() => void 0);
-      }
+    async listReleases(packageName, track) {
+      const res = await api.applications.tracks.releases.list({
+        parent: `applications/${packageName}/tracks/${track}`
+      });
+      return (res.data.releases ?? []).map((r2) => {
+        const rel = {
+          state: normalizeReleaseState(r2.releaseLifecycleState),
+          versionCodes: (r2.activeArtifacts ?? []).map((a) => a.versionCode).filter((v) => typeof v === "number").map(String)
+        };
+        if (r2.releaseName) rel.name = r2.releaseName;
+        return rel;
+      });
     }
   };
 }
 
 // src/sources/play-api/index.ts
+function releaseKey(r2) {
+  const codes = [...r2.versionCodes].sort((a, b) => Number(a) - Number(b));
+  return codes.length ? codes.join("+") : `name:${r2.name ?? ""}`;
+}
+function transitionEvents(prev, next) {
+  if (prev === next) return [];
+  switch (next) {
+    case "NOT_SENT_FOR_REVIEW":
+      return ["PENDING_SUBMISSION"];
+    case "IN_REVIEW":
+      return ["SUBMITTED"];
+    case "APPROVED_NOT_PUBLISHED":
+      return ["APPROVED"];
+    case "NOT_APPROVED":
+      return ["REJECTED"];
+    case "PUBLISHED":
+      if (prev === void 0 || prev === "APPROVED_NOT_PUBLISHED") return ["LIVE"];
+      return ["APPROVED", "LIVE"];
+    default:
+      return [];
+  }
+}
 var PlayApiSourceAdapter = class _PlayApiSourceAdapter {
-  constructor(cfg, client) {
-    this.cfg = cfg;
+  constructor(_cfg, client) {
     this.client = client;
   }
-  cfg;
   client;
   name = "play-api";
   static fromConfig(config) {
@@ -110466,199 +110505,92 @@ var PlayApiSourceAdapter = class _PlayApiSourceAdapter {
     const previous = prev?.packages ?? {};
     const packages = { ...previous };
     const events2 = [];
+    let failedApps = 0;
     const errors = [];
     for (const app of ctx.apps) {
       const pkg = app.packageName;
       const before = previous[pkg];
-      let tracks;
-      try {
-        tracks = await this.client.listTracks(pkg);
-      } catch (e2) {
-        const msg = e2 instanceof Error ? e2.message : String(e2);
-        errors.push(`${pkg}: ${msg}`);
-        ctx.logger.warn(`Play API ${pkg}: tracks.list failed: ${msg}`);
-        packages[pkg] = { tracks: before?.tracks ?? {}, failures: (before?.failures ?? 0) + 1 };
-        continue;
-      }
       const now = { tracks: {}, failures: 0 };
-      for (const t2 of tracks.filter((t3) => app.tracks.includes(t3.track))) {
-        now.tracks[t2.track] = snapshotTrack(t2);
-      }
-      packages[pkg] = now;
-      if (!before || ctx.baseline) continue;
+      let failedTracks = 0;
       for (const track of app.tracks) {
-        const seen = before.tracks[track]?.versions;
-        const current = now.tracks[track]?.versions ?? {};
-        if (!seen) continue;
-        const added = Object.keys(current).filter((v) => !(v in seen));
-        const removed = Object.keys(seen).filter((v) => !(v in current));
-        const highestNow = Math.max(0, ...Object.keys(current).map(Number));
-        for (const versionCode of added) {
-          const release = tracks.find((t2) => t2.track === track)?.releases.find((r2) => r2.versionCodes.includes(versionCode));
-          events2.push(
-            this.event(ctx, app, track, versionCode, "SUBMITTED", "medium", release?.name)
-          );
-          if (this.cfg.emitLiveWithoutConfirmation && (release?.status === "completed" || release?.status === "inProgress")) {
-            events2.push(this.event(ctx, app, track, versionCode, "LIVE", "low", release?.name));
-          }
+        const seen = before?.tracks[track]?.releases;
+        let releases;
+        try {
+          releases = await this.client.listReleases(pkg, track);
+        } catch (e2) {
+          const msg = e2 instanceof Error ? e2.message : String(e2);
+          failedTracks += 1;
+          errors.push(`${pkg}/${track}: ${msg}`);
+          ctx.logger.warn(`Play API ${pkg}/${track}: releases.list failed: ${msg}`);
+          if (seen) now.tracks[track] = { releases: seen };
+          continue;
         }
-        for (const versionCode of removed) {
-          if (Number(versionCode) >= highestNow) {
-            ctx.logger.info(
-              `Play API ${pkg}/${track}: versionCode ${versionCode} disappeared without a higher replacement (rejection candidate; waiting for the email to confirm)`
+        const current = { releases: {} };
+        for (const r2 of releases) {
+          const key = releaseKey(r2);
+          const rs = { state: r2.state, versionCodes: r2.versionCodes };
+          if (r2.name) rs.name = r2.name;
+          current.releases[key] = rs;
+        }
+        now.tracks[track] = current;
+        if (!before || !seen || ctx.baseline) continue;
+        for (const [key, rel] of Object.entries(current.releases)) {
+          const was = seen[key]?.state;
+          for (const type of transitionEvents(was, rel.state)) {
+            events2.push(this.event(ctx, app, track, rel, type));
+          }
+          if (was !== rel.state) {
+            ctx.logger.debug(
+              `Play API ${pkg}/${track}: release ${rel.name ?? key} ${was ?? "(new)"} \u2192 ${rel.state}`
             );
           }
         }
+        for (const key of Object.keys(seen)) {
+          if (!(key in current.releases)) {
+            ctx.logger.debug(`Play API ${pkg}/${track}: release ${key} no longer listed`);
+          }
+        }
       }
+      if (app.tracks.length && failedTracks === app.tracks.length) {
+        failedApps += 1;
+        now.failures = (before?.failures ?? 0) + 1;
+      }
+      packages[pkg] = now;
     }
-    if (errors.length && errors.length === ctx.apps.length) {
+    if (ctx.apps.length && failedApps === ctx.apps.length) {
       throw new Error(`Play API failed for every app: ${errors.join("; ")}`);
     }
     return { events: events2, nextState: { packages } };
   }
-  event(ctx, app, track, versionCode, type, confidence, versionName) {
+  event(ctx, app, track, rel, type) {
+    const versionCode = rel.versionCodes.length ? String(Math.max(...rel.versionCodes.map(Number))) : void 0;
     const ev = {
-      id: manualEventId({ type, packageName: app.packageName, track, versionCode }),
+      id: manualEventId({
+        type,
+        packageName: app.packageName,
+        track,
+        ...versionCode !== void 0 ? { versionCode } : {}
+      }),
       type,
       packageName: app.packageName,
       track,
-      versionCode,
       source: "play-api",
-      confidence,
+      confidence: "high",
       observedAt: ctx.now.toISOString(),
       consoleUrl: consoleUrlFor(app.packageName)
     };
+    if (versionCode !== void 0) ev.versionCode = versionCode;
     if (app.name) ev.appName = app.name;
-    if (versionName) ev.versionName = versionName;
-    return ev;
-  }
-};
-function snapshotTrack(t2) {
-  const versions = {};
-  for (const r2 of t2.releases) {
-    for (const v of r2.versionCodes) versions[v] = r2.name ?? null;
-  }
-  return { versions };
-}
-
-// src/sources/store-listing/index.ts
-function storeListingUrl(packageName, locale, country) {
-  const q = new URLSearchParams({ id: packageName, hl: locale, gl: country });
-  return `https://play.google.com/store/apps/details?${q.toString()}`;
-}
-function parseStoreListing(html) {
-  const label = /class="lXlx5">[^<]*<\/div><div class="xg1aie">([^<]+)<\/div>/.exec(html)?.[1];
-  const entry = (text2) => {
-    const pattern = text2 ? `"(${text2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})",\\[(\\d{9,10}),\\d+\\]` : `"([^"]{6,30})",\\[(\\d{9,10}),\\d+\\]`;
-    return new RegExp(pattern).exec(html);
-  };
-  const m2 = label && entry(label) || entry(void 0);
-  const text = m2?.[1];
-  const epoch = m2?.[2];
-  const info2 = {};
-  if (text !== void 0 && epoch !== void 0) {
-    info2.updatedText = text;
-    info2.updatedAt = Number(epoch);
-  } else if (label) {
-    info2.updatedText = label;
-  }
-  return info2;
-}
-var StoreListingSourceAdapter = class _StoreListingSourceAdapter {
-  constructor(cfg, opts = {}) {
-    this.cfg = cfg;
-    this.opts = opts;
-  }
-  cfg;
-  opts;
-  name = "store-listing";
-  static fromConfig(config, opts = {}) {
-    return new _StoreListingSourceAdapter(config.sources.storeListing, opts);
-  }
-  async poll(ctx, prev) {
-    const previous = prev?.packages ?? {};
-    const packages = { ...previous };
-    const events2 = [];
-    for (const app of ctx.apps.filter((a) => a.tracks.includes("production"))) {
-      const pkg = app.packageName;
-      const before = previous[pkg];
-      const result = await this.observe(ctx, pkg, before);
-      packages[pkg] = result.state;
-      if (!result.ok || !before || ctx.baseline) continue;
-      const now = result.state;
-      const wentLive = !before.published && now.published;
-      const updated = before.published && now.published && now.updatedAt !== void 0 && before.updatedAt !== void 0 && now.updatedAt !== before.updatedAt;
-      if (wentLive || updated) {
-        events2.push(this.liveEvent(ctx, app, now));
-      } else if (before.published && !now.published) {
-        ctx.logger.warn(`Store listing for ${pkg} disappeared (404); not emitting an event`);
-      }
-    }
-    return { events: events2, nextState: { packages } };
-  }
-  async observe(ctx, pkg, before) {
-    const url2 = storeListingUrl(pkg, this.cfg.locale, this.cfg.country);
-    try {
-      const res = await fetchWithRetry(
-        url2,
-        {
-          method: "GET",
-          headers: {
-            "user-agent": `google-play-review-notify/${this.opts.version ?? "0.0.0"}`,
-            "accept-language": this.cfg.locale
-          },
-          signal: AbortSignal.timeout(this.opts.timeoutMs ?? 15e3)
-        },
-        { retries: 1, fetchImpl: this.opts.fetchImpl ?? fetch }
-      );
-      const info2 = parseStoreListing(await res.text());
-      if (info2.updatedAt === void 0) {
-        throw new Error('could not find the "Updated on" date in the listing HTML');
-      }
-      ctx.logger.debug(`Store listing ${pkg}: updated ${info2.updatedText} (${info2.updatedAt})`);
-      const state3 = { published: true, updatedAt: info2.updatedAt, failures: 0 };
-      if (info2.updatedText) state3.updatedText = info2.updatedText;
-      return { ok: true, state: state3 };
-    } catch (e2) {
-      if (e2 instanceof HttpError && e2.status === 404) {
-        ctx.logger.debug(`Store listing ${pkg}: not published (404)`);
-        return { ok: true, state: { published: false, failures: 0 } };
-      }
-      const failures = (before?.failures ?? 0) + 1;
-      const msg = e2 instanceof Error ? e2.message : String(e2);
-      if (failures === this.cfg.failureThreshold) {
-        ctx.logger.error(
-          `Store listing ${pkg} failed ${failures} times in a row; the page format may have changed (${msg})`
-        );
-      } else {
-        ctx.logger.warn(`Store listing ${pkg} fetch/parse failed (${failures}): ${msg}`);
-      }
-      return { ok: false, state: { ...before ?? { published: false }, failures } };
-    }
-  }
-  liveEvent(ctx, app, observed) {
-    const ev = {
-      id: `store:${app.packageName}:${observed.updatedAt}:LIVE`,
-      type: "LIVE",
-      packageName: app.packageName,
-      track: "production",
-      source: "store-listing",
-      confidence: "medium",
-      observedAt: ctx.now.toISOString(),
-      consoleUrl: consoleUrlFor(app.packageName)
-    };
-    if (app.name) ev.appName = app.name;
+    if (rel.name) ev.versionName = rel.name;
     return ev;
   }
 };
 
 // src/sources/index.ts
-function createSources(config, logger7, opts = {}) {
+function createSources(config, logger7) {
   const out = [];
   if (config.sources.email.enabled) out.push(EmailSourceAdapter.fromConfig(config));
   if (config.sources.playApi.enabled) out.push(PlayApiSourceAdapter.fromConfig(config));
-  if (config.sources.storeListing.enabled)
-    out.push(StoreListingSourceAdapter.fromConfig(config, opts));
   if (out.length === 0) logger7.warn("No sources enabled; nothing will be detected");
   return out;
 }
@@ -110851,10 +110783,12 @@ function buildConfigInput() {
   return cfg;
 }
 async function main() {
-  const config = parseConfig(buildConfigInput());
+  const config = parseConfig(buildConfigInput(), process.env, {
+    onWarning: (w) => warning(w)
+  });
   const log2 = actionLogger(collectSecrets(config));
   const dryRun = getBooleanInput("dry-run");
-  const sources = createSources(config, log2, { version: VERSION });
+  const sources = createSources(config, log2);
   const emit = input("emit-event");
   if (emit) {
     const parsed = JSON.parse(emit);

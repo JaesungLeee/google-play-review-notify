@@ -1,21 +1,7 @@
 {
-  "$comment": "English rule set. REJECTED and POLICY_WARNING are validated against a real Play Console policy email (see docs/design.md, 'Email rule sets'): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Other rules remain drafts until matching emails are observed.",
+  "$comment": "English rule set. REJECTED and POLICY_WARNING are validated against real Play Console policy emails (see docs/design.md, 'Email rule sets'): both share the subject 'Action Required: Your app is not compliant with Google Play Policies', so rejections are decided by the body line 'App Status: Rejected'. Rejections themselves are reported by the Play API adapter; the email adds the reason text.",
   "locale": "en",
   "rules": [
-    {
-      "type": "SUSPENDED",
-      "subject": [
-        "has been suspended",
-        "account has been terminated",
-        "developer account has been suspended"
-      ],
-      "body": ["App Status: Suspended"]
-    },
-    {
-      "type": "REMOVED",
-      "subject": ["has been removed from Google Play", "Removal of your app"],
-      "body": ["App Status: Removed"]
-    },
     {
       "type": "REJECTED",
       "subject": ["has been rejected", "Update rejected", "wasn't published", "was not published"],
@@ -29,17 +15,6 @@
         "target API level requirement"
       ],
       "body": ["Status: Further action required", "Status: Additional action required"]
-    },
-    {
-      "type": "APPROVED",
-      "$comment": "Unverified draft: no approval email has been observed yet.",
-      "subject": [
-        "has been approved",
-        "is now available on Google Play",
-        "is now live",
-        "has been published",
-        "update is live"
-      ]
     }
   ],
   "extract": {

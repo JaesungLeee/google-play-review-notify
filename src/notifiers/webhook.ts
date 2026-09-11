@@ -36,9 +36,15 @@ export const webhookEventSchema = z
       .optional()
       .describe('Rejection or warning reason, plain text, capped at reasonMaxLength.'),
     consoleUrl: z.string().optional().describe('Deep link into Play Console when known.'),
-    source: z.enum(['email', 'play-api', 'store-listing', 'manual']),
+    source: z.enum(['email', 'play-api', 'manual']),
     confidence: z.enum(['high', 'medium', 'low']),
     observedAt: z.string().describe('ISO 8601 time the signal was observed.'),
+    followUp: z
+      .boolean()
+      .optional()
+      .describe(
+        'True when this repeats an already-delivered event because a later source added details (typically the rejection reason).',
+      ),
   })
   .describe('A normalized review event.');
 

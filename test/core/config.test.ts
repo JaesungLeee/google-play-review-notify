@@ -5,12 +5,37 @@ describe('config', () => {
   it('applies defaults for events, sources and state store', () => {
     const c = parseConfig({ apps: [{ packageName: 'a.b.c' }] });
     expect(c.events.APPROVED.enabled).toBe(true);
+    expect(c.events.REJECTED.reasonFollowUp).toBe(true);
     expect(c.events.SUBMITTED.enabled).toBe(false);
-    expect(c.events.UNKNOWN_NOTICE.enabled).toBe(false);
+    expect(c.events.PENDING_SUBMISSION.enabled).toBe(false);
     expect(c.sources.email.enabled).toBe(false);
     expect(c.sources.email.lookbackHours).toBe(24);
     expect(c.stateStore).toEqual({ type: 'file', path: '.play-review-notify/state.json' });
     expect(c.apps[0]?.tracks).toEqual(['production']);
+  });
+
+  it('ignores keys from 0.3 configs with a warning instead of failing', () => {
+    const warnings: string[] = [];
+    const c = parseConfig(
+      {
+        apps: [{ packageName: 'a.b.c' }],
+        sources: {
+          playApi: { enabled: false, emitLiveWithoutConfirmation: true },
+          storeListing: { enabled: true, locale: 'ko' },
+        },
+        events: { UNKNOWN_NOTICE: { enabled: true }, REMOVED: { enabled: false } },
+      },
+      {},
+      { onWarning: (w) => warnings.push(w) },
+    );
+    expect(Object.keys(c.events)).not.toContain('UNKNOWN_NOTICE');
+    expect(Object.keys(c.sources)).toEqual(['email', 'playApi']);
+    expect(warnings).toEqual([
+      'events.REMOVED is no longer supported and was ignored (removed in 0.4)',
+      'events.UNKNOWN_NOTICE is no longer supported and was ignored (removed in 0.4)',
+      'sources.storeListing is no longer supported and was ignored (removed in 0.4)',
+      'sources.playApi.emitLiveWithoutConfirmation is no longer supported and was ignored (removed in 0.4)',
+    ]);
   });
 
   it('interpolates ${ENV} references and fails on missing ones', () => {

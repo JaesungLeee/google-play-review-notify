@@ -22,14 +22,12 @@
             "type": {
               "type": "string",
               "enum": [
+                "PENDING_SUBMISSION",
                 "SUBMITTED",
                 "APPROVED",
                 "REJECTED",
                 "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
+                "POLICY_WARNING"
               ],
               "description": "Event type after mergeInto is applied."
             },
@@ -52,14 +50,15 @@
               "type": "string",
               "description": "Deep link into Play Console when known."
             },
-            "source": {
-              "type": "string",
-              "enum": ["email", "play-api", "store-listing", "manual"]
-            },
+            "source": { "type": "string", "enum": ["email", "play-api", "manual"] },
             "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
             "observedAt": {
               "type": "string",
               "description": "ISO 8601 time the signal was observed."
+            },
+            "followUp": {
+              "type": "boolean",
+              "description": "True when this repeats an already-delivered event because a later source added details (typically the rejection reason)."
             }
           },
           "required": ["id", "type", "packageName", "source", "confidence", "observedAt"],
@@ -122,14 +121,12 @@
               "type": {
                 "type": "string",
                 "enum": [
+                  "PENDING_SUBMISSION",
                   "SUBMITTED",
                   "APPROVED",
                   "REJECTED",
                   "LIVE",
-                  "POLICY_WARNING",
-                  "REMOVED",
-                  "SUSPENDED",
-                  "UNKNOWN_NOTICE"
+                  "POLICY_WARNING"
                 ],
                 "description": "Event type after mergeInto is applied."
               },
@@ -155,14 +152,15 @@
                 "type": "string",
                 "description": "Deep link into Play Console when known."
               },
-              "source": {
-                "type": "string",
-                "enum": ["email", "play-api", "store-listing", "manual"]
-              },
+              "source": { "type": "string", "enum": ["email", "play-api", "manual"] },
               "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
               "observedAt": {
                 "type": "string",
                 "description": "ISO 8601 time the signal was observed."
+              },
+              "followUp": {
+                "type": "boolean",
+                "description": "True when this repeats an already-delivered event because a later source added details (typically the rejection reason)."
               }
             },
             "required": ["id", "type", "packageName", "source", "confidence", "observedAt"],

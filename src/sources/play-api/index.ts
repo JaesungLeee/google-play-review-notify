@@ -1,16 +1,19 @@
 /**
- * Play Developer API adapter: SUBMITTED detection. See docs/design.md, "Play API decision table".
+ * Play Developer API adapter: release lifecycle transitions. See docs/design.md, "Play API
+ * transition table".
  *
- * Validation against a real account established what the API can and cannot tell us:
- *   - a release appears in `tracks.list` as soon as it is submitted, already with
- *     `status: completed`, even while it is still under review → a new versionCode in a
- *     configured track means SUBMITTED (confidence medium);
- *   - the same field never changes on approval, so the API alone cannot report LIVE. LIVE comes
- *     from the store listing adapter; `emitLiveWithoutConfirmation` opts into a low-confidence
- *     LIVE for users without a public listing;
- *   - a versionCode that disappears without a higher replacement is only a rejection candidate
- *     and is logged, never notified (the rejection email carries the real signal).
+ * `applications.tracks.releases.list` reports each release's `releaseLifecycleState`
+ * (DRAFT → NOT_SENT_FOR_REVIEW → IN_REVIEW → APPROVED_NOT_PUBLISHED | NOT_APPROVED → PUBLISHED).
+ * The adapter remembers the last state per release and emits one event per state entered:
  *
+ *   NOT_SENT_FOR_REVIEW     → PENDING_SUBMISSION
+ *   IN_REVIEW               → SUBMITTED
+ *   APPROVED_NOT_PUBLISHED  → APPROVED   (managed publishing: approved, waiting for Publish)
+ *   NOT_APPROVED            → REJECTED   (the rejection email later adds the reason)
+ *   PUBLISHED               → LIVE, preceded by APPROVED when the approval itself was not
+ *                             observed (managed publishing off: approval publishes at once)
+ *
+ * A release that disappears (superseded, obsolete) is dropped from state without an event.
  * Event ids use the same shape as `emit` (`api:<pkg>:<track>:<versionCode>:<TYPE>`) so a
  * pipeline that emits SUBMITTED right after upload never duplicates this adapter.
  */
@@ -20,20 +23,28 @@ import type {
   PollContext,
   PollResult,
   ReviewEvent,
+  ReviewEventType,
   SourceAdapter,
   SourceState,
 } from '../../core/types';
 import { consoleUrlFor } from '../email';
 import { manualEventId } from '../manual';
-import { createPlayApiClient, type PlayApiClient, type TrackSnapshot } from './client';
+import { createPlayApiClient, type PlayApiClient, type ReleaseSummary } from './client';
+
+export interface ReleaseState {
+  state: string;
+  versionCodes: string[];
+  name?: string;
+}
 
 interface TrackState {
-  /** versionCode → release name, for every release currently on the track. */
-  versions: Record<string, string | null>;
+  /** Release key (see `releaseKey`) → last observed release. */
+  releases: Record<string, ReleaseState>;
 }
 
 interface PackageState {
   tracks: Record<string, TrackState>;
+  /** Consecutive polls in which every configured track failed. */
   failures: number;
 }
 
@@ -41,11 +52,38 @@ interface PlayApiState extends SourceState {
   packages: Record<string, PackageState>;
 }
 
+/** Releases are identified by their artifacts; a release with none falls back to its name. */
+export function releaseKey(r: Pick<ReleaseSummary, 'name' | 'versionCodes'>): string {
+  const codes = [...r.versionCodes].sort((a, b) => Number(a) - Number(b));
+  return codes.length ? codes.join('+') : `name:${r.name ?? ''}`;
+}
+
+/** Events to emit when a release moves from `prev` (undefined: first sight) to `next`. */
+export function transitionEvents(prev: string | undefined, next: string): ReviewEventType[] {
+  if (prev === next) return [];
+  switch (next) {
+    case 'NOT_SENT_FOR_REVIEW':
+      return ['PENDING_SUBMISSION'];
+    case 'IN_REVIEW':
+      return ['SUBMITTED'];
+    case 'APPROVED_NOT_PUBLISHED':
+      return ['APPROVED'];
+    case 'NOT_APPROVED':
+      return ['REJECTED'];
+    case 'PUBLISHED':
+      // First sight of an already published release says nothing about its review.
+      if (prev === undefined || prev === 'APPROVED_NOT_PUBLISHED') return ['LIVE'];
+      return ['APPROVED', 'LIVE'];
+    default:
+      return [];
+  }
+}
+
 export class PlayApiSourceAdapter implements SourceAdapter {
   readonly name = 'play-api' as const;
 
   constructor(
-    private readonly cfg: Config['sources']['playApi'],
+    _cfg: Config['sources']['playApi'],
     private readonly client: PlayApiClient,
   ) {}
 
@@ -63,66 +101,68 @@ export class PlayApiSourceAdapter implements SourceAdapter {
     const previous = (prev as PlayApiState | undefined)?.packages ?? {};
     const packages: Record<string, PackageState> = { ...previous };
     const events: ReviewEvent[] = [];
+    let failedApps = 0;
     const errors: string[] = [];
 
     for (const app of ctx.apps) {
       const pkg = app.packageName;
       const before = previous[pkg];
-      let tracks: TrackSnapshot[];
-      try {
-        tracks = await this.client.listTracks(pkg);
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        errors.push(`${pkg}: ${msg}`);
-        ctx.logger.warn(`Play API ${pkg}: tracks.list failed: ${msg}`);
-        packages[pkg] = { tracks: before?.tracks ?? {}, failures: (before?.failures ?? 0) + 1 };
-        continue;
-      }
-
       const now: PackageState = { tracks: {}, failures: 0 };
-      for (const t of tracks.filter((t) => app.tracks.includes(t.track))) {
-        now.tracks[t.track] = snapshotTrack(t);
-      }
-      packages[pkg] = now;
-      // First sight of this package or a global baseline run: record only.
-      if (!before || ctx.baseline) continue;
+      let failedTracks = 0;
 
       for (const track of app.tracks) {
-        const seen = before.tracks[track]?.versions;
-        const current = now.tracks[track]?.versions ?? {};
-        // Track not observed before (added to config later): baseline it silently.
-        if (!seen) continue;
-
-        const added = Object.keys(current).filter((v) => !(v in seen));
-        const removed = Object.keys(seen).filter((v) => !(v in current));
-        const highestNow = Math.max(0, ...Object.keys(current).map(Number));
-
-        for (const versionCode of added) {
-          const release = tracks
-            .find((t) => t.track === track)
-            ?.releases.find((r) => r.versionCodes.includes(versionCode));
-          events.push(
-            this.event(ctx, app, track, versionCode, 'SUBMITTED', 'medium', release?.name),
-          );
-          if (
-            this.cfg.emitLiveWithoutConfirmation &&
-            (release?.status === 'completed' || release?.status === 'inProgress')
-          ) {
-            events.push(this.event(ctx, app, track, versionCode, 'LIVE', 'low', release?.name));
-          }
+        // A track state written by 0.3 has `versions` instead of `releases`: treat as unseen.
+        const seen = before?.tracks[track]?.releases;
+        let releases: ReleaseSummary[];
+        try {
+          releases = await this.client.listReleases(pkg, track);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          failedTracks += 1;
+          errors.push(`${pkg}/${track}: ${msg}`);
+          ctx.logger.warn(`Play API ${pkg}/${track}: releases.list failed: ${msg}`);
+          if (seen) now.tracks[track] = { releases: seen };
+          continue;
         }
-        for (const versionCode of removed) {
-          if (Number(versionCode) >= highestNow) {
-            ctx.logger.info(
-              `Play API ${pkg}/${track}: versionCode ${versionCode} disappeared without a higher ` +
-                'replacement (rejection candidate; waiting for the email to confirm)',
+
+        const current: TrackState = { releases: {} };
+        for (const r of releases) {
+          const key = releaseKey(r);
+          const rs: ReleaseState = { state: r.state, versionCodes: r.versionCodes };
+          if (r.name) rs.name = r.name;
+          current.releases[key] = rs;
+        }
+        now.tracks[track] = current;
+
+        // First sight of this package/track or a global baseline run: record only.
+        if (!before || !seen || ctx.baseline) continue;
+
+        for (const [key, rel] of Object.entries(current.releases)) {
+          const was = seen[key]?.state;
+          for (const type of transitionEvents(was, rel.state)) {
+            events.push(this.event(ctx, app, track, rel, type));
+          }
+          if (was !== rel.state) {
+            ctx.logger.debug(
+              `Play API ${pkg}/${track}: release ${rel.name ?? key} ${was ?? '(new)'} → ${rel.state}`,
             );
           }
         }
+        for (const key of Object.keys(seen)) {
+          if (!(key in current.releases)) {
+            ctx.logger.debug(`Play API ${pkg}/${track}: release ${key} no longer listed`);
+          }
+        }
       }
+
+      if (app.tracks.length && failedTracks === app.tracks.length) {
+        failedApps += 1;
+        now.failures = (before?.failures ?? 0) + 1;
+      }
+      packages[pkg] = now;
     }
 
-    if (errors.length && errors.length === ctx.apps.length) {
+    if (ctx.apps.length && failedApps === ctx.apps.length) {
       throw new Error(`Play API failed for every app: ${errors.join('; ')}`);
     }
     return { events, nextState: { packages } satisfies PlayApiState };
@@ -132,32 +172,30 @@ export class PlayApiSourceAdapter implements SourceAdapter {
     ctx: PollContext,
     app: AppRef,
     track: string,
-    versionCode: string,
-    type: 'SUBMITTED' | 'LIVE',
-    confidence: ReviewEvent['confidence'],
-    versionName: string | undefined,
+    rel: ReleaseState,
+    type: ReviewEventType,
   ): ReviewEvent {
+    const versionCode = rel.versionCodes.length
+      ? String(Math.max(...rel.versionCodes.map(Number)))
+      : undefined;
     const ev: ReviewEvent = {
-      id: manualEventId({ type, packageName: app.packageName, track, versionCode }),
+      id: manualEventId({
+        type,
+        packageName: app.packageName,
+        track,
+        ...(versionCode !== undefined ? { versionCode } : {}),
+      }),
       type,
       packageName: app.packageName,
       track,
-      versionCode,
       source: 'play-api',
-      confidence,
+      confidence: 'high',
       observedAt: ctx.now.toISOString(),
       consoleUrl: consoleUrlFor(app.packageName),
     };
+    if (versionCode !== undefined) ev.versionCode = versionCode;
     if (app.name) ev.appName = app.name;
-    if (versionName) ev.versionName = versionName;
+    if (rel.name) ev.versionName = rel.name;
     return ev;
   }
-}
-
-function snapshotTrack(t: TrackSnapshot): TrackState {
-  const versions: Record<string, string | null> = {};
-  for (const r of t.releases) {
-    for (const v of r.versionCodes) versions[v] = r.name ?? null;
-  }
-  return { versions };
 }
