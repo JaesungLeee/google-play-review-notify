@@ -180,7 +180,7 @@ describe('PlayApiSourceAdapter', () => {
     expect(r.nextState).toEqual(seen('PUBLISHED'));
   });
 
-  it('treats state written by 0.3 (versions instead of releases) as unseen', async () => {
+  it('treats state written by 0.4 or earlier (versions instead of releases) as unseen', async () => {
     const a = adapter(client({ 'com.example.app/production': [[rel('PUBLISHED')]] }));
     const legacy = {
       packages: {

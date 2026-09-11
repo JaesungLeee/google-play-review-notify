@@ -86,7 +86,7 @@ event is decided by the state entered, not by the path taken:
 | any                                         | no longer listed         | dropped from state, no event |
 
 Version code in the id is the highest artifact of the release; `versionName` is the release name.
-State written by 0.3 (`versions` per track) is treated as unseen, so an upgrade baselines silently.
+State written by 0.4 and earlier (`versions` per track) is treated as unseen, so an upgrade baselines silently.
 
 Confirmed on a real account (2026-09-11): "View app information (read-only)" is enough for the
 endpoint, and a release under review is reported as `IN_REVIEW` while `edits.tracks.list` shows

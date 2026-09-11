@@ -109428,7 +109428,7 @@ function stripLegacy(raw, warn) {
     const copy = { ...events2 };
     for (const t2 of LEGACY_EVENT_TYPES) {
       if (t2 in copy) {
-        warn(`events.${t2} is no longer supported and was ignored (removed in 0.4)`);
+        warn(`events.${t2} is no longer supported and was ignored (removed in 0.5)`);
         delete copy[t2];
       }
     }
@@ -109439,7 +109439,7 @@ function stripLegacy(raw, warn) {
     const copy = { ...sources };
     for (const k of LEGACY_SOURCE_KEYS) {
       if (k in copy) {
-        warn(`sources.${k} is no longer supported and was ignored (removed in 0.4)`);
+        warn(`sources.${k} is no longer supported and was ignored (removed in 0.5)`);
         delete copy[k];
       }
     }
@@ -109448,7 +109448,7 @@ function stripLegacy(raw, warn) {
       const p = { ...playApi };
       for (const k of LEGACY_PLAY_API_KEYS) {
         if (k in p) {
-          warn(`sources.playApi.${k} is no longer supported and was ignored (removed in 0.4)`);
+          warn(`sources.playApi.${k} is no longer supported and was ignored (removed in 0.5)`);
           delete p[k];
         }
       }

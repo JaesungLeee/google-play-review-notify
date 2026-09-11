@@ -111,7 +111,7 @@ export class PlayApiSourceAdapter implements SourceAdapter {
       let failedTracks = 0;
 
       for (const track of app.tracks) {
-        // A track state written by 0.3 has `versions` instead of `releases`: treat as unseen.
+        // A track state written by 0.4 or earlier has `versions` instead of `releases`: treat as unseen.
         const seen = before?.tracks[track]?.releases;
         let releases: ReleaseSummary[];
         try {

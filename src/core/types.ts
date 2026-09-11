@@ -13,7 +13,7 @@ export const REVIEW_EVENT_TYPES = [
 
 export type ReviewEventType = (typeof REVIEW_EVENT_TYPES)[number];
 
-/** Types that existed before 0.4 and are accepted (with a warning) in old configs, then dropped. */
+/** Types that existed before 0.5 and are accepted (with a warning) in old configs, then dropped. */
 export const LEGACY_EVENT_TYPES = ['REMOVED', 'SUSPENDED', 'UNKNOWN_NOTICE'] as const;
 
 export type EventSource = 'email' | 'play-api' | 'manual';

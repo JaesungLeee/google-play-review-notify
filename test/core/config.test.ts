@@ -31,10 +31,10 @@ describe('config', () => {
     expect(Object.keys(c.events)).not.toContain('UNKNOWN_NOTICE');
     expect(Object.keys(c.sources)).toEqual(['email', 'playApi']);
     expect(warnings).toEqual([
-      'events.REMOVED is no longer supported and was ignored (removed in 0.4)',
-      'events.UNKNOWN_NOTICE is no longer supported and was ignored (removed in 0.4)',
-      'sources.storeListing is no longer supported and was ignored (removed in 0.4)',
-      'sources.playApi.emitLiveWithoutConfirmation is no longer supported and was ignored (removed in 0.4)',
+      'events.REMOVED is no longer supported and was ignored (removed in 0.5)',
+      'events.UNKNOWN_NOTICE is no longer supported and was ignored (removed in 0.5)',
+      'sources.storeListing is no longer supported and was ignored (removed in 0.5)',
+      'sources.playApi.emitLiveWithoutConfirmation is no longer supported and was ignored (removed in 0.5)',
     ]);
   });
 
