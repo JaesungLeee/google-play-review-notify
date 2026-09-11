@@ -2,12 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { collectAnswers, runInit, type InitIo } from '../../src/cli/init';
 import { formatDoctorReport, runDoctor } from '../../src/cli/doctor';
 import {
+  commandOf,
   langFromArgv,
   langFromEnv,
   MESSAGES,
   parseLang,
   promptLang,
   resolveLang,
+  skipsGate,
   systemLang,
   type Lang,
 } from '../../src/cli/i18n';
@@ -88,6 +90,24 @@ describe('systemLang', () => {
   });
 });
 
+describe('commandOf / skipsGate', () => {
+  it('finds the subcommand behind global options, including ones that take a value', () => {
+    expect(commandOf(['doctor'])).toBe('doctor');
+    expect(commandOf(['-c', 'x.yml', '--json', 'lang', 'ko'])).toBe('lang');
+    expect(commandOf(['--config=x.yml', '--lang=ko', '-v', 'run'])).toBe('run');
+    expect(commandOf(['--json'])).toBeUndefined();
+    expect(commandOf(['--', 'run'])).toBeUndefined();
+  });
+
+  it('skips the gate for machine output, the version, and the lang command', () => {
+    expect(skipsGate(['run', '--json'])).toBe(true);
+    expect(skipsGate(['-V'])).toBe(true);
+    expect(skipsGate(['lang', 'ko'])).toBe(true);
+    expect(skipsGate(['-c', 'lang', 'doctor'])).toBe(false);
+    expect(skipsGate(['doctor'])).toBe(false);
+  });
+});
+
 describe('promptLang (the gate)', () => {
   it('shows both languages, applies the default on Enter, and re-asks on garbage', async () => {
     const io = gateIo(['x', '']);
@@ -109,28 +129,61 @@ describe('promptLang (the gate)', () => {
 describe('resolveLang', () => {
   const gate = () => vi.fn<(d: Lang) => Promise<Lang>>().mockResolvedValue('ko');
 
-  it('prefers --lang, then the environment, then the gate, then English', async () => {
+  it('prefers --lang, then the environment, then the saved language, then the gate', async () => {
     const g = gate();
     expect(
       await resolveLang({
         argv: ['--lang', 'en'],
         env: { PLAY_REVIEW_NOTIFY_LANG: 'ko' },
+        saved: 'ko',
         interactive: true,
         gate: g,
       }),
-    ).toBe('en');
+    ).toEqual({ lang: 'en', source: 'option' });
     expect(
       await resolveLang({
         argv: ['doctor'],
         env: { PLAY_REVIEW_NOTIFY_LANG: 'ko' },
+        saved: 'en',
         interactive: true,
         gate: g,
       }),
-    ).toBe('ko');
+    ).toEqual({ lang: 'ko', source: 'env' });
+    expect(
+      await resolveLang({ argv: ['doctor'], env: {}, saved: 'ko', interactive: true, gate: g }),
+    ).toEqual({ lang: 'ko', source: 'saved' });
     expect(g).not.toHaveBeenCalled();
 
-    expect(await resolveLang({ argv: ['doctor'], env: {}, interactive: true, gate: g })).toBe('ko');
+    expect(await resolveLang({ argv: ['doctor'], env: {}, interactive: true, gate: g })).toEqual({
+      lang: 'ko',
+      source: 'gate',
+    });
     expect(g).toHaveBeenCalledWith('en');
+  });
+
+  it('applies the saved language outside a terminal and with --json, but not to the gate', async () => {
+    const g = gate();
+    expect(
+      await resolveLang({ argv: ['run'], env: {}, saved: 'ko', interactive: false, gate: g }),
+    ).toEqual({ lang: 'ko', source: 'saved' });
+    expect(
+      await resolveLang({
+        argv: ['doctor', '--json'],
+        env: {},
+        saved: 'ko',
+        interactive: true,
+        gate: g,
+      }),
+    ).toEqual({ lang: 'ko', source: 'saved' });
+    expect(g).not.toHaveBeenCalled();
+  });
+
+  it('never asks when the lang command manages the language itself', async () => {
+    const g = gate();
+    expect(
+      await resolveLang({ argv: ['lang', 'ko'], env: {}, interactive: true, gate: g }),
+    ).toEqual({ lang: 'en', source: 'default' });
+    expect(g).not.toHaveBeenCalled();
   });
 
   it('passes the system locale to the gate as its default', async () => {
@@ -141,14 +194,19 @@ describe('resolveLang', () => {
 
   it('never asks outside a terminal or when the output is for machines', async () => {
     const g = gate();
-    expect(await resolveLang({ argv: ['run'], env: {}, interactive: false, gate: g })).toBe('en');
+    const english = { lang: 'en', source: 'default' };
+    expect(await resolveLang({ argv: ['run'], env: {}, interactive: false, gate: g })).toEqual(
+      english,
+    );
     expect(
       await resolveLang({ argv: ['run', '--json'], env: {}, interactive: true, gate: g }),
-    ).toBe('en');
-    expect(await resolveLang({ argv: ['--version'], env: {}, interactive: true, gate: g })).toBe(
-      'en',
+    ).toEqual(english);
+    expect(await resolveLang({ argv: ['--version'], env: {}, interactive: true, gate: g })).toEqual(
+      english,
     );
-    expect(await resolveLang({ argv: ['-V'], env: {}, interactive: true, gate: g })).toBe('en');
+    expect(await resolveLang({ argv: ['-V'], env: {}, interactive: true, gate: g })).toEqual(
+      english,
+    );
     expect(g).not.toHaveBeenCalled();
   });
 });

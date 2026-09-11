@@ -2,9 +2,11 @@
  * CLI language selection and message tables.
  *
  * The language is decided once, before the commander program is built, so that help text is
- * localized too. Precedence: `--lang`, then `$PLAY_REVIEW_NOTIFY_LANG`, then a one-question gate
- * in an interactive terminal, then English. The gate is skipped for `--json` (machine output),
- * `--version`, and whenever stdin or stdout is not a TTY, so cron jobs and CI never block on it.
+ * localized too. Precedence: `--lang`, then `$PLAY_REVIEW_NOTIFY_LANG`, then the language saved in
+ * the user's preferences file (see ./prefs), then a one-question gate in an interactive terminal,
+ * then English. The gate's answer is saved, so it is asked once per user; the `lang` command shows
+ * or changes it. The gate is skipped for `--json` (machine output), `--version`, the `lang`
+ * command itself, and whenever stdin or stdout is not a TTY, so cron jobs and CI never block on it.
  *
  * Only CLI-facing text is translated. Core log lines, generated config files, and the JSON output
  * stay in English so that scripts and documentation can rely on them.
@@ -26,7 +28,7 @@ export function parseLang(raw: string): Lang | undefined {
   return undefined;
 }
 
-function invalidLang(raw: string, where: string): LangError {
+export function unknownLangError(raw: string, where: string): LangError {
   return new LangError(
     `${where}: unknown language "${raw}". Use one of: ${LANGS.join(', ')}\n` +
       `${where}: 알 수 없는 언어 "${raw}". 다음 중 하나를 사용하세요: ${LANGS.join(', ')}`,
@@ -42,9 +44,9 @@ export function langFromArgv(argv: readonly string[]): Lang | undefined {
     if (arg === '--lang') raw = argv[i + 1];
     else if (arg.startsWith('--lang=')) raw = arg.slice('--lang='.length);
     else continue;
-    if (raw === undefined) throw invalidLang('', '--lang');
+    if (raw === undefined) throw unknownLangError('', '--lang');
     const lang = parseLang(raw);
-    if (!lang) throw invalidLang(raw, '--lang');
+    if (!lang) throw unknownLangError(raw, '--lang');
     return lang;
   }
   return undefined;
@@ -54,7 +56,7 @@ export function langFromEnv(env: NodeJS.ProcessEnv): Lang | undefined {
   const raw = env[LANG_ENV];
   if (raw === undefined || raw.trim() === '') return undefined;
   const lang = parseLang(raw);
-  if (!lang) throw invalidLang(raw, LANG_ENV);
+  if (!lang) throw unknownLangError(raw, LANG_ENV);
   return lang;
 }
 
@@ -64,9 +66,29 @@ export function systemLang(env: NodeJS.ProcessEnv): Lang {
   return /^ko(?![a-z])/i.test(locale) ? 'ko' : 'en';
 }
 
-/** Arguments for which asking a language question would be pointless or harmful. */
+/** Global options that take a value; `commandOf` must skip the value too. */
+const GLOBAL_VALUE_OPTIONS = new Set(['-c', '--config', '--lang']);
+
+/** The subcommand named on the command line, ignoring global options; undefined if none. */
+export function commandOf(argv: readonly string[]): string | undefined {
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (arg === '--') return undefined;
+    if (GLOBAL_VALUE_OPTIONS.has(arg)) i++;
+    else if (!arg.startsWith('-')) return arg;
+  }
+  return undefined;
+}
+
+/**
+ * Arguments for which asking a language question would be pointless or harmful: machine output,
+ * the version banner, and the `lang` command (which manages the language itself).
+ */
 export function skipsGate(argv: readonly string[]): boolean {
-  return argv.some((a) => a === '--json' || a === '--version' || a === '-V');
+  return (
+    argv.some((a) => a === '--json' || a === '--version' || a === '-V') ||
+    commandOf(argv) === 'lang'
+  );
 }
 
 export interface GateIo {
@@ -86,21 +108,34 @@ export async function promptLang(io: GateIo, defaultLang: Lang): Promise<Lang> {
   }
 }
 
+/** Where the language came from; `gate` answers are saved by the caller, `option` ones are not. */
+export type LangSource = 'option' | 'env' | 'saved' | 'gate' | 'default';
+
+export interface LangResolution {
+  lang: Lang;
+  source: LangSource;
+}
+
 export interface ResolveLangInput {
   /** Arguments after the executable and script (process.argv.slice(2)). */
   argv: readonly string[];
   env: NodeJS.ProcessEnv;
+  /** The language from the user's preferences file, if any. */
+  saved?: Lang | undefined;
   /** Both stdin and stdout are TTYs. */
   interactive: boolean;
   /** Runs the gate; only called when nothing else decided the language. */
   gate: (defaultLang: Lang) => Promise<Lang>;
 }
 
-export async function resolveLang(input: ResolveLangInput): Promise<Lang> {
-  const explicit = langFromArgv(input.argv) ?? langFromEnv(input.env);
-  if (explicit) return explicit;
-  if (!input.interactive || skipsGate(input.argv)) return 'en';
-  return input.gate(systemLang(input.env));
+export async function resolveLang(input: ResolveLangInput): Promise<LangResolution> {
+  const option = langFromArgv(input.argv);
+  if (option) return { lang: option, source: 'option' };
+  const env = langFromEnv(input.env);
+  if (env) return { lang: env, source: 'env' };
+  if (input.saved) return { lang: input.saved, source: 'saved' };
+  if (!input.interactive || skipsGate(input.argv)) return { lang: 'en', source: 'default' };
+  return { lang: await input.gate(systemLang(input.env)), source: 'gate' };
 }
 
 const DOCS_URL = 'https://github.com/JaesungLeee/google-play-review-notify/blob/main/docs';
@@ -128,7 +163,7 @@ const en = {
     optConfig: 'config file (YAML or JSON)',
     optJson: 'structured JSON logs and output',
     optVerbose: 'debug logging',
-    optLang: `output language: ${LANGS.join(' | ')} (default: $${LANG_ENV}, else a question in a terminal)`,
+    optLang: `output language for this run: ${LANGS.join(' | ')} (overrides the saved language and $${LANG_ENV})`,
     run: 'Poll all enabled sources once, notify, and exit',
     runDryRun: 'render messages but do not send or save state',
     runStateStore: 'override state store: file | none',
@@ -182,6 +217,26 @@ const en = {
       '\nKeep it secret. If the OAuth consent screen is still in "Testing", the token ' +
       'expires after 7 days; publish the app to production to make it permanent.',
     authFailed: (err: string) => `auth gmail failed: ${err}`,
+    lang: 'Show or save the output language used by every command',
+    langArg: `${LANGS.join(' | ')}; omit to show the current language`,
+    langReset: 'forget the saved language; a terminal asks again next time',
+    langNames: { en: 'English', ko: '한국어' } as Record<Lang, string>,
+    langFrom: {
+      option: 'from --lang, for this run only',
+      env: `from $${LANG_ENV}`,
+      saved: (path: string) => `saved in ${path}`,
+      gate: 'chosen in the terminal, for this run only',
+      default: 'default; nothing saved yet',
+    },
+    langHowToSave: 'Save one for every command with: play-review-notify lang en|ko',
+    langSaved: (name: string, path: string) =>
+      `Language set to ${name}. Saved in ${path}; every command uses it from now on ` +
+      '(override a single run with --lang).',
+    langCleared: (path: string) =>
+      `Saved language removed from ${path}. A terminal asks again next time; other runs use English.`,
+    langSaveFailed: (path: string, err: string) => `Could not save the language to ${path}: ${err}`,
+    langGateSaved: (path: string) =>
+      `Saved in ${path}. Change it any time with: play-review-notify lang en|ko`,
   },
   init: {
     choiceKinds: { target: 'target', channel: 'channel', source: 'source' } as Record<
@@ -330,7 +385,7 @@ const ko: Messages = {
     optConfig: '설정 파일 (YAML 또는 JSON)',
     optJson: 'JSON 형식의 구조화된 로그와 출력',
     optVerbose: '디버그 로그 출력',
-    optLang: `출력 언어: ${LANGS.join(' | ')} (기본값: $${LANG_ENV}, 없으면 터미널에서 질문)`,
+    optLang: `이번 실행의 출력 언어: ${LANGS.join(' | ')} (저장된 언어와 $${LANG_ENV}보다 우선)`,
     run: '활성화된 모든 소스를 한 번 폴링하고 알린 뒤 종료',
     runDryRun: '메시지를 렌더링만 하고 전송이나 상태 저장은 하지 않음',
     runStateStore: '상태 저장소 재정의: file | none',
@@ -384,6 +439,25 @@ const ko: Messages = {
       '\n이 값은 비밀로 유지하세요. OAuth 동의 화면이 아직 "테스트" 상태라면 토큰은 7일 뒤 만료됩니다. ' +
       '앱을 프로덕션으로 게시하면 영구적으로 유지됩니다.',
     authFailed: (err) => `auth gmail 실패: ${err}`,
+    lang: '모든 명령에 적용되는 출력 언어 확인·저장',
+    langArg: `${LANGS.join(' | ')}; 생략하면 현재 언어 표시`,
+    langReset: '저장된 언어를 지움; 터미널에서는 다음에 다시 질문',
+    langNames: { en: 'English', ko: '한국어' },
+    langFrom: {
+      option: '이번 실행에만 적용되는 --lang',
+      env: `$${LANG_ENV}`,
+      saved: (path) => `${path}에 저장됨`,
+      gate: '이번 실행에서 터미널로 선택',
+      default: '기본값; 아직 저장된 언어 없음',
+    },
+    langHowToSave: '모든 명령에 적용하려면: play-review-notify lang en|ko',
+    langSaved: (name, path) =>
+      `언어를 ${name}(으)로 설정했습니다. ${path}에 저장되어 이제 모든 명령에 적용됩니다 ` +
+      '(한 번만 바꾸려면 --lang).',
+    langCleared: (path) =>
+      `${path}의 저장된 언어를 지웠습니다. 터미널에서는 다음에 다시 묻고, 그 외에는 영어로 출력합니다.`,
+    langSaveFailed: (path, err) => `언어를 ${path}에 저장하지 못했습니다: ${err}`,
+    langGateSaved: (path) => `${path}에 저장했습니다. 언제든 변경: play-review-notify lang en|ko`,
   },
   init: {
     choiceKinds: { target: '실행 대상', channel: '채널', source: '소스' },

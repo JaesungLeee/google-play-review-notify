@@ -218,11 +218,15 @@ per event. Importable n8n workflows are in [examples/n8n](../examples/n8n/README
   failed (notifications still sent), `3` at least one notification failed. `doctor` exits `1`
   when any check fails and `0` otherwise, and never sends anything. `--json` prints
   `{ "events": ReviewEvent[], "summary": {...} }`.
-- CLI language (`src/cli/i18n.ts`): `--lang` > `$PLAY_REVIEW_NOTIFY_LANG` > a one-question gate
-  when stdin and stdout are TTYs (default from the system locale) > English. The gate is skipped
-  for `--json` and `--version`, so scripts never block on it. Only CLI text is translated: help,
-  prompts, `doctor` messages and hints, and command output. Check ids, generated files, JSON
-  output, and core log lines stay English. An unknown language exits `1`.
+- CLI language (`src/cli/i18n.ts`): `--lang` > `$PLAY_REVIEW_NOTIFY_LANG` > the language saved in
+  the user's preferences file (`src/cli/prefs.ts`: `$XDG_CONFIG_HOME` or `~/.config`, `%APPDATA%`
+  on Windows, `play-review-notify/preferences.json`) > a one-question gate when stdin and stdout
+  are TTYs (default from the system locale) > English. The gate's answer is saved, so each user
+  is asked once; `lang [en|ko] [--reset]` shows, saves, or forgets it. The gate is skipped for
+  `--json`, `--version`, and the `lang` command, so scripts never block on it. A missing or
+  malformed preferences file is treated as empty. Only CLI text is translated: help, prompts,
+  `doctor` messages and hints, and command output. Check ids, generated files, JSON output, and
+  core log lines stay English. An unknown language exits `1`.
 
 ## Extending
 

@@ -3,7 +3,8 @@
  * CLI entry. Exit codes are documented in docs/design.md, "CLI contract".
  *
  * The output language is decided before the program is built (see ./i18n): `--lang`, then
- * $PLAY_REVIEW_NOTIFY_LANG, then a language gate in an interactive terminal, then English.
+ * $PLAY_REVIEW_NOTIFY_LANG, then the language saved in the user's preferences file (see ./prefs),
+ * then a language gate in an interactive terminal (its answer is saved), then English.
  */
 import { Command, Help } from 'commander';
 import { collectSecrets, loadConfigFile, ConfigError, type Config } from '../core/config';
@@ -16,7 +17,17 @@ import { createSources, ManualSourceAdapter } from '../sources';
 import { authorizeGmail } from '../sources/email/oauth';
 import { formatDoctorReport, runDoctor } from './doctor';
 import type { Interface as ReadlineInterface } from 'node:readline/promises';
-import { LangError, messages, promptLang, resolveLang, type Lang } from './i18n';
+import {
+  LangError,
+  messages,
+  promptLang,
+  resolveLang,
+  type Lang,
+  type LangResolution,
+  type LangSource,
+} from './i18n';
+import { formatLangResult, runLangCommand } from './lang';
+import { prefsFilePath, readPrefs, writePrefs } from './prefs';
 import {
   CHANNEL_KINDS,
   parseInitChoice,
@@ -96,7 +107,17 @@ function askLangInTerminal(defaultLang: Lang): Promise<Lang> {
   );
 }
 
-export function buildProgram(lang: Lang, interactive: boolean): Command {
+export interface ProgramContext {
+  lang: Lang;
+  langSource: LangSource;
+  /** Both stdin and stdout are TTYs. */
+  interactive: boolean;
+  /** The user's preferences file (read and written by the `lang` command). */
+  prefsPath: string;
+}
+
+export function buildProgram(ctx: ProgramContext): Command {
+  const { lang, langSource, interactive, prefsPath } = ctx;
   const { cli: m, help, docs } = messages(lang);
 
   const program = new Command()
@@ -351,6 +372,29 @@ export function buildProgram(lang: Lang, interactive: boolean): Command {
     );
 
   program
+    .command('lang')
+    .description(m.lang)
+    .argument('[lang]', m.langArg)
+    .option('--reset', m.langReset)
+    .action((value: string | undefined, cmd: { reset?: boolean }) => {
+      const g = program.opts<GlobalOpts>();
+      try {
+        const result = runLangCommand({
+          value,
+          reset: cmd.reset,
+          current: { lang, source: langSource },
+          prefsPath,
+        });
+        if (g.json) process.stdout.write(JSON.stringify(result) + '\n');
+        else process.stdout.write(formatLangResult(result, lang) + '\n');
+        process.exit(EXIT.OK);
+      } catch (e) {
+        process.stderr.write(`${(e as Error).message}\n`);
+        process.exit(EXIT.CONFIG);
+      }
+    });
+
+  program
     .command('auth')
     .argument('<provider>', m.authProvider)
     .description(m.auth(docs.gmailOauth))
@@ -402,13 +446,26 @@ export function buildProgram(lang: Lang, interactive: boolean): Command {
   return program;
 }
 
+/** The gate's answer becomes the saved language; a failed save is reported but not fatal. */
+function saveGateAnswer(lang: Lang, prefsPath: string): void {
+  const m = messages(lang).cli;
+  try {
+    writePrefs(prefsPath, { lang });
+    process.stderr.write(`${m.langGateSaved(prefsPath)}\n\n`);
+  } catch (e) {
+    process.stderr.write(`${m.langSaveFailed(prefsPath, (e as Error).message)}\n\n`);
+  }
+}
+
 async function main(argv: string[]): Promise<void> {
   const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY);
-  let lang: Lang;
+  const prefsPath = prefsFilePath(process.env);
+  let resolved: LangResolution;
   try {
-    lang = await resolveLang({
+    resolved = await resolveLang({
       argv: argv.slice(2),
       env: process.env,
+      saved: readPrefs(prefsPath).lang,
       interactive,
       gate: askLangInTerminal,
     });
@@ -417,7 +474,13 @@ async function main(argv: string[]): Promise<void> {
     process.stderr.write(`${e.message}\n`);
     process.exit(EXIT.CONFIG);
   }
-  await buildProgram(lang, interactive).parseAsync(argv);
+  if (resolved.source === 'gate') saveGateAnswer(resolved.lang, prefsPath);
+  await buildProgram({
+    lang: resolved.lang,
+    langSource: resolved.source,
+    interactive,
+    prefsPath,
+  }).parseAsync(argv);
 }
 
 main(process.argv).catch((e: unknown) => {
