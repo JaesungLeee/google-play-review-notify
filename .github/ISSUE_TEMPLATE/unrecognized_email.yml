@@ -49,13 +49,7 @@ body:
     id: current
     attributes:
       label: How did this tool classify it?
-      options:
-        [
-          Not classified (logged as "matched no rule"),
-          REJECTED,
-          POLICY_WARNING,
-          Not sure,
-        ]
+      options: [Not classified (logged as "matched no rule"), REJECTED, POLICY_WARNING, Not sure]
   - type: textarea
     id: body
     attributes:
