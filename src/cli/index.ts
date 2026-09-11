@@ -52,7 +52,9 @@ function logger(opts: GlobalOpts, config?: Config) {
 
 function loadOrExit(opts: GlobalOpts): Config {
   try {
-    return loadConfigFile(opts.config);
+    return loadConfigFile(opts.config, process.env, {
+      onWarning: (w) => process.stderr.write(`warning: ${w}\n`),
+    });
   } catch (e) {
     process.stderr.write(`${(e as Error).message}\n`);
     process.exit(EXIT.CONFIG);
@@ -133,7 +135,7 @@ export function buildProgram(lang: Lang, interactive: boolean): Command {
             : await createStateStore(config, log);
       const summary = await runOnce({
         config,
-        sources: createSources(config, log, { version: VERSION }),
+        sources: createSources(config, log),
         notifiers: createDefaultNotifiers({ version: VERSION }),
         stateStore,
         logger: log,
@@ -280,7 +282,7 @@ export function buildProgram(lang: Lang, interactive: boolean): Command {
     .action(async () => {
       const g = program.opts<GlobalOpts>();
       const config = loadOrExit(g);
-      const results = await runDoctor(config, { version: VERSION, lang });
+      const results = await runDoctor(config, { lang });
       if (g.json) process.stdout.write(JSON.stringify(results, null, 2) + '\n');
       else process.stdout.write(formatDoctorReport(results, lang) + '\n');
       process.exit(results.some((r) => r.status === 'fail') ? EXIT.CONFIG : EXIT.OK);

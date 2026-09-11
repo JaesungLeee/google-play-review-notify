@@ -78,6 +78,6 @@ jobs:
           test "$actual" = "$expected" || { echo "::error::dist/cli.js --version is $actual, expected $expected"; exit 1; }
           cli="$GITHUB_WORKSPACE/dist/cli.js"
           cd "$RUNNER_TEMP"
-          node "$cli" init --packages com.example.app --channel slack --sources store-listing --target cli --yes
+          node "$cli" init --packages com.example.app --channel slack --sources play-api --target cli --yes
           test -f play-review-notify.yml
-          SLACK_WEBHOOK_URL=https://hooks.slack.com/services/x node "$cli" state show
+          PLAY_SERVICE_ACCOUNT_JSON='{}' SLACK_WEBHOOK_URL=https://hooks.slack.com/services/x node "$cli" state show

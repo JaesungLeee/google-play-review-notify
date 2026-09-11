@@ -107,7 +107,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Gmail source: REJECTED and POLICY_WARNING from Play Console emails.",
+          "description": "Gmail source: POLICY_WARNING, plus the reason text for REJECTED, from Play Console emails.",
           "default": {}
         },
         "playApi": {
@@ -117,40 +117,10 @@
             "serviceAccountJson": {
               "type": "string",
               "description": "Service account key: the JSON content (${PLAY_SERVICE_ACCOUNT_JSON}) or a file path."
-            },
-            "emitLiveWithoutConfirmation": {
-              "type": "boolean",
-              "default": false,
-              "description": "Emit a low-confidence LIVE when a release is completed. Only for apps without a public listing."
             }
           },
           "additionalProperties": false,
-          "description": "Play Developer API source: SUBMITTED when a new versionCode appears on a track.",
-          "default": {}
-        },
-        "storeListing": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean", "default": false },
-            "locale": {
-              "type": "string",
-              "default": "en",
-              "description": "hl query parameter of the store page."
-            },
-            "country": {
-              "type": "string",
-              "default": "US",
-              "description": "gl query parameter of the store page."
-            },
-            "failureThreshold": {
-              "type": "integer",
-              "exclusiveMinimum": 0,
-              "default": 5,
-              "description": "Consecutive fetch failures before the source reports an error."
-            }
-          },
-          "additionalProperties": false,
-          "description": "Public store listing source: LIVE for the production track.",
+          "description": "Play Developer API source: PENDING_SUBMISSION, SUBMITTED, APPROVED, REJECTED and LIVE from the release lifecycle of each configured track.",
           "default": {}
         }
       },
@@ -162,8 +132,40 @@
       "type": "object",
       "additionalProperties": false,
       "default": {},
-      "description": "Per-event-type overrides. Defaults: everything on except SUBMITTED and UNKNOWN_NOTICE.",
+      "description": "Per-event-type overrides. Defaults: everything on except PENDING_SUBMISSION and SUBMITTED.",
       "properties": {
+        "PENDING_SUBMISSION": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
+            "mentions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [],
+              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
+            },
+            "mergeInto": {
+              "type": "string",
+              "enum": [
+                "PENDING_SUBMISSION",
+                "SUBMITTED",
+                "APPROVED",
+                "REJECTED",
+                "LIVE",
+                "POLICY_WARNING"
+              ],
+              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            },
+            "reasonFollowUp": {
+              "type": "boolean",
+              "default": true,
+              "description": "Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED)."
+            }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "description": "Per-event-type settings."
+        },
         "SUBMITTED": {
           "type": "object",
           "properties": {
@@ -177,16 +179,19 @@
             "mergeInto": {
               "type": "string",
               "enum": [
+                "PENDING_SUBMISSION",
                 "SUBMITTED",
                 "APPROVED",
                 "REJECTED",
                 "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
+                "POLICY_WARNING"
               ],
               "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            },
+            "reasonFollowUp": {
+              "type": "boolean",
+              "default": true,
+              "description": "Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED)."
             }
           },
           "required": ["enabled"],
@@ -206,16 +211,19 @@
             "mergeInto": {
               "type": "string",
               "enum": [
+                "PENDING_SUBMISSION",
                 "SUBMITTED",
                 "APPROVED",
                 "REJECTED",
                 "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
+                "POLICY_WARNING"
               ],
               "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            },
+            "reasonFollowUp": {
+              "type": "boolean",
+              "default": true,
+              "description": "Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED)."
             }
           },
           "required": ["enabled"],
@@ -235,16 +243,19 @@
             "mergeInto": {
               "type": "string",
               "enum": [
+                "PENDING_SUBMISSION",
                 "SUBMITTED",
                 "APPROVED",
                 "REJECTED",
                 "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
+                "POLICY_WARNING"
               ],
               "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            },
+            "reasonFollowUp": {
+              "type": "boolean",
+              "default": true,
+              "description": "Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED)."
             }
           },
           "required": ["enabled"],
@@ -264,16 +275,19 @@
             "mergeInto": {
               "type": "string",
               "enum": [
+                "PENDING_SUBMISSION",
                 "SUBMITTED",
                 "APPROVED",
                 "REJECTED",
                 "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
+                "POLICY_WARNING"
               ],
               "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            },
+            "reasonFollowUp": {
+              "type": "boolean",
+              "default": true,
+              "description": "Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED)."
             }
           },
           "required": ["enabled"],
@@ -293,103 +307,19 @@
             "mergeInto": {
               "type": "string",
               "enum": [
+                "PENDING_SUBMISSION",
                 "SUBMITTED",
                 "APPROVED",
                 "REJECTED",
                 "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
+                "POLICY_WARNING"
               ],
               "description": "Report this event under another type, e.g. LIVE as APPROVED."
-            }
-          },
-          "required": ["enabled"],
-          "additionalProperties": false,
-          "description": "Per-event-type settings."
-        },
-        "REMOVED": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
-            "mentions": {
-              "type": "array",
-              "items": { "type": "string" },
-              "default": [],
-              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
             },
-            "mergeInto": {
-              "type": "string",
-              "enum": [
-                "SUBMITTED",
-                "APPROVED",
-                "REJECTED",
-                "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
-              ],
-              "description": "Report this event under another type, e.g. LIVE as APPROVED."
-            }
-          },
-          "required": ["enabled"],
-          "additionalProperties": false,
-          "description": "Per-event-type settings."
-        },
-        "SUSPENDED": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
-            "mentions": {
-              "type": "array",
-              "items": { "type": "string" },
-              "default": [],
-              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
-            },
-            "mergeInto": {
-              "type": "string",
-              "enum": [
-                "SUBMITTED",
-                "APPROVED",
-                "REJECTED",
-                "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
-              ],
-              "description": "Report this event under another type, e.g. LIVE as APPROVED."
-            }
-          },
-          "required": ["enabled"],
-          "additionalProperties": false,
-          "description": "Per-event-type settings."
-        },
-        "UNKNOWN_NOTICE": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean", "description": "Whether this event type is notified." },
-            "mentions": {
-              "type": "array",
-              "items": { "type": "string" },
-              "default": [],
-              "description": "Mentions prepended to the message, e.g. '<!channel>' or '<@U123>'."
-            },
-            "mergeInto": {
-              "type": "string",
-              "enum": [
-                "SUBMITTED",
-                "APPROVED",
-                "REJECTED",
-                "LIVE",
-                "POLICY_WARNING",
-                "REMOVED",
-                "SUSPENDED",
-                "UNKNOWN_NOTICE"
-              ],
-              "description": "Report this event under another type, e.g. LIVE as APPROVED."
+            "reasonFollowUp": {
+              "type": "boolean",
+              "default": true,
+              "description": "Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED)."
             }
           },
           "required": ["enabled"],
@@ -477,14 +407,12 @@
       "default": {},
       "description": "Mustache-style message overrides per event type ({{appName}}, {{reason}}, ...).",
       "properties": {
+        "PENDING_SUBMISSION": { "type": "string" },
         "SUBMITTED": { "type": "string" },
         "APPROVED": { "type": "string" },
         "REJECTED": { "type": "string" },
         "LIVE": { "type": "string" },
-        "POLICY_WARNING": { "type": "string" },
-        "REMOVED": { "type": "string" },
-        "SUSPENDED": { "type": "string" },
-        "UNKNOWN_NOTICE": { "type": "string" }
+        "POLICY_WARNING": { "type": "string" }
       }
     },
     "stateStore": {

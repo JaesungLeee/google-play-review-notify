@@ -1,24 +1,41 @@
-/** Thin Play Developer Publishing API client (service account, read-only edit flow). */
+/** Thin Play Developer Publishing API client (service account, read-only). */
 import { androidpublisher, auth as authPlus } from '@googleapis/androidpublisher';
 import { readFileSync } from 'node:fs';
 
 const SCOPE = 'https://www.googleapis.com/auth/androidpublisher';
 
-export interface TrackRelease {
-  name?: string;
-  status?: string;
-  versionCodes: string[];
-  userFraction?: number;
-}
+/**
+ * `releaseLifecycleState` values of `applications.tracks.releases.list`, without the
+ * `RELEASE_LIFECYCLE_STATE_` prefix. Unknown values are passed through as-is.
+ */
+export const RELEASE_STATES = [
+  'DRAFT',
+  'NOT_SENT_FOR_REVIEW',
+  'IN_REVIEW',
+  'APPROVED_NOT_PUBLISHED',
+  'NOT_APPROVED',
+  'PUBLISHED',
+] as const;
+export type ReleaseState = (typeof RELEASE_STATES)[number];
 
-export interface TrackSnapshot {
-  track: string;
-  releases: TrackRelease[];
+export interface ReleaseSummary {
+  name?: string;
+  /** One of RELEASE_STATES, or the raw API value when it is not recognised. */
+  state: string;
+  /** Version codes of the release's active artifacts, as strings. */
+  versionCodes: string[];
 }
 
 export interface PlayApiClient {
-  /** All tracks of the app as currently stored on Play (one edit is opened and discarded). */
-  listTracks(packageName: string): Promise<TrackSnapshot[]>;
+  /** Releases currently on one track (obsolete releases excluded by the API). */
+  listReleases(packageName: string, track: string): Promise<ReleaseSummary[]>;
+}
+
+const STATE_PREFIX = 'RELEASE_LIFECYCLE_STATE_';
+
+export function normalizeReleaseState(raw: string | null | undefined): string {
+  const v = raw ?? 'UNSPECIFIED';
+  return v.startsWith(STATE_PREFIX) ? v.slice(STATE_PREFIX.length) : v;
 }
 
 /**
@@ -34,28 +51,21 @@ export function createPlayApiClient(serviceAccount: string): PlayApiClient {
   const api = androidpublisher({ version: 'v3', auth });
 
   return {
-    async listTracks(packageName) {
-      const edit = await api.edits.insert({ packageName });
-      const editId = edit.data.id;
-      if (!editId) throw new Error(`edits.insert returned no edit id for ${packageName}`);
-      try {
-        const res = await api.edits.tracks.list({ packageName, editId });
-        return (res.data.tracks ?? [])
-          .filter((t) => !!t.track)
-          .map((t) => ({
-            track: t.track as string,
-            releases: (t.releases ?? []).map((r) => {
-              const rel: TrackRelease = { versionCodes: [...(r.versionCodes ?? [])] };
-              if (r.name) rel.name = r.name;
-              if (r.status) rel.status = r.status;
-              if (typeof r.userFraction === 'number') rel.userFraction = r.userFraction;
-              return rel;
-            }),
-          }));
-      } finally {
-        // Read-only flow: never commit the edit.
-        await api.edits.delete({ packageName, editId }).catch(() => undefined);
-      }
+    async listReleases(packageName, track) {
+      const res = await api.applications.tracks.releases.list({
+        parent: `applications/${packageName}/tracks/${track}`,
+      });
+      return (res.data.releases ?? []).map((r) => {
+        const rel: ReleaseSummary = {
+          state: normalizeReleaseState(r.releaseLifecycleState),
+          versionCodes: (r.activeArtifacts ?? [])
+            .map((a) => a.versionCode)
+            .filter((v): v is number => typeof v === 'number')
+            .map(String),
+        };
+        if (r.releaseName) rel.name = r.releaseName;
+        return rel;
+      });
     },
   };
 }

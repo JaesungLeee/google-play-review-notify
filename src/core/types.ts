@@ -3,19 +3,20 @@
  */
 
 export const REVIEW_EVENT_TYPES = [
+  'PENDING_SUBMISSION',
   'SUBMITTED',
   'APPROVED',
   'REJECTED',
   'LIVE',
   'POLICY_WARNING',
-  'REMOVED',
-  'SUSPENDED',
-  'UNKNOWN_NOTICE',
 ] as const;
 
 export type ReviewEventType = (typeof REVIEW_EVENT_TYPES)[number];
 
-export type EventSource = 'email' | 'play-api' | 'store-listing' | 'manual';
+/** Types that existed before 0.5 and are accepted (with a warning) in old configs, then dropped. */
+export const LEGACY_EVENT_TYPES = ['REMOVED', 'SUSPENDED', 'UNKNOWN_NOTICE'] as const;
+
+export type EventSource = 'email' | 'play-api' | 'manual';
 export type Confidence = 'high' | 'medium' | 'low';
 
 export interface ReviewEvent {
@@ -35,6 +36,11 @@ export interface ReviewEvent {
   confidence: Confidence;
   /** ISO 8601 */
   observedAt: string;
+  /**
+   * True when this repeats an already-notified event because a later source added details
+   * (a rejection email delivering the reason after the API reported the rejection).
+   */
+  followUp?: boolean;
   /** Debug only. Never persisted or sent. */
   raw?: unknown;
 }
@@ -87,6 +93,8 @@ export interface EventRecord {
   delivered: boolean;
   /** True when the event was recorded during a baseline run and intentionally not sent. */
   suppressed?: boolean;
+  /** True when the notified event carried a reason; a later reason then needs no follow-up. */
+  hasReason?: boolean;
   attempts: number;
   lastError?: string;
   /** Channels that still need delivery (only when delivered === false). */

@@ -1,4 +1,8 @@
-/** Email source adapter: primary signal. See docs/design.md, "What each signal can and cannot say". */
+/**
+ * Email source adapter: POLICY_WARNING, and the reason text for REJECTED. See docs/design.md,
+ * "What each signal can and cannot say". Google Play emails that match no rule are logged and
+ * dropped.
+ */
 import type { Config } from '../../core/config';
 import type {
   PollContext,
@@ -64,13 +68,17 @@ export class EmailSourceAdapter implements SourceAdapter {
       if (!senderAllowed(msg.from, this.cfg.senderAllowlist)) continue;
 
       const c = classifyEmail(msg, this.ruleSets, { reasonMaxLength: this.cfg.reasonMaxLength });
+      if (!c) {
+        ctx.logger.debug(`Email ${msg.id} matched no rule, ignored: ${msg.subject}`);
+        continue;
+      }
       const packageName = c.packageName ?? this.matchByAppName(ctx, c.appName) ?? null;
       const ev: ReviewEvent = {
         id: `email:${msg.id}`,
         type: c.type,
         packageName,
         source: 'email',
-        confidence: c.type === 'UNKNOWN_NOTICE' ? 'low' : 'high',
+        confidence: 'high',
         observedAt: msg.receivedAt,
       };
       if (c.appName) ev.appName = c.appName;

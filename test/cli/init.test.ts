@@ -61,22 +61,22 @@ describe('parsePackageList', () => {
 
 describe('collectAnswers', () => {
   it('walks the prompts and applies defaults for empty answers', async () => {
-    const io = scriptedIo(['com.example.app', 'Example', '', '', '', '', '']);
+    const io = scriptedIo(['com.example.app', 'Example', '', '', '', '']);
     const a = await collectAnswers(baseOpts(), io);
     expect(a).toEqual({
       apps: [{ packageName: 'com.example.app', name: 'Example' }],
-      sources: { email: true, 'play-api': false, 'store-listing': true },
+      sources: { email: true, 'play-api': true },
       channel: 'slack',
       target: 'github-actions',
     });
   });
 
   it('re-asks after an invalid package name', async () => {
-    const io = scriptedIo(['nope', 'com.example.app', '', 'cli', 'n', 'y', 'y', 'discord']);
+    const io = scriptedIo(['nope', 'com.example.app', '', 'cli', 'y', 'n', 'discord']);
     const a = await collectAnswers(baseOpts(), io);
     expect(io.output.join('')).toMatch(/not a valid Android package name/);
     expect(a.apps).toEqual([{ packageName: 'com.example.app' }]);
-    expect(a.sources).toEqual({ email: false, 'play-api': true, 'store-listing': true });
+    expect(a.sources).toEqual({ email: false, 'play-api': true });
     expect(a.channel).toBe('discord');
     expect(a.target).toBe('cli');
   });
@@ -90,7 +90,7 @@ describe('collectAnswers', () => {
     expect(io.questions).toEqual([]);
     expect(a.apps.map((x) => x.packageName)).toEqual(['com.a.app', 'com.b.app']);
     expect(a.channel).toBe('webhook');
-    expect(a.sources).toEqual({ email: true, 'play-api': false, 'store-listing': true });
+    expect(a.sources).toEqual({ email: true, 'play-api': true });
   });
 
   it('fails clearly when not interactive and no packages were given', async () => {
@@ -116,7 +116,7 @@ for (const channel of ['slack', 'discord', 'webhook'] as const)
       for (const playApi of [true, false])
         combos.push({
           apps: [{ packageName: 'com.example.app', name: 'Example\'s "App"' }],
-          sources: { email, 'play-api': playApi, 'store-listing': !email || playApi },
+          sources: { email, 'play-api': playApi },
           channel,
           target,
         });
@@ -135,7 +135,6 @@ describe('renderConfig', () => {
     const config = parseConfig(raw, env);
     expect(config.sources.email.enabled).toBe(a.sources.email);
     expect(config.sources.playApi.enabled).toBe(a.sources['play-api']);
-    expect(config.sources.storeListing.enabled).toBe(a.sources['store-listing']);
     expect(Object.keys(config.channels)).toEqual([a.channel]);
     expect(config.stateStore.type).toBe(a.target === 'github-actions' ? 'github-cache' : 'file');
     expect(config.apps[0]?.name).toBe('Example\'s "App"');
@@ -154,7 +153,7 @@ describe('renderWorkflow', () => {
   it('passes exactly the secrets the config references', () => {
     const a: InitAnswers = {
       apps: [{ packageName: 'com.example.app' }],
-      sources: { email: true, 'play-api': true, 'store-listing': true },
+      sources: { email: true, 'play-api': true },
       channel: 'discord',
       target: 'github-actions',
     };
@@ -206,7 +205,7 @@ describe('runInit', () => {
         yes: true,
         packages: ['com.example.app'],
         target: 'cli',
-        sources: ['store-listing'],
+        sources: ['play-api'],
       },
       io,
     );

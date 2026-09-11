@@ -41,12 +41,12 @@ describe('email rules (draft rule set)', () => {
     expect(c.reason).toContain('Deceptive Behavior');
   });
 
-  it('falls back to UNKNOWN_NOTICE', () => {
+  it('returns null for a Play email that matches no rule', () => {
     const c = classifyEmail(
       { id: '1', from: 'x', subject: 'Monthly newsletter', body: '', receivedAt: '' },
       sets,
     );
-    expect(c.type).toBe('UNKNOWN_NOTICE');
+    expect(c).toBeNull();
   });
 
   it('caps reason length', () => {
@@ -130,7 +130,7 @@ describe('email rules (real-world fixtures, Phase 0)', () => {
     'ko/unrelated-developer-verification.txt',
   ]) {
     it(`does not misclassify ${name}`, () => {
-      expect(classifyEmail(fixture(name), sets).type).toBe('UNKNOWN_NOTICE');
+      expect(classifyEmail(fixture(name), sets)).toBeNull();
     });
   }
 });

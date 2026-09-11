@@ -58,12 +58,12 @@ describe('config JSON schema', () => {
       apps: [{ packageName: 'com.example.app', name: 'Example', tracks: ['production', 'beta'] }],
       sources: {
         email: { enabled: true, auth: { clientId: 'a', clientSecret: 'b', refreshToken: 'c' } },
-        playApi: { enabled: true, serviceAccountJson: '{}', emitLiveWithoutConfirmation: true },
-        storeListing: { enabled: true, locale: 'ko', country: 'KR' },
+        playApi: { enabled: true, serviceAccountJson: '{}' },
       },
       events: {
-        REJECTED: { enabled: true, mentions: ['<!channel>'] },
+        REJECTED: { enabled: true, mentions: ['<!channel>'], reasonFollowUp: false },
         LIVE: { enabled: true, mergeInto: 'APPROVED' },
+        PENDING_SUBMISSION: { enabled: true },
       },
       channels: {
         slack: { type: 'slack', webhookUrl: 'https://hooks.slack.com/services/x' },

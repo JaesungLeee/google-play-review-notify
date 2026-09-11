@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
-import { REVIEW_EVENT_TYPES } from './types';
+import { LEGACY_EVENT_TYPES, REVIEW_EVENT_TYPES } from './types';
 
 const eventTypeSchema = z.enum(REVIEW_EVENT_TYPES);
 
@@ -72,7 +72,9 @@ export const emailSourceSchema = z
       .default(1000)
       .describe('Maximum length of the extracted rejection reason.'),
   })
-  .describe('Gmail source: REJECTED and POLICY_WARNING from Play Console emails.');
+  .describe(
+    'Gmail source: POLICY_WARNING, plus the reason text for REJECTED, from Play Console emails.',
+  );
 
 export const playApiSourceSchema = z
   .object({
@@ -83,28 +85,10 @@ export const playApiSourceSchema = z
       .describe(
         'Service account key: the JSON content (${PLAY_SERVICE_ACCOUNT_JSON}) or a file path.',
       ),
-    emitLiveWithoutConfirmation: z
-      .boolean()
-      .default(false)
-      .describe(
-        'Emit a low-confidence LIVE when a release is completed. Only for apps without a public listing.',
-      ),
   })
-  .describe('Play Developer API source: SUBMITTED when a new versionCode appears on a track.');
-
-export const storeListingSourceSchema = z
-  .object({
-    enabled: z.boolean().default(false),
-    locale: z.string().default('en').describe('hl query parameter of the store page.'),
-    country: z.string().default('US').describe('gl query parameter of the store page.'),
-    failureThreshold: z
-      .number()
-      .int()
-      .positive()
-      .default(5)
-      .describe('Consecutive fetch failures before the source reports an error.'),
-  })
-  .describe('Public store listing source: LIVE for the production track.');
+  .describe(
+    'Play Developer API source: PENDING_SUBMISSION, SUBMITTED, APPROVED, REJECTED and LIVE from the release lifecycle of each configured track.',
+  );
 
 export const eventConfigSchema = z
   .object({
@@ -116,6 +100,12 @@ export const eventConfigSchema = z
     mergeInto: eventTypeSchema
       .optional()
       .describe('Report this event under another type, e.g. LIVE as APPROVED.'),
+    reasonFollowUp: z
+      .boolean()
+      .default(true)
+      .describe(
+        'Send a follow-up when a later source adds a reason to an already-notified event (the rejection email arriving after the API reported REJECTED).',
+      ),
   })
   .describe('Per-event-type settings.');
 
@@ -184,15 +174,59 @@ const DEFAULT_EVENTS: Record<
   (typeof REVIEW_EVENT_TYPES)[number],
   z.input<typeof eventConfigSchema>
 > = {
+  PENDING_SUBMISSION: { enabled: false },
   SUBMITTED: { enabled: false },
   APPROVED: { enabled: true },
   REJECTED: { enabled: true },
   LIVE: { enabled: true },
   POLICY_WARNING: { enabled: true },
-  REMOVED: { enabled: true },
-  SUSPENDED: { enabled: true },
-  UNKNOWN_NOTICE: { enabled: false },
 };
+
+/**
+ * Keys accepted from configs written for earlier versions and silently dropped, so an upgrade
+ * never breaks a working config. `parseConfig` reports them through `onWarning`.
+ */
+const LEGACY_SOURCE_KEYS = ['storeListing'] as const;
+const LEGACY_PLAY_API_KEYS = ['emitLiveWithoutConfirmation'] as const;
+
+function stripLegacy(raw: unknown, warn: (msg: string) => void): unknown {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
+  const obj = { ...(raw as Record<string, unknown>) };
+  const events = obj['events'];
+  if (events && typeof events === 'object' && !Array.isArray(events)) {
+    const copy = { ...(events as Record<string, unknown>) };
+    for (const t of LEGACY_EVENT_TYPES) {
+      if (t in copy) {
+        warn(`events.${t} is no longer supported and was ignored (removed in 0.5)`);
+        delete copy[t];
+      }
+    }
+    obj['events'] = copy;
+  }
+  const sources = obj['sources'];
+  if (sources && typeof sources === 'object' && !Array.isArray(sources)) {
+    const copy = { ...(sources as Record<string, unknown>) };
+    for (const k of LEGACY_SOURCE_KEYS) {
+      if (k in copy) {
+        warn(`sources.${k} is no longer supported and was ignored (removed in 0.5)`);
+        delete copy[k];
+      }
+    }
+    const playApi = copy['playApi'];
+    if (playApi && typeof playApi === 'object' && !Array.isArray(playApi)) {
+      const p = { ...(playApi as Record<string, unknown>) };
+      for (const k of LEGACY_PLAY_API_KEYS) {
+        if (k in p) {
+          warn(`sources.playApi.${k} is no longer supported and was ignored (removed in 0.5)`);
+          delete p[k];
+        }
+      }
+      copy['playApi'] = p;
+    }
+    obj['sources'] = copy;
+  }
+  return obj;
+}
 
 export const configSchema = z.object({
   version: z.literal(1).default(1).describe('Config format version.'),
@@ -201,7 +235,6 @@ export const configSchema = z.object({
     .object({
       email: emailSourceSchema.default({}),
       playApi: playApiSourceSchema.default({}),
-      storeListing: storeListingSourceSchema.default({}),
     })
     .default({})
     .describe('Signal sources. Enable at least one.'),
@@ -209,7 +242,7 @@ export const configSchema = z.object({
     .record(eventTypeSchema, eventConfigSchema)
     .default({})
     .describe(
-      'Per-event-type overrides. Defaults: everything on except SUBMITTED and UNKNOWN_NOTICE.',
+      'Per-event-type overrides. Defaults: everything on except PENDING_SUBMISSION and SUBMITTED.',
     )
     .transform((given) => {
       const merged: Record<string, z.output<typeof eventConfigSchema>> = {};
@@ -276,8 +309,17 @@ export function interpolateEnv(value: unknown, env: NodeJS.ProcessEnv = process.
   return value;
 }
 
-export function parseConfig(raw: unknown, env: NodeJS.ProcessEnv = process.env): Config {
-  const interpolated = interpolateEnv(raw, env);
+export interface ParseOptions {
+  /** Receives one message per ignored legacy key. Default: silent. */
+  onWarning?: (message: string) => void;
+}
+
+export function parseConfig(
+  raw: unknown,
+  env: NodeJS.ProcessEnv = process.env,
+  opts: ParseOptions = {},
+): Config {
+  const interpolated = interpolateEnv(stripLegacy(raw, opts.onWarning ?? (() => undefined)), env);
   const result = configSchema.safeParse(interpolated);
   if (!result.success) {
     const issues = result.error.issues
@@ -300,7 +342,11 @@ function validateReferences(config: Config): Config {
   return config;
 }
 
-export function loadConfigFile(path: string, env: NodeJS.ProcessEnv = process.env): Config {
+export function loadConfigFile(
+  path: string,
+  env: NodeJS.ProcessEnv = process.env,
+  opts: ParseOptions = {},
+): Config {
   const abs = resolve(path);
   let text: string;
   try {
@@ -309,7 +355,7 @@ export function loadConfigFile(path: string, env: NodeJS.ProcessEnv = process.en
     throw new ConfigError(`Cannot read config file ${abs}: ${(e as Error).message}`);
   }
   const raw = abs.endsWith('.json') ? JSON.parse(text) : parseYaml(text);
-  return parseConfig(raw, env);
+  return parseConfig(raw, env, opts);
 }
 
 /** Collect secret-like values so loggers can redact them. */

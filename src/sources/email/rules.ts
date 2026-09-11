@@ -102,12 +102,13 @@ function runExtractor(pattern: string, text: string): string | undefined {
   return undefined;
 }
 
+/** Null when no rule matches: the email is from Google Play but not one this tool reports. */
 export function classifyEmail(
   email: ParsedEmail,
   ruleSets: EmailRuleSet[],
   opts: { reasonMaxLength?: number } = {},
-): Classification {
-  let type: ReviewEventType = 'UNKNOWN_NOTICE';
+): Classification | null {
+  let type: ReviewEventType | undefined;
   let matched: EmailRuleSet | undefined;
   outer: for (const set of ruleSets) {
     for (const rule of set.rules) {
@@ -118,6 +119,7 @@ export function classifyEmail(
       }
     }
   }
+  if (!type) return null;
 
   const result: Classification = { type };
   const text = `${email.subject}\n${email.body}`;

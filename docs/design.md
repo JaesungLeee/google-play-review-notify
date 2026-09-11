@@ -5,8 +5,8 @@ notifications. Read this before adding a source, notifier, or rule set.
 
 ## Goals and non-goals
 
-Goals: detect review-related events (submitted, rejected, live, policy notices) for any app in
-any Play Console account without human polling; deliver them to Slack, Discord, or any HTTP
+Goals: detect review-related events (submitted, approved, rejected, live, policy notices) for
+any app in any Play Console account without human polling; deliver them to Slack, Discord, or any HTTP
 receiver; run anywhere a scheduler exists (GitHub Actions, cron, n8n) with no server of its own;
 keep sources, state stores, and notifiers pluggable.
 
@@ -24,13 +24,14 @@ Every source normalizes its findings into a `ReviewEvent` (`src/core/types.ts`):
 
 | Field         | Meaning                                                                                  |
 | ------------- | ---------------------------------------------------------------------------------------- |
-| `id`          | Stable dedupe key: `email:<gmailMessageId>`, `api:<pkg>:<track>:<versionCode>:<TYPE>`, `store:<pkg>:<epoch>:LIVE` |
-| `type`        | `SUBMITTED`, `APPROVED`, `REJECTED`, `LIVE`, `POLICY_WARNING`, `REMOVED`, `SUSPENDED`, `UNKNOWN_NOTICE` |
+| `id`          | Stable dedupe key: `email:<gmailMessageId>`, `api:<pkg>:<track>:<versionCode>:<TYPE>`  |
+| `type`        | `PENDING_SUBMISSION`, `SUBMITTED`, `APPROVED`, `REJECTED`, `LIVE`, `POLICY_WARNING`      |
 | `packageName` | `null` when the source could not identify the app (an email without the package name)  |
 | `appName`, `track`, `versionCode`, `versionName`, `reason`, `consoleUrl` | Optional details; `reason` is length-capped |
-| `source`      | `email`, `play-api`, `store-listing`, `manual`                                           |
-| `confidence`  | `high` (email), `medium` (API diff, store listing), `low` (opt-in inference)             |
+| `source`      | `email`, `play-api`, `manual`                                                            |
+| `confidence`  | `high` for both adapters; kept for `emit` callers and future inference sources           |
 | `observedAt`  | ISO 8601                                                                                 |
+| `followUp`    | `true` when the event repeats an already-delivered one to add details (the rejection reason) |
 
 Rules that every source follows:
 
@@ -44,13 +45,15 @@ Rules that every source follows:
 
 ## What each signal can and cannot say
 
-Validated against real Play Console emails and Play Developer API responses (September 2026).
+| Signal                                                     | Tells you                                                                                  | Does not tell you                                   |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| Play Developer API (`applications.tracks.releases.list`)   | Each release's `releaseLifecycleState`: not sent, in review, approved (not published), not approved, published | The reason for a rejection; account-level notices |
+| Play Console email                                         | Policy warnings with a deadline; the reason text of a rejection                            | Approval of an update: Google normally sends no email for it |
 
-| Signal                       | Tells you                                                                 | Does not tell you                                                    |
-| ---------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Play Console email           | Rejection with reason; policy warnings with a deadline; removal, suspension | Approval of an update: Google normally sends no email for it        |
-| Play Developer API (`edits.tracks.list`) | A new versionCode was submitted to a track                    | Review state: a release under review is already `status: completed`  |
-| Public store listing         | A production release actually reached users (404→200, or "Updated on" changed) | Anything about non-production tracks; anything before you press Publish under managed publishing |
+The release lifecycle endpoint appeared in the API between February and May 2026 (it is absent
+from `@googleapis/androidpublisher` 35.3.0 and present in 35.4.0). The older `edits.tracks.list`
+reports a release under review as `status: completed`, which is why earlier versions of this tool
+had to infer `LIVE` from the public store page; that adapter is gone.
 
 Consequences baked into the adapters:
 
@@ -58,29 +61,44 @@ Consequences baked into the adapters:
   the body: `App Status: Rejected` / `앱 상태: 거부됨` means rejected, `Status: Further action
   required` / `상태: 추가 조치 필요` means warning.
 - Rejection emails come from `no-reply-googleplay-developer@google.com`; newsletters and terms
-  updates come from `googleplay-noreply@google.com`. Both are allowlisted; the latter mostly
-  classify as `UNKNOWN_NOTICE`, which is off by default.
-- `LIVE` is emitted by the store listing adapter, not by the API. `emitLiveWithoutConfirmation`
-  turns on a low-confidence `LIVE` from the API for apps that have no public listing.
+  updates come from `googleplay-noreply@google.com`. Both are allowlisted; emails that match no
+  rule are logged at debug level and dropped.
+- A rejection is reported twice: by the API (no reason) and by the email (with reason). The
+  pipeline recognises the repeat by `packageName:versionCode:REJECTED` and sends the email as a
+  follow-up (`followUp: true`, title suffixed "(reason added)") when the first notification had
+  no reason; see "Pipeline".
 
-### Play API decision table
+### Play API transition table
 
-| Previous state                     | Current observation                          | Result                                             |
-| ---------------------------------- | -------------------------------------------- | -------------------------------------------------- |
-| Package or track seen for the first time | anything                               | record only                                        |
-| versionCode V absent               | V appears on a configured track              | `SUBMITTED` (medium), release name as `versionName` |
-| V present                          | V disappears, no higher version              | log as rejection candidate; the email confirms     |
-| V present                          | V disappears, higher W appears               | `SUBMITTED`(W)                                     |
-| any                                | `completed` / `inProgress`                   | `LIVE` (low) only with `emitLiveWithoutConfirmation` |
+State per release, keyed by its artifacts (`releaseKey`: sorted version codes), per track. The
+event is decided by the state entered, not by the path taken:
 
-Still unverified: whether a rejected release is removed from the track, and whether managed
-publishing's "approved, pending publish" state is visible in the API.
+| Previous state                              | Current state            | Events                       |
+| ------------------------------------------- | ------------------------ | ---------------------------- |
+| Package or track seen for the first time; baseline run | anything      | record only                  |
+| anything else                               | `DRAFT`                  | none                         |
+| not `NOT_SENT_FOR_REVIEW`                   | `NOT_SENT_FOR_REVIEW`    | `PENDING_SUBMISSION`         |
+| not `IN_REVIEW`                             | `IN_REVIEW`              | `SUBMITTED`                  |
+| not `APPROVED_NOT_PUBLISHED`                | `APPROVED_NOT_PUBLISHED` | `APPROVED`                   |
+| not `NOT_APPROVED`                          | `NOT_APPROVED`           | `REJECTED`                   |
+| unseen release, or `APPROVED_NOT_PUBLISHED` | `PUBLISHED`              | `LIVE`                       |
+| any other state                             | `PUBLISHED`              | `APPROVED` then `LIVE`       |
+| any                                         | no longer listed         | dropped from state, no event |
+
+Version code in the id is the highest artifact of the release; `versionName` is the release name.
+State written by 0.4 and earlier (`versions` per track) is treated as unseen, so an upgrade baselines silently.
+
+Confirmed on a real account (2026-09-11): "View app information (read-only)" is enough for the
+endpoint, and a release under review is reported as `IN_REVIEW` while `edits.tracks.list` shows
+the same release as `status: completed`. Still being confirmed: whether a rejected release stays
+listed as `NOT_APPROVED` or disappears, and whether a halted staged rollout is distinguishable
+from `PUBLISHED` (the docs say it is not).
 
 ### Email rule sets
 
 `rules/email/<locale>.json`, evaluated top to bottom across all bundled sets (English first); the
-first subject or body match wins, and an allowlisted sender with no match becomes
-`UNKNOWN_NOTICE`. Extractors are `regex:<pattern>` (first capture group) or
+first subject or body match wins, and an allowlisted sender with no match is ignored (logged at
+debug level). Extractors are `regex:<pattern>` (first capture group) or
 `section:<Heading|Alt>` (text after a heading line until a blank line). Rule sets are data, so
 new email wording ships as a patch release without code changes. See
 [CONTRIBUTING.md](../CONTRIBUTING.md) for adding a locale.
@@ -89,8 +107,8 @@ new email wording ships as a patch release without code changes. See
 
 ```
 ┌────────────┐  ┌─────────────┐  ┌───────────────┐
-│ Email      │  │ Play API    │  │ Store listing │   SourceAdapter[]
-│ (Gmail)    │  │ (tracks)    │  │ (public page) │
+│ Play API   │  │ Email       │  │ Manual        │   SourceAdapter[]
+│ (releases) │  │ (Gmail)     │  │ (emit)        │
 └─────┬──────┘  └──────┬──────┘  └──────┬────────┘
       └────────────────┼────────────────┘
                        ▼
@@ -117,7 +135,11 @@ Both entry points (CLI `run`, GitHub Action) call the same `runOnce()` in `src/c
 
 1. Poll every enabled source; one failure never blocks the others.
 2. Drop events already in state; apply `mergeInto` (for example `LIVE` → `APPROVED`); drop
-   disabled types.
+   disabled types. Then match the logical key `packageName:versionCode:type` against the ledger
+   and the run: a repeat from another source (or of a merged type) is suppressed, unless it adds
+   a reason the delivered event lacked and `reasonFollowUp` is on, in which case it is delivered
+   as a follow-up. Two reports in one run collapse into one event carrying both sets of details.
+   Repeats from the same source keep their own ids and are delivered.
 3. Baseline run: record everything as suppressed and stop.
 4. Otherwise record each event as pending, deliver to its channels, record the outcome. Failed
    deliveries are retried on later runs up to `maxRetries`.
@@ -136,11 +158,11 @@ One JSON document, `schemaVersion: 1`, per-source opaque sections plus the event
   "updatedAt": "2026-09-08T06:49:24.527Z",
   "sources": {
     "email": { "watermark": "2026-08-29T06:49:24.527Z", "processedMessageIds": ["18f3..."] },
-    "play-api": { "packages": { "com.example.app": { "tracks": { "production": { "versions": { "3": "1.0.0" } } }, "failures": 0 } } },
-    "store-listing": { "packages": { "com.example.app": { "published": false, "failures": 0 } } }
+    "play-api": { "packages": { "com.example.app": { "tracks": { "production": { "releases": { "4": { "state": "IN_REVIEW", "versionCodes": ["4"], "name": "1.1.0" } } } }, "failures": 0 } } }
   },
   "events": {
-    "email:18f3...": { "type": "REJECTED", "packageName": "com.example.app", "at": "...", "delivered": true, "attempts": 1 }
+    "api:com.example.app:production:4:REJECTED": { "type": "REJECTED", "packageName": "com.example.app", "versionCode": "4", "at": "...", "delivered": true, "attempts": 1, "hasReason": true },
+    "email:18f3...": { "type": "REJECTED", "packageName": "com.example.app", "versionCode": "4", "at": "...", "delivered": true, "attempts": 1, "hasReason": true }
   }
 }
 ```
@@ -153,7 +175,8 @@ newest is restored with a prefix match; entries expire after 7 days without acce
 ## Notifiers
 
 - **Slack**: Incoming Webhook, Block Kit. **Discord**: webhook embed. Both use per-event colors
-  (rejected red, warning orange, live green, removed/suspended dark red) and optional mentions.
+  (rejected red, warning orange, approved/live green, pending/submitted grey) and optional
+  mentions.
 - **Webhook**: JSON payload for n8n, Make, Zapier, or your own server.
 
 ```json

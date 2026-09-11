@@ -29,8 +29,8 @@ when you change anything under `src/` or `rules/`.
 
 ## Reporting an unrecognized Play email
 
-1. Enable `UNKNOWN_NOTICE` in your config so the email surfaces as an event, or find it in Gmail
-   with `from:google.com "Google Play"`.
+1. Run with `--verbose`: emails from Google Play that match no rule are logged with their
+   subject. Or find it in Gmail with `from:google.com "Google Play"`.
 2. Open the email in Gmail → ⋮ → **Show original** → **Download original** to get the `.eml`.
 3. Mask before sharing: replace the developer name, app names, package names, URLs to your
    servers, and the recipient address with placeholders such as `Sample Team`, `Sample App`,
@@ -101,7 +101,7 @@ and `test/core/schema.test.ts` fail when the file is stale.
 ## Pull requests
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) in the title
-  (`feat(email): ...`, `fix(store-listing): ...`, `docs: ...`). Changelog entries are derived
+  (`feat(email): ...`, `fix(play-api): ...`, `docs: ...`). Changelog entries are derived
   from them.
 - Keep the PR focused; documentation updates that describe the change belong in the same PR.
 - Do not edit `CHANGELOG.md` or bump the version: both are generated from the commit titles

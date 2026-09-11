@@ -6,10 +6,8 @@
 import { existsSync, mkdirSync, accessSync, constants } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import type { Config } from '../core/config';
-import { fetchWithRetry, HttpError } from '../core/http';
 import { buildQuery, createGmailClient, type GmailClient } from '../sources/email/gmail';
 import { createPlayApiClient, type PlayApiClient } from '../sources/play-api/client';
-import { parseStoreListing, storeListingUrl } from '../sources/store-listing';
 import { messages, type Lang, type Messages } from './i18n';
 
 export type CheckStatus = 'ok' | 'warn' | 'fail' | 'skip';
@@ -25,8 +23,6 @@ export interface CheckResult {
 }
 
 export interface DoctorOptions {
-  version?: string;
-  fetchImpl?: typeof fetch;
   /** Injected for tests. */
   gmailClient?: (auth: NonNullable<Config['sources']['email']['auth']>) => GmailClient;
   playClient?: (serviceAccount: string) => PlayApiClient;
@@ -52,7 +48,6 @@ export async function runDoctor(config: Config, opts: DoctorOptions = {}): Promi
   out.push(...checkConfig(config, t));
   out.push(...(await checkGmail(config, opts, now, t)));
   out.push(...(await checkPlayApi(config, opts, t)));
-  out.push(...(await checkStoreListing(config, opts, t)));
   out.push(...checkChannels(config, t));
   out.push(...(await checkStateStore(config, env, t)));
   return out;
@@ -79,28 +74,26 @@ function checkConfig(config: Config, { m, docs }: Texts): CheckResult[] {
     message: m.apps(config.apps.length, apps),
   });
 
-  const enabled = (['email', 'playApi', 'storeListing'] as const).filter(
-    (s) => config.sources[s].enabled,
-  );
+  const enabled = (['email', 'playApi'] as const).filter((s) => config.sources[s].enabled);
   results.push(
     enabled.length
       ? { id: 'config.sources', status: 'ok', message: m.sourcesEnabled(enabled.join(', ')) }
       : { id: 'config.sources', status: 'fail', message: m.noSource, hint: m.noSourceHint },
   );
+  if (!config.sources.playApi.enabled) {
+    results.push({
+      id: 'config.releases',
+      status: 'warn',
+      message: m.playOff,
+      hint: m.playOffHint(docs.playApiSetup),
+    });
+  }
   if (!config.sources.email.enabled) {
     results.push({
       id: 'config.rejections',
       status: 'warn',
       message: m.emailOff,
       hint: m.emailOffHint(docs.gmailOauth),
-    });
-  }
-  if (!config.sources.storeListing.enabled) {
-    results.push({
-      id: 'config.live',
-      status: 'warn',
-      message: m.storeOff,
-      hint: m.storeOffHint,
     });
   }
 
@@ -232,27 +225,36 @@ async function checkPlayApi(config: Config, opts: DoctorOptions, t: Texts): Prom
   }
   const results: CheckResult[] = [];
   for (const app of config.apps) {
-    try {
-      const tracks = await client.listTracks(app.packageName);
-      const wanted = tracks.filter((x) => app.tracks.includes(x.track));
-      const summary = wanted
-        .map((x) => `${x.track}=[${x.releases.flatMap((r) => r.versionCodes).join(',') || '-'}]`)
-        .join(' ');
-      const missingTracks = app.tracks.filter((x) => !tracks.some((y) => y.track === x));
-      results.push({
-        id: `play-api.${app.packageName}`,
-        status: missingTracks.length ? 'warn' : 'ok',
-        message: m.playTracks(app.packageName, summary || m.playNoTrack),
-        ...(missingTracks.length ? { hint: m.playMissingTracks(missingTracks.join(', ')) } : {}),
-      });
-    } catch (e) {
+    const parts: string[] = [];
+    const failed: string[] = [];
+    let lastError = '';
+    for (const track of app.tracks) {
+      try {
+        const releases = await client.listReleases(app.packageName, track);
+        const items = releases.map(
+          (r) => `${r.name ?? '?'}:${r.state}(${r.versionCodes.join(',') || '-'})`,
+        );
+        parts.push(`${track}=[${items.join(' ')}]`);
+      } catch (e) {
+        failed.push(track);
+        lastError = msg(e);
+      }
+    }
+    if (failed.length === app.tracks.length && app.tracks.length) {
       results.push({
         id: `play-api.${app.packageName}`,
         status: 'fail',
-        message: `${app.packageName}: ${msg(e)}`,
-        hint: playHint(msg(e), t),
+        message: `${app.packageName}: ${lastError}`,
+        hint: playHint(lastError, t),
       });
+      continue;
     }
+    results.push({
+      id: `play-api.${app.packageName}`,
+      status: failed.length ? 'warn' : 'ok',
+      message: m.playTracks(app.packageName, parts.join(' ')),
+      ...(failed.length ? { hint: `${m.playTracksFailed(failed.join(', '))} ${lastError}` } : {}),
+    });
   }
   return results;
 }
@@ -264,72 +266,6 @@ function playHint(text: string, { m, docs }: Texts): string {
   if (/404|not found/i.test(text)) return m.playHintNotFound;
   if (/invalid_grant|JWT|signature/i.test(text)) return m.playHintKey;
   return m.playHintDefault(docs.playApiSetup);
-}
-
-async function checkStoreListing(
-  config: Config,
-  opts: DoctorOptions,
-  { m }: Texts,
-): Promise<CheckResult[]> {
-  const cfg = config.sources.storeListing;
-  if (!cfg.enabled) return [{ id: 'store-listing', status: 'skip', message: m.storeDisabled }];
-  const results: CheckResult[] = [];
-  const apps = config.apps.filter((a) => a.tracks.includes('production'));
-  if (!apps.length) {
-    return [
-      {
-        id: 'store-listing',
-        status: 'warn',
-        message: m.storeNoProduction,
-        hint: m.storeNoProductionHint,
-      },
-    ];
-  }
-  for (const app of apps) {
-    const url = storeListingUrl(app.packageName, cfg.locale, cfg.country);
-    try {
-      const res = await fetchWithRetry(
-        url,
-        {
-          method: 'GET',
-          headers: { 'user-agent': `google-play-review-notify/${opts.version ?? '0.0.0'}` },
-          signal: AbortSignal.timeout(15_000),
-        },
-        { retries: 0, fetchImpl: opts.fetchImpl ?? fetch },
-      );
-      const info = parseStoreListing(await res.text());
-      results.push(
-        info.updatedAt !== undefined
-          ? {
-              id: `store-listing.${app.packageName}`,
-              status: 'ok',
-              message: m.storeListed(app.packageName, info.updatedText ?? info.updatedAt),
-            }
-          : {
-              id: `store-listing.${app.packageName}`,
-              status: 'fail',
-              message: m.storeNoDate(app.packageName),
-              hint: m.storeNoDateHint,
-            },
-      );
-    } catch (e) {
-      if (e instanceof HttpError && e.status === 404) {
-        results.push({
-          id: `store-listing.${app.packageName}`,
-          status: 'ok',
-          message: m.storeNotPublished(app.packageName),
-        });
-      } else {
-        results.push({
-          id: `store-listing.${app.packageName}`,
-          status: 'fail',
-          message: m.storeFetchFailed(app.packageName, msg(e)),
-          hint: m.storeFetchFailedHint,
-        });
-      }
-    }
-  }
-  return results;
 }
 
 function checkChannels(config: Config, { m }: Texts): CheckResult[] {

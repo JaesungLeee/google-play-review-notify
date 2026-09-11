@@ -189,3 +189,64 @@ describe('runOnce', () => {
     expect((await store.load())?.events['email:msg-2']).toBeUndefined();
   });
 });
+
+describe('runOnce: same fact from two sources', () => {
+  const apiRejected = (id = 'api:com.example.app:production:1204:REJECTED') =>
+    makeEvent({ id, source: 'play-api', reason: undefined, versionName: undefined });
+  const emailRejected = (id = 'email:msg-9') => makeEvent({ id, reason: 'Deceptive Behavior' });
+
+  it('sends the API rejection, then a follow-up when the email brings the reason', async () => {
+    const { slack, run, store } = await setup([]);
+    await run(); // baseline
+    await run([apiRejected()]);
+    expect(slack.sent).toHaveLength(1);
+    expect(slack.sent[0]?.message.body).not.toContain('Reason:');
+
+    const s = await run([emailRejected()]);
+    expect(s.events.map((e) => [e.id, e.followUp])).toEqual([['email:msg-9', true]]);
+    expect(slack.sent).toHaveLength(2);
+    expect(slack.sent[1]?.message.title).toContain('(reason added)');
+    expect(slack.sent[1]?.message.body).toContain('Reason: Deceptive Behavior');
+    expect(
+      (await store.load())?.events['api:com.example.app:production:1204:REJECTED']?.hasReason,
+    ).toBe(true);
+
+    // Another email about the same version is a same-source repeat (a resubmission rejected
+    // again, for example) and keeps its own id: it is delivered, not merged.
+    const again = await run([emailRejected('email:msg-10')]);
+    expect(again.events.map((e) => e.followUp)).toEqual([undefined]);
+    expect(slack.sent).toHaveLength(3);
+  });
+
+  it('suppresses the API rejection when the email with the reason was already sent', async () => {
+    const { slack, run } = await setup([]);
+    await run();
+    await run([emailRejected()]);
+    const s = await run([apiRejected()]);
+    expect(s.events).toHaveLength(0);
+    expect(slack.sent).toHaveLength(1);
+  });
+
+  it('merges both into one notification when they arrive in the same run', async () => {
+    const { slack, run } = await setup([]);
+    await run();
+    const s = await run([apiRejected(), emailRejected()]);
+    expect(s.events).toHaveLength(1);
+    expect(s.events[0]?.id).toBe('api:com.example.app:production:1204:REJECTED');
+    expect(s.events[0]?.reason).toBe('Deceptive Behavior');
+    expect(s.events[0]?.versionName).toBe('3.4.2');
+    expect(slack.sent).toHaveLength(1);
+    expect(slack.sent[0]?.message.body).toContain('Reason: Deceptive Behavior');
+  });
+
+  it('honours reasonFollowUp: false', async () => {
+    const { slack, run } = await setup([], {
+      events: { REJECTED: { enabled: true, reasonFollowUp: false } },
+    });
+    await run();
+    await run([apiRejected()]);
+    const s = await run([emailRejected()]);
+    expect(s.events).toHaveLength(0);
+    expect(slack.sent).toHaveLength(1);
+  });
+});

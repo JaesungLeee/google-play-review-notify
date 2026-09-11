@@ -2,14 +2,14 @@
 
 한국어: [play-api-setup.ko.md](./play-api-setup.ko.md)
 
-The Play API source emits a `SUBMITTED` event the moment a new versionCode appears on a track.
-Authentication uses a Google Cloud **service account** JSON key; in Play Console the account only
-needs **read-only** access.
+The Play API source follows every release on the configured tracks through its review lifecycle
+(`applications.tracks.releases.list`) and emits `PENDING_SUBMISSION`, `SUBMITTED`, `APPROVED`,
+`REJECTED` and `LIVE`. Authentication uses a Google Cloud **service account** JSON key; in Play
+Console the account only needs **read-only** access.
 
-> What the Play API can **not** tell you: whether a release is in review, approved, or rejected.
-> A release under review is already reported as `status: completed` (verified in Phase 0).
-> Rejections come from the email source and going live from the store listing source. See the
-> decision table in [design.md](./design.md#play-api-decision-table).
+> What the Play API can **not** tell you: the reason for a rejection and account-level policy
+> notices. Those come from the email source. See the transition table in
+> [design.md](./design.md#play-api-transition-table).
 
 | Variable                    | Value                                  |
 | --------------------------- | -------------------------------------- |
@@ -56,7 +56,11 @@ sources:
   playApi:
     enabled: true
     serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}
-    # emitLiveWithoutConfirmation: true   # only for apps without a public listing (internal-only)
+
+events:
+  # SUBMITTED: { enabled: true }            # off by default
+  # PENDING_SUBMISSION: { enabled: true }   # off by default
+  # LIVE: { mergeInto: APPROVED }           # one message per release instead of approved + live
 ```
 
 In GitHub Actions, store the whole key file content in the `PLAY_SERVICE_ACCOUNT_JSON` secret and
@@ -65,8 +69,10 @@ pass it through the `play-service-account-json` input or the `env` block.
 Verify:
 
 ```bash
+npx play-review-notify doctor
+# ✔ play-api.com.example.app: com.example.app: production=[1.1.0:IN_REVIEW(4)]
 npx play-review-notify run --dry-run --verbose
-# [DEBUG] Source play-api produced 0 event(s)
+# [DEBUG] Play API com.example.app/production: release 1.1.0 IN_REVIEW → APPROVED_NOT_PUBLISHED
 ```
 
 To see the raw API response, use the spike script from a checkout of this repository:
@@ -77,15 +83,22 @@ PLAY_SERVICE_ACCOUNT_FILE=~/secrets/play-sa.json npm run spike:play -- com.examp
 
 ## Detection rules
 
-| Previous state              | Current observation                   | Action                                                                     |
-| --------------------------- | ------------------------------------- | -------------------------------------------------------------------------- |
-| Package seen for the first time | anything                          | record only                                                                |
-| versionCode V absent        | V appears on the track                | `SUBMITTED` (confidence medium), release name used as `versionName`        |
-| V present                   | V disappears, no higher version       | log only (rejection candidate); the rejection email produces the event     |
-| V present                   | V disappears, higher W appears        | `SUBMITTED`(W)                                                             |
-| any                         | `completed` / `inProgress`            | `LIVE` (low) only when `emitLiveWithoutConfirmation: true`                 |
+The adapter remembers the `releaseLifecycleState` of every release and emits one event per state
+entered:
 
-Event ids are `api:<package>:<track>:<versionCode>:SUBMITTED`, the same key used by
+| State entered            | Event                                                          |
+| ------------------------ | -------------------------------------------------------------- |
+| `NOT_SENT_FOR_REVIEW`    | `PENDING_SUBMISSION`                                           |
+| `IN_REVIEW`              | `SUBMITTED`                                                    |
+| `APPROVED_NOT_PUBLISHED` | `APPROVED` (managed publishing: waiting for you to press Publish) |
+| `NOT_APPROVED`           | `REJECTED` (the email adds the reason as a follow-up)          |
+| `PUBLISHED`              | `LIVE`, preceded by `APPROVED` when the approval was not observed (managed publishing off) |
+
+The first observation of a package or track only records state. A release that disappears from
+the list is forgotten without an event. The full table is in
+[design.md](./design.md#play-api-transition-table).
+
+Event ids are `api:<package>:<track>:<versionCode>:<TYPE>`, the same key used by
 `emit --type SUBMITTED`, so a CI pipeline that emits right after upload and this source never
 notify twice.
 

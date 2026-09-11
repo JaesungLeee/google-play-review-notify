@@ -12,24 +12,24 @@ English: [README.md](README.md)
 
 ## 왜 필요한가
 
-Google Play는 심사 결과를 Play Console 화면과 개발자 계정 메일함, 딱 두 곳에만 알려줍니다. Webhook은 없고, Publishing API에는 "심사 중 / 승인 / 거절" 상태가 없습니다. 이 도구는 실제로 존재하는 신호를 감시해 정규화된 이벤트로 바꿉니다.
+Google Play에는 심사 결과 Webhook이 없습니다. 대신 Play Developer API가 릴리스별 심사 상태(`applications.tracks.releases.list`의 `releaseLifecycleState`)를 알려주고, API에 없는 정책 경고와 거부 사유는 개발자 메일함으로 옵니다. 이 도구는 둘을 주기적으로 조회해 정규화된 이벤트로 바꿉니다.
 
-| 이벤트                             | 출처                     | 방법                                                                                  |
-| ---------------------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
-| `REJECTED`                         | Gmail (Play Console 정책 메일) | 본문의 `앱 상태: 거부됨` / `App Status: Rejected` 줄로 판정, 사유 추출              |
-| `POLICY_WARNING`                   | Gmail                    | 기한이 있는 "조치 필요" 안내, 대상 API 수준 경고                                      |
-| `SUBMITTED`                        | Play Developer API       | 설정한 트랙에 새 versionCode 등장                                                     |
-| `LIVE`                             | 공개 스토어 페이지       | 404 → 200 전환(첫 출시) 또는 "업데이트 날짜" 변화                                     |
-| `REMOVED`, `SUSPENDED`, `APPROVED` | Gmail                    | 룰은 있으나 검증 전 초안. Google은 업데이트 승인 시 **메일을 보내지 않는 것이 보통**   |
-| `UNKNOWN_NOTICE`                   | Gmail                    | 룰이 분류하지 못한 Play 메일 (기본 꺼짐. 새 메일 형식을 잡으려면 켜세요)               |
+| 이벤트               | 출처               | 방법                                                                         |
+| -------------------- | ------------------ | ---------------------------------------------------------------------------- |
+| `PENDING_SUBMISSION` | Play Developer API | 릴리스는 만들었지만 아직 심사에 보내지 않음 (기본 꺼짐)                       |
+| `SUBMITTED`          | Play Developer API | 릴리스가 심사에 들어감 (기본 꺼짐)                                            |
+| `APPROVED`           | Play Developer API | 심사 통과, 게시 버튼 대기 중 (관리형 게시)                                    |
+| `REJECTED`           | Play Developer API | 심사 거부. 이후 Play Console 메일이 오면 사유를 후속 알림으로 보냄            |
+| `LIVE`               | Play Developer API | 해당 트랙 사용자에게 배포됨. production 외 트랙도 포함                        |
+| `POLICY_WARNING`     | Gmail              | 기한이 있는 "조치 필요" 안내, 대상 API 수준 경고                              |
 
 모든 이벤트는 멱등입니다. 이벤트마다 안정적인 id가 있고, 상태가 실행 사이에 유지되며, 첫 실행은 알림 없이 기준점만 기록합니다.
 
-> 감지 규칙은 실제 Play Console 메일과 Play API 응답으로 검증했습니다. 확정된 결정표와 한계(관리형 게시 포함)는 [docs/design.md](docs/design.md#what-each-signal-can-and-cannot-say)(영어)에 있습니다.
+> API 이벤트의 전이표와 메일 룰은 [docs/design.md](docs/design.md#what-each-signal-can-and-cannot-say)(영어)에 있습니다. 릴리스 생명주기 엔드포인트는 2026년 봄에 새로 생긴 것이라 실제 계정에서 확인 중인 경계 사례가 그곳에 정리돼 있습니다.
 
 ## 빠른 시작: GitHub Action
 
-1. [docs/gmail-oauth.ko.md](docs/gmail-oauth.ko.md)를 따라 Gmail 시크릿 세 개를 만듭니다(최초 1회, 약 10분). `SUBMITTED` 이벤트가 필요하면 [docs/play-api-setup.ko.md](docs/play-api-setup.ko.md)로 Play 서비스 계정도 추가합니다.
+1. [docs/play-api-setup.ko.md](docs/play-api-setup.ko.md)를 따라 읽기 전용 Play 서비스 계정을 만듭니다(약 10분). 릴리스 이벤트는 여기서 옵니다. 정책 경고와 거부 사유까지 받으려면 [docs/gmail-oauth.ko.md](docs/gmail-oauth.ko.md)로 Gmail 시크릿 세 개도 추가합니다.
 2. 저장소에 `play-review-notify.yml`을 추가합니다. `npx play-review-notify init`이 몇 가지 질문 뒤에 설정 파일과 아래 워크플로우를 만들어 주며, [examples/play-review-notify.yml](examples/play-review-notify.yml)에서 시작해도 됩니다.
 3. 워크플로우를 추가합니다.
 
@@ -139,15 +139,11 @@ sources:
   playApi:
     enabled: true
     serviceAccountJson: ${PLAY_SERVICE_ACCOUNT_JSON}
-  storeListing:
-    enabled: true
-    locale: ko
-    country: KR
 
-events: # 기본값: SUBMITTED, UNKNOWN_NOTICE만 꺼짐
-  REJECTED: { enabled: true, mentions: ['<!channel>'] }
+events: # 기본값: PENDING_SUBMISSION, SUBMITTED만 꺼짐
+  REJECTED: { enabled: true, mentions: ['<!channel>'], reasonFollowUp: true }
   SUBMITTED: { enabled: true }
-  LIVE: { enabled: true, mergeInto: APPROVED }
+  LIVE: { enabled: true, mergeInto: APPROVED } # 승인 + 출시 대신 릴리스당 메시지 하나
 
 channels:
   release-slack: { type: slack, webhookUrl: ${SLACK_WEBHOOK_URL} }
@@ -179,9 +175,9 @@ maxRetries: 3
 
 ## 신호의 실제 동작
 
-- **거절**은 항상 `no-reply-googleplay-developer@google.com`에서 메일로 옵니다. 거절과 기한부 경고의 제목이 같아서 본문으로 분류합니다.
-- **업데이트 승인**은 메일이 오지 않습니다. Play Developer API는 제출 직후부터 심사 중인 릴리즈를 `completed`로 보고합니다. 릴리즈가 사용자에게 도달했다는 유일한 증거는 공개 스토어 페이지이고, `storeListing` 소스가 그것을 감시합니다. production 트랙만 해당됩니다.
-- **관리형 게시**: 게시 버튼을 눌러야 스토어가 바뀌므로 "승인됨, 게시 대기" 시점은 어떤 소스로도 알 수 없습니다.
+- **릴리스 상태**는 `applications.tracks.releases.list`에서 옵니다. `releaseLifecycleState`는 `NOT_SENT_FOR_REVIEW → IN_REVIEW → APPROVED_NOT_PUBLISHED | NOT_APPROVED → PUBLISHED`로 움직이고, 어댑터는 릴리스마다 마지막 상태를 기억해 새 상태에 들어갈 때마다 이벤트를 하나씩 냅니다. 폴링 간격 사이에 전이를 건너뛸 수 있어서, `IN_REVIEW` 다음에 바로 `PUBLISHED`가 보이면 `APPROVED`와 `LIVE`를 함께 냅니다.
+- **관리형 게시 켜짐**: "게시 준비됨"에 도달하면 `APPROVED`, 게시 버튼을 누르면 `LIVE`. **꺼짐**: 승인 즉시 게시되므로 보통 같은 실행에서 둘이 함께 옵니다 (메시지 하나면 충분하면 `LIVE: { mergeInto: APPROVED }`).
+- **거절**은 API가 사유 없이 먼저 알립니다. 사유는 보통 몇 분 뒤 `no-reply-googleplay-developer@google.com` 메일로 오고, 같은 거절에 대한 후속 알림으로 전송됩니다 (`reasonFollowUp: false`로 끌 수 있음). 거절과 기한부 경고의 제목이 같아서 본문으로 분류합니다.
 - **메일 언어**는 Play Console 언어 설정을 따릅니다. 영어·한국어 룰셋이 내장돼 있고 다른 언어 기여를 환영합니다.
 
 ## 문서
@@ -194,15 +190,14 @@ maxRetries: 3
 
 ## 기여
 
-버그 제보, 새 메일 형식 제보, 다른 언어 룰셋이 가장 가치 있는 기여입니다. 분류되지 않은 Play 메일이 있으면 `UNKNOWN_NOTICE`를 켜서 확인한 뒤 마스킹한 제목·본문으로 "Unrecognized Play email" 이슈를 열어주세요. 개발 환경과 룰셋 테스트 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)에 있습니다.
+버그 제보, 새 메일 형식 제보, 다른 언어 룰셋이 가장 가치 있는 기여입니다. 분류되지 않은 Play 메일이 있으면 `--verbose`로 실행해 확인한 뒤(매치되지 않은 메일은 제목과 함께 로그에 남습니다) 마스킹한 제목·본문으로 "Unrecognized Play email" 이슈를 열어주세요. 개발 환경과 룰셋 테스트 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)에 있습니다.
 
 보안 문제는 [SECURITY.md](SECURITY.md)를 따라 비공개로 알려주세요.
 
 ## 개인정보와 권한
 
 - Gmail은 읽기 전용 스코프 `gmail.readonly`만 사용합니다. 메일은 저장하지 않으며, 상태 파일에는 메시지 id와 시각만, 알림에는 추출된 필드(앱, 버전, `reasonMaxLength`로 제한된 사유)만 들어갑니다.
-- Play 서비스 계정은 "앱 정보 보기(읽기 전용)" 권한만 필요합니다. 트랙 조회용 edit은 항상 폐기됩니다.
-- 스토어 리스팅 소스는 앱당 실행마다 인증 없는 요청 1회를 명시적 User-Agent로 보냅니다.
+- Play 서비스 계정은 "앱 정보 보기(읽기 전용)" 권한만 필요합니다. `applications.tracks.releases.list`만 호출하며 edit은 열지 않습니다.
 - 설정에서 참조한 시크릿은 로그에서 마스킹됩니다.
 
 ## 개발
