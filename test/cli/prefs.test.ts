@@ -51,7 +51,6 @@ describe('readPrefs / writePrefs', () => {
   });
 
   it('keeps unknown keys and removes a key set to undefined', () => {
-    writeFileSync(path.replace('nested/', ''), '');
     writePrefs(path, { lang: 'en' });
     const raw = JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>;
     writeFileSync(path, JSON.stringify({ ...raw, future: true }));
