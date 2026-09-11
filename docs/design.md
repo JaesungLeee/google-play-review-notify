@@ -121,7 +121,7 @@ new email wording ships as a patch release without code changes. See
              └─────────┬─────────┘      └────────────┘
                        ▼
              ┌───────────────────┐
-             │ Route + render    │  per-app / per-event channels, templates
+             │ Route + render    │  per-app / per-event channels, language, templates
              └─────────┬─────────┘
                        ▼
         ┌──────────────┼──────────────┐

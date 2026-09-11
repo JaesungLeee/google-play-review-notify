@@ -73,7 +73,7 @@ jobs:
     secrets: inherit
 ```
 
-설정 파일 없이 쓰고 싶으면 주요 항목을 Action 입력으로 줄 수 있고(`packages`, `gmail-*`, `play-service-account-json`, `slack-webhook-url`, `discord-webhook-url`, `webhook-url`, `webhook-secret`, `state-store`, `dry-run`, `emit-event`), 후속 스텝용으로 `events`, `events-count`, `has-rejection` 출력을 제공합니다. [action.yml](action.yml)을 참고하세요.
+설정 파일 없이 쓰고 싶으면 주요 항목을 Action 입력으로 줄 수 있고(`packages`, `gmail-*`, `play-service-account-json`, `slack-webhook-url`, `discord-webhook-url`, `webhook-url`, `webhook-secret`, `language`, `state-store`, `dry-run`, `emit-event`), 후속 스텝용으로 `events`, `events-count`, `has-rejection` 출력을 제공합니다. [action.yml](action.yml)을 참고하세요.
 
 GitHub 스케줄 트리거는 최소 5분 간격이며 지연될 수 있습니다. 더 빠른 알림이 필요하면 CLI를 크론으로 실행하세요.
 
@@ -156,6 +156,7 @@ channels:
     batch: false
 defaultChannels: [release-slack]
 
+language: ko # en | ko: 기본 알림 문구(제목, 본문, 필드 이름)의 언어
 templates: # 이벤트 타입별 Mustache 스타일 오버라이드
   REJECTED: |
     :x: *{{appName}}* ({{packageName}}) v{{versionName}} 거절됨.
@@ -172,7 +173,8 @@ maxRetries: 3
 
 - **채널**: `slack`(Incoming Webhook, Block Kit), `discord`(webhook embed), `webhook`(JSON 페이로드 + `X-Play-Review-Event`, `X-Play-Review-Timestamp`, `X-Play-Review-Signature: sha256=HMAC(secret, timestamp + "." + body)` 헤더. `batch: true`면 실행당 배열 1회 전송). 페이로드 형식은 [schemas/webhook-payload.schema.json](schemas/webhook-payload.schema.json)에, 바로 가져올 수 있는 n8n 워크플로우는 [examples/n8n](examples/n8n/README.md)에 있습니다.
 - **상태 저장소**: `file`(CLI 기본), `github-cache`(Action 기본. 7일간 접근 없으면 만료되므로 그보다 짧은 주기면 문제없음), `none`(lookback 창만 사용), `custom`(`StateStore`를 export하는 로컬 모듈).
-- **템플릿**에는 이벤트의 모든 필드와 설정의 `app.*`를 쓸 수 있습니다.
+- **언어**: `language: ko`로 두면 모든 알림의 기본 제목·본문·필드 이름이 한국어로 나갑니다(기본값 `en`). 알림은 팀 채널로 가므로 CLI 언어와는 별개인 프로젝트 설정입니다. 거절 사유는 Play Console 메일 원문을 인용하므로 콘솔 언어를 따릅니다.
+- **템플릿**에는 이벤트의 모든 필드와 설정의 `app.*`를 쓸 수 있고, 언어 설정과 관계없이 쓴 그대로 사용됩니다.
 
 ## 신호의 실제 동작
 

@@ -37,6 +37,9 @@ inputs:
   webhook-secret:
     description: 'HMAC-SHA256 secret used to sign generic webhook payloads.'
     required: false
+  language:
+    description: "Language of the built-in notification text: en | ko. Defaults to the config file's language, else en."
+    required: false
   state-store:
     description: 'github-cache | file | none. Defaults to github-cache unless the config file sets stateStore.'
     required: false

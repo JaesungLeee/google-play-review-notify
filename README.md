@@ -88,7 +88,7 @@ jobs:
 
 The Action also accepts the main settings as inputs when you do not want a config file
 (`packages`, `gmail-*`, `play-service-account-json`, `slack-webhook-url`, `discord-webhook-url`,
-`webhook-url`, `webhook-secret`, `state-store`, `dry-run`, `emit-event`) and exposes `events`,
+`webhook-url`, `webhook-secret`, `language`, `state-store`, `dry-run`, `emit-event`) and exposes `events`,
 `events-count`, and `has-rejection` as outputs for later steps. See [action.yml](action.yml).
 
 GitHub's schedule trigger runs at most every 5 minutes and may be delayed. If you need faster
@@ -185,6 +185,7 @@ channels:
     batch: false
 defaultChannels: [release-slack]
 
+language: en # en | ko: language of the built-in notification text (titles, body, field labels)
 templates: # Mustache-style overrides per event type
   REJECTED: |
     :x: *{{appName}}* ({{packageName}}) v{{versionName}} was rejected.
@@ -208,7 +209,12 @@ maxRetries: 3
 - **State stores**: `file` (CLI default), `github-cache` (Action default; entries expire after 7
   days without access, which is fine for any schedule shorter than that), `none` (lookback window
   only), `custom` (a local module exporting a `StateStore`).
-- **Templates** receive every event field plus `app.*` from the config.
+- **Language**: `language: ko` switches the built-in titles, body, and field labels of every
+  notification to Korean (default `en`). It is a project setting, separate from the CLI's own
+  language, because notifications go to a shared channel. Rejection reasons are quoted from the
+  Play Console email and follow the console's language.
+- **Templates** receive every event field plus `app.*` from the config and are used as-is in any
+  language.
 
 ## How the signals work, honestly
 

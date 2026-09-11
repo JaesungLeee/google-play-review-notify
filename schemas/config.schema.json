@@ -401,6 +401,12 @@
       "default": [],
       "description": "Channels used by apps that do not list their own."
     },
+    "language": {
+      "type": "string",
+      "enum": ["en", "ko"],
+      "default": "en",
+      "description": "Language of the built-in notification text: titles, body, and field labels. Templates you write are used as-is."
+    },
     "templates": {
       "type": "object",
       "additionalProperties": false,
