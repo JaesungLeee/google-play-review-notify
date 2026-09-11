@@ -88,10 +88,11 @@ event is decided by the state entered, not by the path taken:
 Version code in the id is the highest artifact of the release; `versionName` is the release name.
 State written by 0.3 (`versions` per track) is treated as unseen, so an upgrade baselines silently.
 
-Still being confirmed on real accounts (the endpoint is new): whether a rejected release stays
-listed as `NOT_APPROVED` or disappears, whether "View app information (read-only)" is enough for
-the endpoint, and whether a halted staged rollout is distinguishable from `PUBLISHED` (the docs
-say it is not).
+Confirmed on a real account (2026-09-11): "View app information (read-only)" is enough for the
+endpoint, and a release under review is reported as `IN_REVIEW` while `edits.tracks.list` shows
+the same release as `status: completed`. Still being confirmed: whether a rejected release stays
+listed as `NOT_APPROVED` or disappears, and whether a halted staged rollout is distinguishable
+from `PUBLISHED` (the docs say it is not).
 
 ### Email rule sets
 
