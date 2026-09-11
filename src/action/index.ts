@@ -88,6 +88,9 @@ export function buildConfigInput(): ConfigInput {
   if (added.length && !(cfg.defaultChannels && cfg.defaultChannels.length))
     cfg.defaultChannels = added;
 
+  const language = input('language');
+  if (language) cfg.language = language as ConfigInput['language'];
+
   const store = input('state-store') ?? (cfg.stateStore ? undefined : 'github-cache');
   if (store === 'github-cache') cfg.stateStore = { type: 'github-cache' };
   else if (store === 'file') cfg.stateStore = { type: 'file' };

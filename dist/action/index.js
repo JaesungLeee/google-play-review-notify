@@ -109328,6 +109328,7 @@ var STATE_SCHEMA_VERSION = 1;
 
 // src/core/config.ts
 var eventTypeSchema = external_exports.enum(REVIEW_EVENT_TYPES);
+var NOTIFICATION_LANGUAGES = ["en", "ko"];
 var appConfigSchema = external_exports.object({
   packageName: external_exports.string().min(1).describe("Android application id, e.g. com.example.app."),
   name: external_exports.string().optional().describe(
@@ -109476,6 +109477,9 @@ var configSchema = external_exports.object({
   }),
   channels: external_exports.record(external_exports.string(), channelSchema).default({}).describe("Named notification targets referenced from apps[].channels and defaultChannels."),
   defaultChannels: external_exports.array(external_exports.string()).default([]).describe("Channels used by apps that do not list their own."),
+  language: external_exports.enum(NOTIFICATION_LANGUAGES).default("en").describe(
+    "Language of the built-in notification text: titles, body, and field labels. Templates you write are used as-is."
+  ),
   templates: external_exports.record(eventTypeSchema, external_exports.string()).default({}).describe("Mustache-style message overrides per event type ({{appName}}, {{reason}}, ...)."),
   stateStore: stateStoreSchema.default({ type: "file" }),
   includeReason: external_exports.boolean().default(true).describe("Include the extracted rejection reason in notifications."),
@@ -109628,20 +109632,44 @@ var EVENT_EMOJI = {
   REJECTED: "\u{1F6AB}",
   POLICY_WARNING: "\u26A0\uFE0F"
 };
-var DEFAULT_TITLES = {
-  PENDING_SUBMISSION: "{{emoji}} Ready to send for review \u2014 {{displayName}}",
-  SUBMITTED: "{{emoji}} Submitted for review \u2014 {{displayName}}",
-  APPROVED: "{{emoji}} Approved \u2014 {{displayName}}",
-  LIVE: "{{emoji}} Live on Google Play \u2014 {{displayName}}",
-  REJECTED: "{{emoji}} Rejected \u2014 {{displayName}}",
-  POLICY_WARNING: "{{emoji}} Policy warning \u2014 {{displayName}}"
+var NOTIFICATION_TEXT = {
+  en: {
+    titles: {
+      PENDING_SUBMISSION: "{{emoji}} Ready to send for review \u2014 {{displayName}}",
+      SUBMITTED: "{{emoji}} Submitted for review \u2014 {{displayName}}",
+      APPROVED: "{{emoji}} Approved \u2014 {{displayName}}",
+      LIVE: "{{emoji}} Live on Google Play \u2014 {{displayName}}",
+      REJECTED: "{{emoji}} Rejected \u2014 {{displayName}}",
+      POLICY_WARNING: "{{emoji}} Policy warning \u2014 {{displayName}}"
+    },
+    followUpSuffix: " (reason added)",
+    body: "{{#track}}Track: {{track}}{{/track}}{{#versionLabel}} \xB7 Version: {{versionLabel}}{{/versionLabel}}\n{{#reason}}Reason: {{reason}}\n{{/reason}}{{#consoleUrl}}Open in Play Console \u2192 {{consoleUrl}}\n{{/consoleUrl}}Source: {{source}} \xB7 {{observedAt}}",
+    fields: { package: "Package", track: "Track", version: "Version", source: "Source" },
+    unknownApp: "Unknown app"
+  },
+  ko: {
+    titles: {
+      PENDING_SUBMISSION: "{{emoji}} \uAC80\uD1A0 \uC81C\uCD9C \uC900\uBE44\uB428 \u2014 {{displayName}}",
+      SUBMITTED: "{{emoji}} \uAC80\uD1A0 \uC81C\uCD9C\uB428 \u2014 {{displayName}}",
+      APPROVED: "{{emoji}} \uC2B9\uC778\uB428 \u2014 {{displayName}}",
+      LIVE: "{{emoji}} Google Play \uAC8C\uC2DC\uB428 \u2014 {{displayName}}",
+      REJECTED: "{{emoji}} \uAC70\uC808\uB428 \u2014 {{displayName}}",
+      POLICY_WARNING: "{{emoji}} \uC815\uCC45 \uACBD\uACE0 \u2014 {{displayName}}"
+    },
+    followUpSuffix: " (\uC0AC\uC720 \uCD94\uAC00\uB428)",
+    body: "{{#track}}\uD2B8\uB799: {{track}}{{/track}}{{#versionLabel}} \xB7 \uBC84\uC804: {{versionLabel}}{{/versionLabel}}\n{{#reason}}\uC0AC\uC720: {{reason}}\n{{/reason}}{{#consoleUrl}}Play Console\uC5D0\uC11C \uC5F4\uAE30 \u2192 {{consoleUrl}}\n{{/consoleUrl}}\uCD9C\uCC98: {{source}} \xB7 {{observedAt}}",
+    fields: { package: "\uD328\uD0A4\uC9C0", track: "\uD2B8\uB799", version: "\uBC84\uC804", source: "\uCD9C\uCC98" },
+    unknownApp: "\uC54C \uC218 \uC5C6\uB294 \uC571"
+  }
 };
-var FOLLOW_UP_SUFFIX = " (reason added)";
-var DEFAULT_BODY = "{{#track}}Track: {{track}}{{/track}}{{#versionLabel}} \xB7 Version: {{versionLabel}}{{/versionLabel}}\n{{#reason}}Reason: {{reason}}\n{{/reason}}{{#consoleUrl}}Open in Play Console \u2192 {{consoleUrl}}\n{{/consoleUrl}}Source: {{source}} \xB7 {{observedAt}}";
+var DEFAULT_TITLES = NOTIFICATION_TEXT.en.titles;
+var FOLLOW_UP_SUFFIX = NOTIFICATION_TEXT.en.followUpSuffix;
+var DEFAULT_BODY = NOTIFICATION_TEXT.en.body;
 function buildContext(config, event, app) {
   const appName = event.appName ?? app?.name;
   const pkg = event.packageName ?? void 0;
-  const displayName = appName && pkg ? `${appName} (${pkg})` : appName ?? pkg ?? "Unknown app";
+  const text = NOTIFICATION_TEXT[config.language];
+  const displayName = appName && pkg ? `${appName} (${pkg})` : appName ?? pkg ?? text.unknownApp;
   const versionLabel = event.versionName && event.versionCode ? `${event.versionName} (${event.versionCode})` : event.versionName ?? event.versionCode ?? "";
   const { raw: _raw, ...safeEvent } = event;
   const ctx = {
@@ -109656,14 +109684,15 @@ function buildContext(config, event, app) {
 }
 function renderMessage(config, event, app) {
   const ctx = buildContext(config, event, app);
+  const text = NOTIFICATION_TEXT[config.language];
   const override = config.templates[event.type];
-  const title = renderTemplate(DEFAULT_TITLES[event.type], ctx) + (event.followUp ? FOLLOW_UP_SUFFIX : "");
-  const body2 = renderTemplate(override ?? DEFAULT_BODY, ctx).trim();
+  const title = renderTemplate(text.titles[event.type], ctx) + (event.followUp ? text.followUpSuffix : "");
+  const body2 = renderTemplate(override ?? text.body, ctx).trim();
   const fields = [];
-  if (event.packageName) fields.push({ label: "Package", value: event.packageName });
-  if (event.track) fields.push({ label: "Track", value: event.track });
-  if (ctx.versionLabel) fields.push({ label: "Version", value: ctx.versionLabel });
-  fields.push({ label: "Source", value: `${event.source} (${event.confidence})` });
+  if (event.packageName) fields.push({ label: text.fields.package, value: event.packageName });
+  if (event.track) fields.push({ label: text.fields.track, value: event.track });
+  if (ctx.versionLabel) fields.push({ label: text.fields.version, value: ctx.versionLabel });
+  fields.push({ label: text.fields.source, value: `${event.source} (${event.confidence})` });
   const rendered = {
     event,
     title,
@@ -110776,6 +110805,8 @@ function buildConfigInput() {
   }
   if (added.length && !(cfg.defaultChannels && cfg.defaultChannels.length))
     cfg.defaultChannels = added;
+  const language = input("language");
+  if (language) cfg.language = language;
   const store = input("state-store") ?? (cfg.stateStore ? void 0 : "github-cache");
   if (store === "github-cache") cfg.stateStore = { type: "github-cache" };
   else if (store === "file") cfg.stateStore = { type: "file" };

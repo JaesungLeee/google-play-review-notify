@@ -10,6 +10,10 @@ import { LEGACY_EVENT_TYPES, REVIEW_EVENT_TYPES } from './types';
 
 const eventTypeSchema = z.enum(REVIEW_EVENT_TYPES);
 
+/** Languages the built-in notification text ships in. Independent of the CLI language. */
+export const NOTIFICATION_LANGUAGES = ['en', 'ko'] as const;
+export type NotificationLanguage = (typeof NOTIFICATION_LANGUAGES)[number];
+
 export const appConfigSchema = z
   .object({
     packageName: z.string().min(1).describe('Android application id, e.g. com.example.app.'),
@@ -262,6 +266,13 @@ export const configSchema = z.object({
     .array(z.string())
     .default([])
     .describe('Channels used by apps that do not list their own.'),
+  language: z
+    .enum(NOTIFICATION_LANGUAGES)
+    .default('en')
+    .describe(
+      'Language of the built-in notification text: titles, body, and field labels. ' +
+        'Templates you write are used as-is.',
+    ),
   templates: z
     .record(eventTypeSchema, z.string())
     .default({})

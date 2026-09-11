@@ -43,6 +43,8 @@ channels:
   #   secret: ${N8N_WEBHOOK_SECRET}
 defaultChannels: [release-slack]
 
+# language: ko # en | ko: language of the built-in notification text
+
 stateStore:
   type: file
   path: .play-review-notify/state.json
