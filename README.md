@@ -122,15 +122,20 @@ Schedule Trigger; state lives in `.play-review-notify/state.json` by default.
 | `test-notify`         | Send a sample event to the configured channels                     |
 | `emit`                | Emit an event from a pipeline, e.g. `SUBMITTED` right after upload |
 | `state show \| reset` | Inspect or clear the persisted state                               |
+| `lang [en\|ko]`       | Show or save the output language used by every command             |
 
 Exit codes: `0` ok, `1` configuration or auth error, `2` a source failed (notifications still
 sent), `3` a notification failed. `--json` switches to structured output.
 
-**Language.** In a terminal the CLI first asks whether to continue in English or Korean (Enter
-picks the system locale's language). Skip the question with `--lang en|ko` or
-`PLAY_REVIEW_NOTIFY_LANG=ko`; outside a terminal, with `--json`, or with `--version` there is no
-question and the output is English. Generated files, JSON output, and core log lines stay English
-in every language.
+**Language.** The first time you run the CLI in a terminal it asks whether to continue in English
+or Korean (Enter picks the system locale's language) and saves the answer in
+`~/.config/play-review-notify/preferences.json` (`$XDG_CONFIG_HOME` or `%APPDATA%` when set), so
+every later command, including cron jobs run as the same user, uses that language without asking.
+`play-review-notify lang` shows the language in effect and where it came from, `lang en|ko` saves a
+new one, and `lang --reset` forgets it. `--lang en|ko` overrides a single run and
+`PLAY_REVIEW_NOTIFY_LANG` overrides the saved language for scripts. Without a saved language there
+is no question outside a terminal, with `--json`, or with `--version`, and the output is English.
+Generated files, JSON output, and core log lines stay English in every language.
 
 ## Configuration
 

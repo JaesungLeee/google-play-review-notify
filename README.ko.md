@@ -104,10 +104,11 @@ play-review-notify run                             # 첫 실행은 기준점 기
 | `test-notify`         | 설정된 채널로 샘플 이벤트 전송                                  |
 | `emit`                | 파이프라인에서 이벤트 직접 발행 (예: 업로드 직후 `SUBMITTED`)   |
 | `state show \| reset` | 저장된 상태 확인·초기화                                         |
+| `lang [en\|ko]`       | 모든 명령에 적용되는 출력 언어 확인·저장                          |
 
 종료 코드: `0` 성공, `1` 설정·인증 오류, `2` 소스 실패(알림은 전송됨), `3` 알림 전송 실패. `--json`으로 구조화 출력.
 
-**언어.** 터미널에서 실행하면 CLI가 먼저 영어/한국어 중 무엇으로 진행할지 묻습니다(Enter를 누르면 시스템 로케일의 언어). `--lang en|ko` 또는 `PLAY_REVIEW_NOTIFY_LANG=ko`로 질문을 건너뛸 수 있고, 터미널 밖(cron, CI)이나 `--json`, `--version`에서는 묻지 않고 영어로 출력합니다. 생성되는 파일, JSON 출력, 코어 로그는 언어와 관계없이 영어입니다.
+**언어.** 터미널에서 처음 실행하면 CLI가 영어/한국어 중 무엇으로 진행할지 묻고(Enter를 누르면 시스템 로케일의 언어) 답을 `~/.config/play-review-notify/preferences.json`(`$XDG_CONFIG_HOME` 또는 `%APPDATA%`가 있으면 그 아래)에 저장합니다. 이후에는 같은 사용자로 실행하는 cron을 포함해 모든 명령이 묻지 않고 그 언어를 씁니다. `play-review-notify lang`은 현재 언어와 출처를 보여주고, `lang en|ko`는 새 언어를 저장하며, `lang --reset`은 저장된 언어를 지웁니다. `--lang en|ko`는 한 번의 실행에만 적용되고, `PLAY_REVIEW_NOTIFY_LANG`은 스크립트에서 저장된 언어보다 우선합니다. 저장된 언어가 없으면 터미널 밖(cron, CI)이나 `--json`, `--version`에서는 묻지 않고 영어로 출력합니다. 생성되는 파일, JSON 출력, 코어 로그는 언어와 관계없이 영어입니다.
 
 ## 설정
 
